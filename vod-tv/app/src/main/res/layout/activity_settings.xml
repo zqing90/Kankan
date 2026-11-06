@@ -4,8 +4,8 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@color/bg"
-    android:paddingLeft="48dp"
-    android:paddingRight="48dp"
+    android:paddingLeft="@dimen/topbar_pad_h"
+    android:paddingRight="@dimen/topbar_pad_h"
     android:paddingTop="28dp">
 
     <!-- 顶栏：返回固定左上（曾经放在右上，与其他页面不一致） -->

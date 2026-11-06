@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:paddingLeft="48dp"
+        android:paddingLeft="@dimen/topbar_pad_h"
         android:paddingTop="18dp">
 
         <include
@@ -25,8 +25,8 @@
         android:layout_height="0dp"
         android:layout_weight="46"
         android:orientation="horizontal"
-        android:paddingLeft="44dp"
-        android:paddingRight="44dp"
+        android:paddingLeft="@dimen/content_pad_h"
+        android:paddingRight="@dimen/content_pad_h"
         android:paddingTop="10dp"
         android:paddingBottom="10dp">
 
@@ -50,7 +50,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textColor="@color/text_primary"
-                android:textSize="26sp"
+                android:textSize="@dimen/app_title_size"
                 android:textStyle="bold"
                 android:singleLine="true"
                 android:ellipsize="end" />
@@ -124,8 +124,8 @@
         android:layout_height="0dp"
         android:layout_weight="54"
         android:orientation="vertical"
-        android:paddingLeft="44dp"
-        android:paddingRight="44dp"
+        android:paddingLeft="@dimen/content_pad_h"
+        android:paddingRight="@dimen/content_pad_h"
         android:paddingTop="14dp">
 
         <LinearLayout

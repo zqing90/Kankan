@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 电视 / 平板（宽 >= 600dp）：按 Android TV 规范留 overscan 安全区，左右 48dp -->
+<resources>
+    <dimen name="topbar_pad_h">48dp</dimen>
+    <dimen name="content_pad_h">44dp</dimen>
+    <dimen name="app_title_size">26sp</dimen>
+</resources>

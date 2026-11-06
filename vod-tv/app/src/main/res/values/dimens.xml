@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 手机 / 小屏（宽 < 600dp）：顶栏与内容边距收紧，否则 6 个分类 + 4 个图标按钮会把图标挤出屏幕 -->
+<resources>
+    <dimen name="topbar_pad_h">20dp</dimen>
+    <dimen name="content_pad_h">16dp</dimen>
+    <dimen name="app_title_size">20sp</dimen>
+</resources>

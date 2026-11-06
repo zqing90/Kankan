@@ -11,8 +11,8 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:paddingLeft="48dp"
-        android:paddingRight="48dp"
+        android:paddingLeft="@dimen/topbar_pad_h"
+        android:paddingRight="@dimen/topbar_pad_h"
         android:paddingTop="22dp"
         android:paddingBottom="4dp">
 
@@ -21,20 +21,25 @@
             android:layout_height="wrap_content"
             android:text="@string/app_name"
             android:textColor="@color/text_primary"
-            android:textSize="26sp"
+            android:textSize="@dimen/app_title_size"
             android:textStyle="bold"
             android:layout_marginRight="28dp" />
 
-        <LinearLayout
-            android:id="@+id/tabs"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal" />
-
-        <View
+        <!-- 分类 tab 放进横向滚动并吃掉剩余宽度：
+             窄屏（手机）上 6 个 tab + 4 个图标按钮会溢出，图标被挤出屏幕就点不到了 -->
+        <HorizontalScrollView
             android:layout_width="0dp"
-            android:layout_height="1dp"
-            android:layout_weight="1" />
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:scrollbars="none"
+            android:fillViewport="true">
+
+            <LinearLayout
+                android:id="@+id/tabs"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal" />
+        </HorizontalScrollView>
 
         <!-- 动作一律用图标（Material Icons），顺序固定：搜索 / 记录 / 更新 / 设置 -->
         <ImageView
@@ -71,7 +76,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/topbar"
-        android:paddingLeft="50dp"
+        android:paddingLeft="@dimen/content_pad_h"
         android:paddingTop="6dp"
         android:paddingBottom="10dp"
         android:text="@string/loading"
@@ -93,7 +98,7 @@
             android:id="@+id/history_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingLeft="50dp"
+            android:paddingLeft="@dimen/content_pad_h"
             android:paddingBottom="8dp"
             android:text="继续观看"
             android:textColor="@color/text_primary"
@@ -103,8 +108,8 @@
         <HorizontalScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingLeft="44dp"
-            android:paddingRight="44dp"
+            android:paddingLeft="@dimen/content_pad_h"
+            android:paddingRight="@dimen/content_pad_h"
             android:clipToPadding="false"
             android:scrollbars="none">
 
@@ -125,8 +130,8 @@
         android:numColumns="6"
         android:horizontalSpacing="14dp"
         android:verticalSpacing="20dp"
-        android:paddingLeft="44dp"
-        android:paddingRight="44dp"
+        android:paddingLeft="@dimen/content_pad_h"
+        android:paddingRight="@dimen/content_pad_h"
         android:paddingTop="8dp"
         android:paddingBottom="32dp"
         android:clipChildren="false"

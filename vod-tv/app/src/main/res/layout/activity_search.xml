@@ -11,8 +11,8 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:paddingLeft="48dp"
-        android:paddingRight="48dp"
+        android:paddingLeft="@dimen/topbar_pad_h"
+        android:paddingRight="@dimen/topbar_pad_h"
         android:paddingTop="20dp"
         android:paddingBottom="6dp">
 
@@ -54,8 +54,8 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/topbar"
         android:orientation="vertical"
-        android:paddingLeft="50dp"
-        android:paddingRight="48dp"
+        android:paddingLeft="@dimen/content_pad_h"
+        android:paddingRight="@dimen/topbar_pad_h"
         android:paddingTop="4dp"
         android:paddingBottom="6dp"
         android:visibility="gone">
@@ -111,8 +111,8 @@
         android:layout_below="@id/history_panel"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:paddingLeft="50dp"
-        android:paddingRight="48dp"
+        android:paddingLeft="@dimen/content_pad_h"
+        android:paddingRight="@dimen/topbar_pad_h"
         android:paddingBottom="10dp">
 
         <TextView
@@ -143,8 +143,8 @@
         android:numColumns="6"
         android:horizontalSpacing="14dp"
         android:verticalSpacing="20dp"
-        android:paddingLeft="44dp"
-        android:paddingRight="44dp"
+        android:paddingLeft="@dimen/content_pad_h"
+        android:paddingRight="@dimen/content_pad_h"
         android:paddingTop="8dp"
         android:paddingBottom="32dp"
         android:clipChildren="false"
