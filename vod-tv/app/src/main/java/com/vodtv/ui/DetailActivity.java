@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.vodtv.R;
 import com.vodtv.data.HistoryStore;
@@ -302,6 +303,10 @@ public class DetailActivity extends Activity {
                 }
             });
             return;
+        }
+        // 从记录点进来、却没找到能续播的线路：必须说一句，不能静默停在片源列表
+        if (autoResumePending) {
+            Toast.makeText(this, R.string.resume_not_found, Toast.LENGTH_LONG).show();
         }
         autoResumePending = false;
 

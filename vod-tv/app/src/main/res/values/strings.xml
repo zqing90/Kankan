@@ -21,6 +21,13 @@
     <string name="history_count">共 %1$d 部</string>
     <string name="history_deleted">已删除这条记录</string>
     <string name="history_cleared">观看记录已清空</string>
+    <!-- 续播进度 / 失败原因 -->
+    <string name="resume_preparing">正在准备续播…</string>
+    <string name="resume_searching">上次的片源没缓存，正在检索 %1$d 个站…</string>
+    <string name="resume_fail_source">没找到可播片源，已打开详情页</string>
+    <string name="resume_fail_ep">没找到上次看的那一集，已打开详情页</string>
+    <string name="resume_fail_media">这一集取流失败，已打开详情页</string>
+    <string name="resume_not_found">没找到可续播的片源，请手动选择</string>
     <string name="search_history">最近搜索</string>
 
     <!-- 1.4.0 UI 改版新增 -->

@@ -20,7 +20,6 @@ import android.widget.Toast;
 import com.vodtv.R;
 import com.vodtv.data.HistoryStore;
 import com.vodtv.data.ImageLoader;
-import com.vodtv.data.PlayCache;
 import com.vodtv.data.PlayResolver;
 
 import java.util.ArrayList;
@@ -175,102 +174,41 @@ public class HistoryActivity extends Activity {
     private void resume(final HistoryStore.Entry e) {
         if (opening || e == null) return;
         opening = true;
-        showBusy("正在准备续播…");
 
-        new Thread(new Runnable() {
+        ResumeHelper.resume(this, e, new ResumeHelper.Cb() {
             @Override
-            public void run() {
-                PlayCache.Cached cache = PlayCache.load(e.title);
-                boolean checkedToday = cache != null && cache.fresh();
-
-                PlayResolver.PlayLine line = null;
-                PlayResolver.Ep ep = null;
-                if (checkedToday) {
-                    line = pickLine(cache.lines, e.sourceId);
-                    ep = pickEp(line, e.ep);
-                }
-
-                // 今天没检测过才值得再跑一遍；检测过却对不上，重跑也是一样的结果
-                if (!checkedToday) {
-                    final int n = com.vodtv.data.SourceStore.enabled().size();
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            showBusy("上次的片源没缓存，正在重新检索 " + n + " 个站…");
-                        }
-                    });
-                    List<PlayResolver.PlayLine> list = PlayResolver.search(e.title, null);
-                    line = pickLine(list, e.sourceId);
-                    ep = pickEp(line, e.ep);
-                }
-
-                String media = null;
-                if (line != null && ep != null) {
-                    // 检索时探的就是这一集，直接复用结果，不再多打一次请求
-                    if (line.media != null && line.media.length() > 0
-                            && ep.label != null && ep.label.equals(line.label)) {
-                        media = line.media;
-                    } else {
-                        media = PlayResolver.resolveEp(ep);
-                    }
-                }
-
-                final PlayResolver.PlayLine fLine = line;
-                final PlayResolver.Ep fEp = ep;
-                final String fMedia = media;
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        opening = false;
-                        hideBusy();
-                        if (fMedia != null && fMedia.length() > 0) {
-                            DetailActivity.launchPlayer(HistoryActivity.this, fLine, fEp, fMedia, e.info);
-                            return;
-                        }
-                        // 拿不到流就交给人挑源：详情页带 autoResume，检索完会自己续播
-                        Intent i = new Intent(HistoryActivity.this, DetailActivity.class);
-                        e.info.toIntent(i);
-                        i.putExtra("title", e.title);
-                        i.putExtra("autoResume", true);
-                        startActivity(i);
-                    }
-                });
+            public void onBusy(String text) {
+                if (busyText != null) busyText.setText(text);
+                if (busyPanel != null) busyPanel.setVisibility(View.VISIBLE);
             }
-        }, "history-resume").start();
-    }
 
-    /** 优先上次那个源；那个源挂了就用第一条可播的 */
-    private PlayResolver.PlayLine pickLine(List<PlayResolver.PlayLine> list, String sourceId) {
-        if (list == null) return null;
-        PlayResolver.PlayLine fallback = null;
-        for (PlayResolver.PlayLine l : list) {
-            if (l == null || !l.ok) continue;
-            if (sourceId != null && sourceId.length() > 0 && sourceId.equals(l.sourceId)) return l;
-            if (fallback == null) fallback = l;
-        }
-        return fallback;
-    }
-
-    /** 集名对得上才算续播；单集（电影）集名不符也认，多集对不上就交给详情人挑 */
-    private PlayResolver.Ep pickEp(PlayResolver.PlayLine l, String label) {
-        if (l == null || l.eps == null || l.eps.isEmpty()) return null;
-        if (label != null && label.length() > 0) {
-            for (PlayResolver.Ep ep : l.eps) {
-                if (label.equals(ep.label)) return ep;
-            }
-        }
-        return l.eps.size() == 1 ? l.eps.get(0) : null;
-    }
-
-    private void showBusy(final String text) {
-        runOnUiThread(new Runnable() {
             @Override
-            public void run() {
-                if (busyPanel == null) return;
-                busyText.setText(text);
-                busyPanel.setVisibility(View.VISIBLE);
+            public void onPlay(PlayResolver.PlayLine line, PlayResolver.Ep ep, String media,
+                               HistoryStore.Entry entry) {
+                opening = false;
+                hideBusy();
+                DetailActivity.launchPlayer(HistoryActivity.this, line, ep, media, entry.info);
+            }
+
+            @Override
+            public void onGiveUp(HistoryStore.Entry entry, int reason) {
+                opening = false;
+                hideBusy();
+                Toast.makeText(HistoryActivity.this, failText(reason), Toast.LENGTH_LONG).show();
+                // 拿不到流就交给人挑源：详情页带 autoResume，检索完会自己续播
+                Intent i = new Intent(HistoryActivity.this, DetailActivity.class);
+                entry.info.toIntent(i);
+                i.putExtra("title", entry.title);
+                i.putExtra("autoResume", true);
+                startActivity(i);
             }
         });
+    }
+
+    private int failText(int reason) {
+        if (reason == ResumeHelper.FAIL_NO_EP) return R.string.resume_fail_ep;
+        if (reason == ResumeHelper.FAIL_NO_MEDIA) return R.string.resume_fail_media;
+        return R.string.resume_fail_source;
     }
 
     private void hideBusy() {

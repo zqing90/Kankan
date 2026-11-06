@@ -23,6 +23,7 @@ import com.vodtv.R;
 import com.vodtv.data.HistoryStore;
 import com.vodtv.data.ImageLoader;
 import com.vodtv.data.Prefs;
+import com.vodtv.data.PlayResolver;
 import com.vodtv.data.RankItem;
 import com.vodtv.data.RankRepository;
 
@@ -59,6 +60,10 @@ public class HomeActivity extends Activity {
     /** 横条末尾的「全部记录」入口卡 */
     private TextView btnAllHistory;
     private TextView historyCount;
+
+    /** 续播准备遮罩：点横条后要落地解析一次 m3u8，期间必须有反馈 */
+    private View busyPanel;
+    private TextView busyText;
 
     private RankRepository.RankData data;
     private String group = null;          // null = 全部
@@ -105,6 +110,8 @@ public class HomeActivity extends Activity {
         btnSettings = findViewById(R.id.btn_settings);
         historyBlock = (LinearLayout) findViewById(R.id.history_block);
         historyRow = (LinearLayout) findViewById(R.id.history_row);
+        busyPanel = findViewById(R.id.busy_panel);
+        busyText = (TextView) findViewById(R.id.busy_text);
 
         tabDefs.add(new String[]{"all", "全部"});
         tabDefs.add(new String[]{RankRepository.GROUP_TV, "剧集"});
@@ -525,14 +532,54 @@ public class HomeActivity extends Activity {
     }
 
     /** 从历史卡进详情：带整份影片信息，并让详情页把焦点直接停在「继续看」上 */
-    private void openFromHistory(HistoryStore.Entry e) {
-        if (opening) return;
+    /**
+     * 点「继续观看」卡片 = 直接继续播放，和观看记录页走同一套逻辑。
+     *
+     * 以前这里只 startActivity(详情页) + autoResume，详情页要重新检索各站，
+     * 检索完如果对不上上次那一集就静默停住 —— 用户感受就是「点了没反应」。
+     * 现在先尝试直进播放页，拿不到流才退回详情页，每一步都有可见反馈。
+     */
+    private void openFromHistory(final HistoryStore.Entry e) {
+        if (opening || e == null) return;
         opening = true;
-        Intent i = new Intent(this, DetailActivity.class);
-        e.info.toIntent(i);
-        i.putExtra("title", e.title);
-        i.putExtra("autoResume", true);
-        startActivity(i);
+
+        ResumeHelper.resume(this, e, new ResumeHelper.Cb() {
+            @Override
+            public void onBusy(String text) {
+                if (busyText != null) busyText.setText(text);
+                if (busyPanel != null) busyPanel.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onPlay(PlayResolver.PlayLine line, PlayResolver.Ep ep, String media,
+                               HistoryStore.Entry entry) {
+                opening = false;
+                hideBusy();
+                DetailActivity.launchPlayer(HomeActivity.this, line, ep, media, entry.info);
+            }
+
+            @Override
+            public void onGiveUp(HistoryStore.Entry entry, int reason) {
+                opening = false;
+                hideBusy();
+                Toast.makeText(HomeActivity.this, failText(reason), Toast.LENGTH_LONG).show();
+                Intent i = new Intent(HomeActivity.this, DetailActivity.class);
+                entry.info.toIntent(i);
+                i.putExtra("title", entry.title);
+                i.putExtra("autoResume", true);
+                startActivity(i);
+            }
+        });
+    }
+
+    private int failText(int reason) {
+        if (reason == ResumeHelper.FAIL_NO_EP) return R.string.resume_fail_ep;
+        if (reason == ResumeHelper.FAIL_NO_MEDIA) return R.string.resume_fail_media;
+        return R.string.resume_fail_source;
+    }
+
+    private void hideBusy() {
+        if (busyPanel != null) busyPanel.setVisibility(View.GONE);
     }
 
     /**
@@ -724,6 +771,7 @@ public class HomeActivity extends Activity {
         super.onResume();
         // 从详情页/设置页回来，允许再次打开
         opening = false;
+        hideBusy();
         // 从播放页回来进度变了、或刚在记录页删了记录，横条要跟着变
         renderHistory();
         // 从设置页回来时源配置可能变了，刷新一下状态栏文案即可

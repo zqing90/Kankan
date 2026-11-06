@@ -7,6 +7,7 @@
   动作按钮全部是图标，顺序固定：搜索 / 记录 / 更新 / 设置。
 -->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -201,5 +202,33 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_sm"
             android:text="@string/empty" />
+    </LinearLayout>
+
+    <!--
+      续播准备遮罩：点「继续观看」后要落地解析一次 m3u8（没缓存时还要检索十几个站），
+      没有这层反馈用户会以为「点了没反应」。和观看记录页同一套做法。
+    -->
+    <LinearLayout
+        android:id="@+id/busy_panel"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#CC000000"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:clickable="true"
+        android:visibility="gone"
+        tools:ignore="KeyboardInaccessibleWidget">
+
+        <ProgressBar
+            android:layout_width="36dp"
+            android:layout_height="36dp" />
+
+        <TextView
+            android:id="@+id/busy_text"
+            style="@style/Text.Body"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_lg"
+            android:gravity="center" />
     </LinearLayout>
 </RelativeLayout>
