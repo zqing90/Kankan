@@ -345,9 +345,11 @@ public class HomeActivity extends Activity {
         }
 
         if (currentTab == idx) {
-            // 同一个分类再按一次也重绑一遍，避免界面偶发没跟上
+            // 同一个分类再按一次也重绑一遍，避免界面偶发没跟上；
+            // 顺手回到顶部，「再点一次当前 Tab 回顶」是通用交互
             adapter.notifyDataSetChanged();
             grid.invalidateViews();
+            scrollGridToTop();
             return;
         }
         currentTab = idx;
@@ -370,20 +372,23 @@ public class HomeActivity extends Activity {
     /**
      * 切分类后回到第一行。
      *
-     * 不能直接用 grid.setSelection(0)：AbsListView 的实现里，
-     * 触摸模式下它只把位置记进 mResurrectToPosition，不触发滚动——
-     * 手机上表现为「切了 Tab，列表还停在原来那一屏」。
-     * 所以触摸模式必须走 smoothScrollToPosition，且要 post 到下一帧让新数据先完成布局。
+     * 三个坑叠在一起，所以写法不能省：
+     * 1. {@code setSelection(0)} 在触摸模式只记住位置、不滚动（AbsListView 的既定行为）；
+     * 2. 数据刚 notify 过，layoutChildren 会走 handleDataChanged() 把上一个分类的
+     *    可见位置「恢复」回来——这就是「切了 Tab 还停在原来那一屏」的直接原因；
+     * 3. {@code setSelectionFromTop} 是 API 21 才有的（lint 会拦，minSdk 19 用不了）。
+     *
+     * 所以先用 setSelection(0) 把待恢复的位置清掉，再在下一帧用
+     * smoothScrollToPositionFromTop（API 11，内部 PositionScroller 会等布局完成再滚）
+     * 真正把第 0 项顶到顶部。
      */
     private void scrollGridToTop() {
+        grid.setSelection(0);
         grid.post(new Runnable() {
             @Override
             public void run() {
-                if (grid.isInTouchMode()) {
-                    grid.smoothScrollToPosition(0);
-                } else {
-                    grid.setSelection(0);
-                }
+                grid.setSelection(0);
+                grid.smoothScrollToPositionFromTop(0, 0);
             }
         });
     }
