@@ -51,6 +51,11 @@ public class DetailActivity extends Activity {
     private HistoryStore.Entry resumeEntry;
     private PlayResolver.PlayLine resumeLine;
     private PlayResolver.Ep resumeEp;
+    /**
+     * 从观看记录 / 首页「继续看」进来时置 true：检索完成后直接续播，不用再按一次 OK。
+     * 只消费一次——之后用户手动重测或换源，不该又被自动跳进播放页。
+     */
+    private boolean autoResumePending;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +67,7 @@ public class DetailActivity extends Activity {
         title = getIntent().getStringExtra("title");
         info = MovieInfo.fromIntent(getIntent());
         if (info.title.length() == 0) info.title = title;
+        autoResumePending = getIntent().getBooleanExtra("autoResume", false);
         linesBox = (LinearLayout) findViewById(R.id.lines);
         scroll = (ScrollView) findViewById(R.id.scroll);
         linesTitle = (TextView) findViewById(R.id.lines_title);
@@ -283,16 +289,28 @@ public class DetailActivity extends Activity {
 
         updateResume(h);
 
-        // 从首页「继续观看」点进来时，焦点直接停在「继续看」上，按一下 OK 就接着播；
-        // 普通进入仍落在推荐源上。
-        boolean wantResume = getIntent().getBooleanExtra("autoResume", false)
-                && btnResume.getVisibility() == View.VISIBLE;
-        final View target = wantResume ? btnResume : firstPlayable;
-        if (target != null) {
-            target.post(new Runnable() {
+        // 从记录页 / 首页「继续看」点进来：检索一完成就直接续播。
+        // 以前这里只是把焦点放在「继续看」上，用户还得再按一次 OK
+        //（加上要等检索十几秒）—— 感受就是「点了没反应、没法继续播放」。
+        boolean wantResume = autoResumePending && btnResume.getVisibility() == View.VISIBLE;
+        if (wantResume) {
+            autoResumePending = false;
+            btnResume.post(new Runnable() {
                 @Override
                 public void run() {
-                    target.requestFocus();
+                    continuePlay();
+                }
+            });
+            return;
+        }
+        autoResumePending = false;
+
+        final View first = firstPlayable;
+        if (first != null) {
+            first.post(new Runnable() {
+                @Override
+                public void run() {
+                    first.requestFocus();
                 }
             });
         }
@@ -492,7 +510,21 @@ public class DetailActivity extends Activity {
      * 集数只传 label 和原始 url，真正的 m3u8 解析放到播放页切集时再做（慢，得在子线程）。
      */
     private void play(PlayResolver.PlayLine l, PlayResolver.Ep ep, String media) {
-        Intent i = new Intent(DetailActivity.this, PlayerActivity.class);
+        launchPlayer(this, l, ep, media, info);
+    }
+
+    /**
+     * 跳播放页。观看记录页的「继续播放」也走这里，避免两处各打一份 Intent 参数。
+     *
+     * 除了当前这一集的地址，还把**整条线路的全部集数**带过去 —— 播放页要靠它做
+     * 「上一集 / 下一集 / 选集」，否则用户在播放页里想换集只能退出来重选。
+     * 集数只传 label 和原始 url，真正的 m3u8 解析放到播放页切集时再做（慢，得在子线程）。
+     */
+    public static void launchPlayer(Activity from, PlayResolver.PlayLine l, PlayResolver.Ep ep,
+                                    String media, MovieInfo info) {
+        if (from == null || l == null || media == null || media.length() == 0) return;
+
+        Intent i = new Intent(from, PlayerActivity.class);
         i.putExtra("url", media);
         i.putExtra("source", l.sourceName);
         i.putExtra("sourceId", l.sourceId);
@@ -512,12 +544,14 @@ public class DetailActivity extends Activity {
         }
 
         // 整份影片信息一起带过去，播放页退出时写进历史，首页才能显示海报
-        info.toIntent(i);
-        startActivity(i);
+        MovieInfo m = info != null ? info : new MovieInfo();
+        if (m.title == null || m.title.length() == 0) m.title = l.label;
+        m.toIntent(i);
+        from.startActivity(i);
     }
 
     /** 先按引用找（正常路径都是同一个对象），找不到再按集名兜底 */
-    private int indexOf(List<PlayResolver.Ep> eps, PlayResolver.Ep ep) {
+    private static int indexOf(List<PlayResolver.Ep> eps, PlayResolver.Ep ep) {
         if (ep == null) return 0;
         for (int i = 0; i < eps.size(); i++) {
             if (eps.get(i) == ep) return i;

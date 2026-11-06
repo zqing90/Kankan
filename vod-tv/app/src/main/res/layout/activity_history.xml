@@ -4,6 +4,7 @@
   规范见 PROJECT.md §15。
 -->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/bg">
@@ -117,4 +118,33 @@
         android:textColor="@color/text_secondary"
         android:textSize="15sp"
         android:visibility="gone" />
+
+    <!--
+      续播准备遮罩：点记录后要落地解析一次 m3u8（没缓存时还要重新检索 14 个站），
+      期间必须有明确反馈，否则用户会以为「点了没反应」。见 PROJECT.md §17。
+    -->
+    <LinearLayout
+        android:id="@+id/busy_panel"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#CC000000"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:clickable="true"
+        android:visibility="gone"
+        tools:ignore="KeyboardInaccessibleWidget">
+
+        <ProgressBar
+            android:layout_width="36dp"
+            android:layout_height="36dp" />
+
+        <TextView
+            android:id="@+id/busy_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:gravity="center"
+            android:textColor="@color/text_primary"
+            android:textSize="14sp" />
+    </LinearLayout>
 </RelativeLayout>

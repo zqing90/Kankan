@@ -20,9 +20,9 @@
 ```bash
 cd /d/code/kankan/vod-tv
 ./gradlew assembleDebug
-cp app/build/outputs/apk/debug/app-debug.apk dist/Kankan-1.3.1-debug.apk
-cp dist/Kankan-1.3.1-debug.apk /e/share/
-md5sum dist/Kankan-1.3.1-debug.apk /e/share/Kankan-1.3.1-debug.apk
+cp app/build/outputs/apk/debug/app-debug.apk dist/Kankan-1.3.2-debug.apk
+cp dist/Kankan-1.3.2-debug.apk /e/share/
+md5sum dist/Kankan-1.3.2-debug.apk /e/share/Kankan-1.3.2-debug.apk
 ```
 
 规则细则：
@@ -97,7 +97,7 @@ vod-tv/
 ├── gradle.properties
 ├── local.properties             ⚠️ 不入库，需自己写 sdk.dir
 ├── gradlew / gradlew.bat
-├── dist/Kankan-1.3.1-debug.apk  已构建产物（同时复制一份到 E:\share\）
+├── dist/Kankan-1.3.2-debug.apk  已构建产物（同时复制一份到 E:\share\）
 ├── README.md                    使用与构建说明（面向人）
 ├── PROJECT.md                   本文件（面向 AI）
 └── app/
@@ -497,8 +497,8 @@ echo "sdk.dir=D:\\Android\\Sdk" > local.properties
 
 ./gradlew assembleDebug
 # 产物：app/build/outputs/apk/debug/app-debug.apk
-# 留档：dist/Kankan-1.3.1-debug.apk
-# 分发：E:\share\Kankan-1.3.1-debug.apk   ← 见顶部「铁律 · APK 产出后必须分发」
+# 留档：dist/Kankan-1.3.2-debug.apk
+# 分发：E:\share\Kankan-1.3.2-debug.apk   ← 见顶部「铁律 · APK 产出后必须分发」
 ```
 
 环境（本机已装好，可直接构建）：
@@ -527,7 +527,7 @@ echo "sdk.dir=D:\\Android\\Sdk" > local.properties
 
 ```bash
 adb connect 192.168.x.x:5555
-adb install -r Kankan-1.3.1-debug.apk
+adb install -r Kankan-1.3.2-debug.apk
 ```
 
 ### 9.2 跑采集器
@@ -810,3 +810,48 @@ git revert <commit>                  # 撤销一次提交（不用 reset）
 > `add()` 第一行就 `return`、`list()` 永远返回空 → 标签组整块永久 `GONE`。
 > 表现就是「搜索记录没有」，而且不报错、不崩溃，只能靠肉眼发现。
 > **新增任何依赖 `init(Context)` 的数据类，必须同时改 `App.onCreate()`，并在此处登记。**
+
+---
+
+## 17. 续播链路：点记录就是播，不是「进详情页再按一下」
+
+### 17.1 1.3.1 及更早的问题
+
+观看记录页 `open()` 做的事是：`startActivity(DetailActivity)` + `putExtra("autoResume", true)`，
+而详情页对 `autoResume` 的处理只是**把焦点放到「继续看」按钮上**——用户还得再按一次 OK。
+
+再叠加一层：详情页要重新检索 14 个片源站（当天没缓存时 10~30 秒），期间只有一行「正在检索…」，
+按钮根本还不存在。用户点一下记录，看到的是一个要等的详情页，**感受就是「点了没法继续播放」**。
+
+### 17.2 现在的链路（1.3.2 起）
+
+点记录卡片 → 立刻出现遮罩「正在准备续播…」→ 后台按三级降级拿流：
+
+| 级 | 条件 | 动作 | 耗时 |
+|---|---|---|---|
+| 1 | `PlayCache` 有**当天**缓存 | 取缓存线路 → 找上次那个源 → 找同名集 → `resolveEp` | 1~2 秒 |
+| 2 | 今天没检测过 | `PlayResolver.search(title)` 重新检索 → 同样规则挑源挑集 → `resolveEp` | 10~30 秒 |
+| 3 | 上面都拿不到流 | 进详情页（`autoResume`），**详情页检索完会自己续播**，不用再按 OK | — |
+
+要点：
+
+- **第 1 级命中就不要跑第 2 级**。「今天检测过但对不上」重跑一遍也是同样结果，白等 30 秒。
+- 若 `ep.label` 与线路探测时命中的 `line.label` 相同，直接用 `line.media`，不再多打一次探针。
+- 第 2 级必须更新遮罩文案（「重新检索 N 个站…」），否则用户以为卡死。
+- 全程 `opening` 标志拦住重复点击；`onResume` 复位并收起遮罩。
+- 遮罩层 `busy_panel` 显式 `clickable="true"`，否则触摸会穿透到下面的网格。
+
+### 17.3 播放页参数打包只有一份
+
+`DetailActivity.launchPlayer(from, line, ep, media, info)` 是**唯一**跳播放页的入口，
+详情页 `play()` 和记录页续播都调它。参数包括当前集 url、整条线路的 `epLabels`/`epUrls`/`epIndex`、
+以及整份 `MovieInfo`（播放页退出时靠它写历史，首页/记录页才能显示海报）。
+
+以前详情页里有一份私有 `play()`，记录页要直接播就得再抄一遍——抄漏一个 extra 就是
+「播放页没有选集」「历史里没海报」这类难查的问题。
+
+### 17.4 仍然成立的约束
+
+- 记录里的 `sourceId` 只是**优先项**，那个源挂了要能退到任意可播线路，不能因此判失败。
+- 多集时集名对不上就**不猜**，返回 null 交给详情页让人挑（单集电影例外）。
+- 详情页 `autoResumePending` 只消费一次：用户手动「重新检测」或被降级进来后，不该再次自动跳播放页。
