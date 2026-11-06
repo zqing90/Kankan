@@ -21,6 +21,9 @@
     <string name="history_count">共 %1$d 部</string>
     <string name="history_deleted">已删除这条记录</string>
     <string name="history_cleared">观看记录已清空</string>
+    <!-- 看完的记录不再删除，只在副标题上标一下，点进去从头播 -->
+    <string name="history_finished">已看完</string>
+    <string name="history_replay">重看</string>
     <!-- 续播进度 / 失败原因 -->
     <string name="resume_preparing">正在准备续播…</string>
     <string name="resume_searching">上次的片源没缓存，正在检索 %1$d 个站…</string>

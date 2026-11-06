@@ -355,10 +355,19 @@ public class DetailActivity extends Activity {
         }
         if (resumeLine == null) return;
 
-        StringBuilder txt = new StringBuilder("继续看 ");
-        if (h.ep != null && h.ep.length() > 0) txt.append(h.ep).append("  ");
-        txt.append(h.posText());
-        if (h.dur > 0) txt.append(" / ").append(h.durText());
+        StringBuilder txt = new StringBuilder();
+        // 看完的记录还在，但位置贴到片尾，续播会从头开始 —— 文案跟着改成「重看」，
+        // 不要再说「继续看 45:00 / 45:00」把用户骗到片尾
+        if (h.isFinished()) {
+            txt.append(getString(R.string.history_replay));
+        } else {
+            txt.append("继续看 ");
+        }
+        if (h.ep != null && h.ep.length() > 0) txt.append(" ").append(h.ep);
+        if (!h.isFinished()) {
+            txt.append("  ").append(h.posText());
+            if (h.dur > 0) txt.append(" / ").append(h.durText());
+        }
         btnResume.setText(txt.toString());
         btnResume.setVisibility(View.VISIBLE);
     }

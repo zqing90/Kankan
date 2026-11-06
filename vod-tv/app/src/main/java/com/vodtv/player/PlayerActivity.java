@@ -864,6 +864,9 @@ public class PlayerActivity extends Activity implements Player.Listener {
             }
         } else if (playbackState == Player.STATE_ENDED) {
             ended = true;
+            // 播完立刻落盘：此时 pos 贴到片尾，HistoryStore 会把它记成「已看完」而不是删掉。
+            // 不能只等 onPause —— 用户看完直接按电源/回桌面，onPause 可能来不及走到这里。
+            saveProgress();
             boolean hasNext = epUrls != null && epIndex >= 0 && epIndex < epUrls.size() - 1;
             msg.setVisibility(View.VISIBLE);
             msg.setText(hasNext

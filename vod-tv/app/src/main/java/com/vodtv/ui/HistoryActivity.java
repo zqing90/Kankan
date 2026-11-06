@@ -266,9 +266,17 @@ public class HistoryActivity extends Activity {
 
             StringBuilder sub = new StringBuilder();
             if (e.ep != null && e.ep.length() > 0) sub.append(e.ep).append("  ·  ");
-            sub.append(e.posText());
-            if (e.dur > 0) sub.append(" / ").append(e.durText());
-            ((TextView) v.findViewById(R.id.h_sub)).setText(sub.toString());
+            if (e.isFinished()) {
+                // 看完的记录保留在列表里，不再显示「45:00 / 45:00」这种无信息量的文字
+                sub.append(getString(R.string.history_finished));
+            } else {
+                sub.append(e.posText());
+                if (e.dur > 0) sub.append(" / ").append(e.durText());
+            }
+            TextView subView = (TextView) v.findViewById(R.id.h_sub);
+            subView.setText(sub.toString());
+            subView.setTextColor(getResources().getColor(
+                    e.isFinished() ? R.color.text_tertiary : R.color.text_secondary));
 
             int pct = Math.max(0, Math.min(100, e.percent()));
             View done = v.findViewById(R.id.h_bar_done);
