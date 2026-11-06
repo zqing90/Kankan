@@ -32,7 +32,6 @@
 
     <!-- 1.4.0 UI 改版新增 -->
     <string name="continue_watching">继续观看</string>
-    <string name="see_all">全部 ›</string>
     <string name="empty_title">还没有榜单数据</string>
     <string name="search_empty_title">没有找到匹配的片</string>
     <string name="search_empty_sub">换个片名试试，或只输入片名的一部分</string>

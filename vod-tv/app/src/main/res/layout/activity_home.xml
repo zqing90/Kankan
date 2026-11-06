@@ -2,12 +2,11 @@
 <!--
   首页
   ─────────────────────────────────────────────────────────────
-  垂直顺序：品牌栏 → 状态行 →（继续观看）→ 海报墙
+  垂直顺序：品牌栏 → 状态行 → 海报墙
   顶栏左右 48dp / 手机 20dp（@dimen/topbar_pad_h），是 Android TV overscan 安全区。
   动作按钮全部是图标，顺序固定：搜索 / 记录 / 更新 / 设置。
 -->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -98,73 +97,11 @@
         android:paddingBottom="@dimen/space_md"
         android:text="@string/loading" />
 
-    <!-- 继续观看：无历史时整块 gone，GridView 会自动贴回 status 下方 -->
-    <LinearLayout
-        android:id="@+id/history_block"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/status"
-        android:orientation="vertical"
-        android:paddingBottom="@dimen/space_md"
-        android:visibility="gone">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:paddingLeft="@dimen/content_pad_h"
-            android:paddingRight="@dimen/content_pad_h"
-            android:paddingBottom="@dimen/space_sm">
-
-            <TextView
-                android:id="@+id/history_title"
-                style="@style/Text.Body"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/continue_watching"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/history_count"
-                style="@style/Text.Micro"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginLeft="@dimen/space_sm" />
-
-            <TextView
-                android:id="@+id/btn_all_history"
-                style="@style/Text.Caption"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingLeft="@dimen/space_md"
-                android:paddingTop="@dimen/space_xs"
-                android:paddingBottom="@dimen/space_xs"
-                android:text="@string/see_all" />
-        </LinearLayout>
-
-        <HorizontalScrollView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingLeft="@dimen/content_pad_h"
-            android:paddingRight="@dimen/content_pad_h"
-            android:clipToPadding="false"
-            android:scrollbars="none">
-
-            <LinearLayout
-                android:id="@+id/history_row"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal" />
-        </HorizontalScrollView>
-    </LinearLayout>
-
     <GridView
         android:id="@+id/grid"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/history_block"
+        android:layout_below="@id/status"
         android:layout_alignParentBottom="true"
         android:numColumns="@integer/grid_cols"
         android:horizontalSpacing="@dimen/card_gap_h"
@@ -202,33 +139,5 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_sm"
             android:text="@string/empty" />
-    </LinearLayout>
-
-    <!--
-      续播准备遮罩：点「继续观看」后要落地解析一次 m3u8（没缓存时还要检索十几个站），
-      没有这层反馈用户会以为「点了没反应」。和观看记录页同一套做法。
-    -->
-    <LinearLayout
-        android:id="@+id/busy_panel"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#CC000000"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:clickable="true"
-        android:visibility="gone"
-        tools:ignore="KeyboardInaccessibleWidget">
-
-        <ProgressBar
-            android:layout_width="36dp"
-            android:layout_height="36dp" />
-
-        <TextView
-            android:id="@+id/busy_text"
-            style="@style/Text.Body"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_lg"
-            android:gravity="center" />
     </LinearLayout>
 </RelativeLayout>

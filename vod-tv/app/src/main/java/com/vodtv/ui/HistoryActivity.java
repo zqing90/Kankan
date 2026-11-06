@@ -7,9 +7,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -87,6 +89,17 @@ public class HistoryActivity extends Activity {
 
         adapter = new RecordAdapter();
         grid.setAdapter(adapter);
+        // 兜底点击通道：条目自身是可聚焦的，正常情况下触摸/OK 都由条目自己接住；
+        // 但在部分机型上 GridView 会把焦点收上去、事件不下发，条目就"点了没反应"。
+        // OnItemClickListener 走的是 AdapterView.performItemClick，能把这两种情况一起覆盖。
+        grid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if (position >= 0 && position < items.size()) {
+                    resume(items.get(position));
+                }
+            }
+        });
         grid.post(new Runnable() {
             @Override
             public void run() {
@@ -297,6 +310,18 @@ public class HistoryActivity extends Activity {
                 public boolean onLongClick(View view) {
                     deleteOne(e);
                     return true;
+                }
+            });
+            // 第三道兜底：条目是 focusable 的，某些 ROM 上 GridView 会把 UP 事件收走
+            //（AbsListView 对「child 自身可聚焦」的条目不做 performItemClick），
+            // 条目的 onClick 就收不到。这里直接监听触摸，不消费事件，滚动照常。
+            v.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View view, MotionEvent ev) {
+                    if (ev.getAction() == MotionEvent.ACTION_UP) {
+                        resume(e);
+                    }
+                    return false;
                 }
             });
 
