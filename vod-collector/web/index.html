@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>今日热播 · 海报墙</title>
+<link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.14/dist/full.min.css" rel="stylesheet" type="text/css" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.20/dist/hls.min.js"></script>
+<style>
+  body{background:#0b0d12}
+  .poster{aspect-ratio:2/3}
+  .poster img{transition:transform .5s cubic-bezier(.2,.8,.2,1)}
+  .card:hover .poster img{transform:scale(1.06)}
+  .rank{font-variant-numeric:tabular-nums}
+  ::-webkit-scrollbar{height:8px;width:8px}
+  ::-webkit-scrollbar-thumb{background:#2a2f3a;border-radius:4px}
+</style>
+</head>
+<body class="text-base-content">
+
+<header class="sticky top-0 z-30 backdrop-blur bg-[#0b0d12]/85 border-b border-white/5">
+  <div class="max-w-[1600px] mx-auto px-5 py-3 flex items-center gap-4">
+    <div class="flex items-center gap-2">
+      <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-rose-500 to-orange-400 grid place-items-center text-white font-black">热</div>
+      <span class="text-lg font-bold tracking-tight">今日热播</span>
+      <span class="badge badge-ghost badge-sm hidden md:inline-flex" id="meta">加载中…</span>
+    </div>
+    <div class="flex-1"></div>
+    <input id="q" class="input input-sm input-bordered w-40 md:w-56 bg-white/5" placeholder="搜索片名…">
+    <button id="refresh" class="btn btn-sm btn-ghost">刷新</button>
+  </div>
+  <div class="max-w-[1600px] mx-auto px-5 pb-3 flex gap-2 overflow-x-auto" id="tabs"></div>
+</header>
+
+<main class="max-w-[1600px] mx-auto px-5 py-5">
+  <div id="grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7 gap-4"></div>
+  <div id="empty" class="hidden text-center py-24 text-base-content/40">没有匹配的影片</div>
+</main>
+
+<!-- 详情 / 播放抽屉 -->
+<dialog id="modal" class="modal">
+  <div class="modal-box max-w-4xl p-0 bg-[#12151c] border border-white/10 overflow-hidden max-h-[90vh]">
+    <div class="flex flex-col md:flex-row">
+      <div class="md:w-64 shrink-0 bg-black/40">
+        <img id="m-poster" class="w-full poster object-cover" alt="">
+      </div>
+      <div class="flex-1 p-5 space-y-3 md:max-h-[90vh] overflow-y-auto">
+        <div class="flex items-start gap-3">
+          <div class="flex-1">
+            <h2 id="m-title" class="text-2xl font-bold"></h2>
+            <div id="m-sub" class="text-sm text-base-content/60 mt-1"></div>
+          </div>
+          <form method="dialog"><button class="btn btn-sm btn-circle btn-ghost">✕</button></form>
+        </div>
+        <div class="flex flex-wrap gap-2" id="m-badges"></div>
+        <p id="m-desc" class="text-sm leading-relaxed text-base-content/70 line-clamp-4"></p>
+
+        <div class="divider my-2 text-xs">播放源</div>
+        <div id="m-lines" class="space-y-2 max-h-52 overflow-y-auto pr-1">
+          <div class="text-sm text-base-content/40">正在检索…</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  <form method="dialog" class="modal-backdrop"><button>close</button></form>
+</dialog>
+
+<!-- 独立播放浮层 -->
+<dialog id="player" class="modal">
+  <div class="modal-box w-[min(92vw,1024px)] max-w-none p-0 bg-black border border-white/10 overflow-hidden">
+    <video id="p-video" class="w-full aspect-video bg-black" controls autoplay playsinline></video>
+    <div class="flex items-center gap-3 px-4 py-3 bg-[#12151c]">
+      <div class="flex-1 min-w-0">
+        <div id="p-title" class="text-sm font-medium truncate"></div>
+        <div id="p-meta" class="text-[11px] text-base-content/50 truncate"></div>
+      </div>
+      <button id="p-back" class="btn btn-sm btn-ghost">返回详情</button>
+      <form method="dialog"><button class="btn btn-sm btn-circle btn-ghost">✕</button></form>
+    </div>
+  </div>
+  <form method="dialog" class="modal-backdrop"><button>close</button></form>
+</dialog>
+
+<script>
+const state = { chart: window.__CHART__ || null, group: 'movie', kw: '', playing: null };
+const EL = (id) => document.getElementById(id);
+const esc = (s='') => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+async function load(force) {
+  if (window.__CHART__ && !force) { state.chart = window.__CHART__; return render(); }
+  try {
+    const r = await fetch('/api/chart' + (force ? '?force=1' : ''));
+    if (!r.ok) throw 0;
+    state.chart = await r.json();
+    render();
+  } catch {
+    EL('meta').textContent = '静态数据';
+    render();
+  }
+}
+
+function render() {
+  const c = state.chart;
+  if (!c) { EL('meta').textContent = '无数据'; return; }
+  const d = new Date(c.generatedAt);
+  EL('meta').textContent = `${c.items.length} 部 · ${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')} 更新${c.cached ? ' · 缓存' : ''}`;
+
+  const groups = Object.entries(c.groups).filter(([, g]) => g.items.length);
+  if (!groups.find(([k]) => k === state.group)) state.group = groups[0]?.[0] || 'movie';
+  EL('tabs').innerHTML = groups.map(([k, g]) =>
+    `<button class="btn btn-sm ${k===state.group?'btn-primary':'btn-ghost bg-white/5'} rounded-full" data-g="${k}">
+       ${g.label}<span class="ml-1 text-xs opacity-60">${g.items.length}</span></button>`).join('');
+  EL('tabs').querySelectorAll('[data-g]').forEach(b => b.onclick = () => { state.group = b.dataset.g; render(); });
+
+  const items = (c.groups[state.group]?.items || []).filter(x =>
+    !state.kw || x.name.toLowerCase().includes(state.kw.toLowerCase()));
+
+  EL('empty').classList.toggle('hidden', items.length > 0);
+  EL('grid').innerHTML = items.map((it, i) => card(it, i)).join('');
+  EL('grid').querySelectorAll('[data-idx]').forEach(el => {
+    el.onclick = () => openDetail(items[+el.dataset.idx]);
+  });
+}
+
+function card(it, i) {
+  const rank = i < 3 ? ['text-amber-400','text-zinc-300','text-orange-400'][i] : 'text-white/40';
+  const hot = it.stations.length >= 6;
+  return `
+  <div class="card bg-transparent cursor-pointer group" data-idx="${i}">
+    <div class="poster relative rounded-xl overflow-hidden bg-white/5 ring-1 ring-white/10">
+      ${it.pic
+        ? `<img src="${esc(it.pic)}" loading="lazy" referrerpolicy="no-referrer" class="w-full h-full object-cover" onerror="this.style.display='none'">`
+        : `<div class="w-full h-full grid place-items-center text-3xl font-black text-white/20">${esc(it.name.slice(0,1))}</div>`}
+      <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition"></div>
+      <div class="absolute top-1.5 left-1.5 rank text-xs font-black ${rank} bg-black/50 px-1.5 py-0.5 rounded">${String(i+1).padStart(2,'0')}</div>
+      ${hot ? '<div class="absolute top-1.5 right-1.5 text-[10px] bg-rose-500/90 text-white px-1.5 py-0.5 rounded">热</div>' : ''}
+      <div class="absolute bottom-0 inset-x-0 p-2 translate-y-2 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition">
+        <div class="flex items-center gap-1 text-[11px] text-white/90">
+          <span class="bg-white/20 rounded px-1">${it.stations.length} 站</span>
+          <span class="truncate">${esc(it.remarks||'')}</span>
+        </div>
+      </div>
+    </div>
+    <div class="pt-2 px-0.5">
+      <div class="text-sm font-medium truncate group-hover:text-primary transition">${esc(it.name)}</div>
+      <div class="text-[11px] text-base-content/40 truncate">${it.year||''} ${esc(it.remarks||'')}</div>
+    </div>
+  </div>`;
+}
+
+function openDetail(it) {
+  EL('m-title').textContent = it.name;
+  EL('m-sub').textContent = [it.year, it.actors?.slice(0,3).join(' / ')].filter(Boolean).join(' · ');
+  EL('m-poster').src = it.pic || '';
+  EL('m-desc').textContent = it.content || '暂无简介';
+  EL('m-badges').innerHTML = [
+    it.year && `<span class="badge badge-sm badge-ghost">${it.year}</span>`,
+    `<span class="badge badge-sm badge-ghost">${it.stations.length} 站收录</span>`,
+    it.remarks && `<span class="badge badge-sm badge-outline badge-primary">${esc(it.remarks)}</span>`,
+  ].filter(Boolean).join('');
+  EL('m-lines').innerHTML = '<div class="text-sm text-base-content/40">正在检索播放源…</div>';
+  EL('modal').showModal();
+  findSources(it);
+}
+
+async function findSources(it) {
+  try {
+    const r = await fetch(`/api/search?kw=${encodeURIComponent(it.name)}&resolve=1`);
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const d = await r.json();
+    const target = (d.items || []).find(x => x.name === it.name) || d.items?.[0];
+    const lines = (target?.lines || []).filter(l => l.playable);
+    if (!lines.length) { EL('m-lines').innerHTML = '<div class="text-sm text-warning">未找到可播放线路</div>'; return; }
+    EL('m-lines').innerHTML = lines.slice(0, 8).map((l, i) => `
+      <button class="btn btn-sm btn-block justify-between font-normal ${i===0?'btn-primary':'btn-ghost bg-white/5'}" data-url="${esc(l.media || l.url)}" data-station="${esc(l.stationName)}" data-res="${esc(l.resolution||'—')}" data-dur="${esc(l.duration||'')}">
+        <span class="flex items-center gap-2">
+          <span class="text-xs opacity-70">${esc(l.stationName)}</span>
+          <span class="badge badge-xs badge-ghost">${l.resolution||'—'}</span>
+          <span class="text-xs opacity-70">${l.duration}</span>
+        </span>
+        <span class="text-xs">${l.encrypted?'加密':'▶ 播放'}</span>
+      </button>`).join('');
+    EL('m-lines').querySelectorAll('[data-url]').forEach(b => b.onclick = () =>
+      play(b.dataset.url, it.name, `${b.dataset.station} · ${b.dataset.res} · ${b.dataset.dur}`));
+  } catch (e) {
+    EL('m-lines').innerHTML = `<div class="text-sm text-warning">检索失败：${esc(e.message)}<br><span class="text-xs opacity-60">需要先启动 node src/server.js 8765</span></div>`;
+  }
+}
+
+function play(url, label, meta) {
+  if (url.includes('/share/')) {
+    EL('m-lines').insertAdjacentHTML('afterbegin',
+      '<div class="alert alert-warning py-1 text-xs">该线路是分享页，请用下面已解析的 m3u8 线路</div>');
+    return;
+  }
+  const v = EL('p-video');
+  if (state.playing) { try { state.playing.destroy(); } catch {} state.playing = null; }
+  EL('p-title').textContent = label || '';
+  EL('p-meta').textContent = meta || '';
+  EL('player').showModal();
+  if (window.Hls && Hls.isSupported()) {
+    const hls = new Hls({ enableWorker: true });
+    hls.loadSource(url);
+    hls.attachMedia(v);
+    hls.on(Hls.Events.MANIFEST_PARSED, () => v.play().catch(() => {}));
+    hls.on(Hls.Events.ERROR, (e, d) => {
+      if (!d.fatal) return;
+      EL('p-meta').textContent = `播放失败：${d.type} / ${d.details}`;
+    });
+    state.playing = hls;
+  } else {
+    v.src = url;
+    v.play().catch(() => {});
+  }
+}
+
+EL('p-back').onclick = () => { EL('player').close(); EL('modal').showModal(); };
+EL('player').addEventListener('close', () => {
+  if (state.playing) { try { state.playing.destroy(); } catch {} state.playing = null; }
+  EL('p-video').removeAttribute('src');
+});
+EL('q').oninput = (e) => { state.kw = e.target.value.trim(); render(); };
+EL('refresh').onclick = () => load(true);
+load(false);
+</script>
+</body>
+</html>

@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg">
+
+    <!-- 顶栏：返回 + 输入框 + 搜索 -->
+    <LinearLayout
+        android:id="@+id/topbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingLeft="36dp"
+        android:paddingRight="36dp"
+        android:paddingTop="20dp"
+        android:paddingBottom="6dp">
+
+        <TextView
+            android:id="@+id/btn_back"
+            style="@style/TopButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="0dp"
+            android:text="← 返回" />
+
+        <EditText
+            android:id="@+id/q"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginLeft="14dp"
+            android:background="@drawable/bg_tab"
+            android:hint="@string/search_hint"
+            android:imeOptions="actionSearch"
+            android:inputType="text"
+            android:maxLines="1"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:singleLine="true"
+            android:textColor="@color/text_primary"
+            android:textColorHint="@color/text_dim"
+            android:textSize="15sp" />
+
+        <TextView
+            android:id="@+id/btn_go"
+            style="@style/TopButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/search" />
+    </LinearLayout>
+
+    <!-- 状态 / 兜底入口 -->
+    <LinearLayout
+        android:id="@+id/status_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/topbar"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingLeft="38dp"
+        android:paddingRight="38dp"
+        android:paddingBottom="10dp">
+
+        <TextView
+            android:id="@+id/status"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="输入片名后按「搜索」，也可以直接按遥控器确认键"
+            android:textColor="@color/text_dim"
+            android:textSize="12sp" />
+
+        <!-- 本地榜单没有时才出现：去 14 个片源站搜 -->
+        <TextView
+            android:id="@+id/btn_online"
+            style="@style/TopButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="联网搜索片源"
+            android:visibility="gone" />
+    </LinearLayout>
+
+    <GridView
+        android:id="@+id/sgrid"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/status_bar"
+        android:layout_alignParentBottom="true"
+        android:numColumns="6"
+        android:horizontalSpacing="14dp"
+        android:verticalSpacing="20dp"
+        android:paddingLeft="32dp"
+        android:paddingRight="32dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="32dp"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:listSelector="@android:color/transparent"
+        android:scrollbars="none" />
+
+    <TextView
+        android:id="@+id/empty"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:textColor="@color/text_secondary"
+        android:textSize="15sp"
+        android:visibility="gone" />
+</RelativeLayout>

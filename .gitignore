@@ -1,0 +1,39 @@
+# ---------- Android / Gradle 构建产物 ----------
+build/
+!gradle/wrapper/gradle-wrapper.jar
+.gradle/
+cxx/
+*.apk
+*.aab
+*.ap_
+*.aar
+*.dex
+*.class
+*.so
+captures/
+output.json
+
+# ---------- 本机专用（不入库） ----------
+local.properties
+*.iml
+.idea/
+*.hprof
+
+# ---------- 分发留档（APK 不入库，历史版本靠 E:\share，见 AGENTS.md） ----------
+vod-tv/dist/
+
+# ---------- Node ----------
+node_modules/
+npm-debug.log*
+yarn-error.log*
+package-lock.json
+
+# ---------- WorkBuddy 会话/记忆数据（含本机绝对路径） ----------
+.workbuddy/
+
+# ---------- 系统 / 编辑器 ----------
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+*.swp

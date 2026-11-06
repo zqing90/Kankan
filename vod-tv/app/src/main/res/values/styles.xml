@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- 基础主题：TV 全屏深色，无 ActionBar -->
+    <style name="AppTheme" parent="@android:style/Theme.Holo.NoActionBar">
+        <item name="android:windowBackground">@color/bg</item>
+        <item name="android:windowNoTitle">true</item>
+    </style>
+
+    <style name="PlayerTheme" parent="@android:style/Theme.Holo.NoActionBar.Fullscreen">
+        <item name="android:windowBackground">@android:color/black</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:keepScreenOn">true</item>
+    </style>
+
+    <!-- 卡片标题 -->
+    <style name="CardTitle">
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:ellipsize">end</item>
+    </style>
+
+    <style name="CardSub">
+        <item name="android:textColor">@color/text_secondary</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:ellipsize">end</item>
+    </style>
+
+    <!-- 顶部分类 tab -->
+    <style name="TabText">
+        <item name="android:textColor">@color/text_secondary</item>
+        <item name="android:textSize">17sp</item>
+        <item name="android:paddingLeft">20dp</item>
+        <item name="android:paddingRight">20dp</item>
+        <item name="android:paddingTop">8dp</item>
+        <item name="android:paddingBottom">8dp</item>
+        <item name="android:background">@drawable/bg_tab</item>
+        <item name="android:focusable">true</item>
+        <item name="android:layout_marginRight">6dp</item>
+    </style>
+
+    <style name="TopButton">
+        <item name="android:textColor">@color/text_secondary</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:paddingLeft">16dp</item>
+        <item name="android:paddingRight">16dp</item>
+        <item name="android:paddingTop">8dp</item>
+        <item name="android:paddingBottom">8dp</item>
+        <item name="android:background">@drawable/bg_tab</item>
+        <item name="android:focusable">true</item>
+        <item name="android:layout_marginLeft">8dp</item>
+    </style>
+
+    <!-- 播放页 / 选集浮层里的按钮。刻意不写 focusableInTouchMode：
+         一旦写了，触摸模式下第一次点击只会抢焦点、不触发 click，
+         手机上就变成"每个按钮要点两次" -->
+    <style name="PlayerBtn">
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:paddingLeft">18dp</item>
+        <item name="android:paddingRight">18dp</item>
+        <item name="android:paddingTop">9dp</item>
+        <item name="android:paddingBottom">9dp</item>
+        <item name="android:background">@drawable/bg_tab</item>
+        <item name="android:focusable">true</item>
+        <item name="android:layout_marginRight">8dp</item>
+    </style>
+</resources>

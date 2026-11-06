@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Lint 规则基线。
+    原则：只屏蔽「对侧载分发没有意义」的项，其余保持默认；
+    会导致崩溃 / 交互失效的规则一律提升为 error，配合 abortOnError 挡住构建。
+-->
+<lint>
+
+    <!-- 只影响上架 Google Play，本项目是侧载 APK，不拦 -->
+    <issue id="ExpiredTargetSdkVersion" severity="ignore" />
+
+    <!--
+        这三条是「编译能过、真机必炸」的类型错误，锁死为 error：
+        ResourceType     —— 把颜色字面量当资源 ID 传给 getColor 之类（v1.0.1 首页闪退就是它）
+        WrongConstant    —— 把普通 int 传给 @ColorRes/@DrawableRes 等注解参数
+        NewApi           —— minSdk 19 上不存在的方法（低版本会 NoSuchMethodError）
+    -->
+    <issue id="ResourceType" severity="error" />
+    <issue id="WrongConstant" severity="error" />
+    <issue id="NewApi" severity="error" />
+
+    <!-- 文本国际化、过度绘制、冗余资源等，单语言 TV 应用无意义，保持 warning 不拦截 -->
+</lint>

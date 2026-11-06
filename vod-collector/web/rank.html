@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>热播榜 · 今日影视热度</title>
+<link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.14/dist/full.min.css" rel="stylesheet" type="text/css" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.20/dist/hls.min.js"></script>
+<style>::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-thumb{background:#3a3f4b;border-radius:4px}::-webkit-scrollbar-track{background:transparent}.scrollbar-none::-webkit-scrollbar{display:none}</style>
+</head>
+<body class="bg-[#0b0d12] min-h-screen text-zinc-100">
+
+<!-- 顶栏 -->
+<header class="sticky top-0 z-30 bg-[#0b0d12]/92 backdrop-blur border-b border-white/8">
+  <div class="max-w-[1560px] mx-auto px-5 py-2.5 md:py-3 flex flex-wrap items-center gap-x-3 gap-y-2">
+    <div class="flex items-center gap-2.5 shrink-0">
+      <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-rose-500 to-orange-400 flex items-center justify-center">
+        <svg class="w-4.5 h-4.5" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2"><path d="M3 17l6-6 4 4 8-8"/><path d="M21 7v6h-6"/></svg>
+      </div>
+      <div class="min-w-0">
+        <div class="font-bold text-[15px] leading-tight tracking-tight">热播榜</div>
+        <div id="meta" class="text-[10.5px] text-zinc-500 leading-tight whitespace-nowrap truncate max-w-[92px] md:max-w-[190px]">正在读取…</div>
+      </div>
+    </div>
+
+    <nav id="tabs" class="order-last w-full md:order-none md:w-auto md:flex-1 md:ml-4 flex items-center gap-1 overflow-x-auto scrollbar-none"></nav>
+
+    <div class="flex-1 md:hidden"></div>
+
+    <div class="relative hidden lg:block shrink-0">
+      <input id="q" class="input input-sm bg-white/6 border-white/10 focus:border-rose-400/60 w-52 pl-8 text-xs" placeholder="搜剧名 / 演员">
+      <svg class="w-3.5 h-3.5 absolute left-2.5 top-2.5 text-zinc-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+    </div>
+    <button id="refresh" class="btn btn-sm btn-ghost text-zinc-400 hover:text-white shrink-0" title="重新抓取">
+      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 11-3-6.7"/><path d="M21 3v6h-6"/></svg>
+    </button>
+  </div>
+</header>
+
+<main class="max-w-[1560px] mx-auto px-5 pb-24">
+  <!-- 数据源说明 -->
+  <div class="flex items-center gap-2 py-3 text-[11px] text-zinc-500">
+    <span class="badge badge-sm bg-white/5 border-white/10 text-zinc-400 gap-1">
+      <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>数据源 豆瓣
+    </span>
+    <span id="src-note">官方榜单接口 · 30 分钟自动更新</span>
+  </div>
+
+  <div id="view"></div>
+</main>
+
+<!-- 详情 -->
+<dialog id="modal" class="modal">
+  <div class="modal-box w-[min(94vw,880px)] max-w-none p-0 bg-[#12151c] border border-white/10 overflow-hidden">
+    <div class="flex flex-col md:flex-row">
+      <div class="md:w-[240px] shrink-0 bg-black/40 md:max-h-[86vh] overflow-hidden">
+        <img id="m-pic" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" class="w-full h-full object-cover" alt="">
+      </div>
+      <div class="flex-1 p-6 space-y-3 md:max-h-[86vh] overflow-y-auto">
+        <div class="flex items-start gap-3">
+          <div class="flex-1 min-w-0">
+            <h2 id="m-title" class="text-xl font-bold leading-snug"></h2>
+            <div id="m-sub" class="text-xs text-zinc-500 mt-1"></div>
+          </div>
+          <form method="dialog"><button class="btn btn-sm btn-circle btn-ghost">✕</button></form>
+        </div>
+        <div id="m-rating" class="flex items-center gap-2"></div>
+        <div id="m-tags" class="flex flex-wrap gap-1.5"></div>
+        <p id="m-desc" class="text-[13px] leading-relaxed text-zinc-400"></p>
+        <div id="m-credits" class="text-xs text-zinc-500 space-y-1"></div>
+        <div class="divider my-2 before:bg-white/5 after:bg-white/5"></div>
+        <div class="flex items-center justify-between">
+          <div class="text-xs font-medium text-zinc-300">片源</div>
+          <button id="m-douban" target="_blank" class="link link-hover text-[11px] text-zinc-500">豆瓣详情 ↗</button>
+        </div>
+        <div id="m-lines" class="space-y-2"></div>
+      </div>
+    </div>
+  </div>
+  <form method="dialog" class="modal-backdrop"><button>close</button></form>
+</dialog>
+
+<!-- 播放 -->
+<dialog id="player" class="modal">
+  <div class="modal-box w-[min(94vw,1024px)] max-w-none p-0 bg-black border border-white/10 overflow-hidden">
+    <video id="p-video" class="w-full max-h-[78vh] bg-black" controls autoplay playsinline></video>
+    <div class="flex items-center gap-3 px-4 py-3 bg-[#12151c]">
+      <div class="flex-1 min-w-0">
+        <div id="p-title" class="text-sm font-medium truncate"></div>
+        <div id="p-meta" class="text-[11px] text-zinc-500 truncate"></div>
+      </div>
+      <button id="p-back" class="btn btn-sm btn-ghost">返回详情</button>
+      <form method="dialog"><button class="btn btn-sm btn-circle btn-ghost">✕</button></form>
+    </div>
+  </div>
+  <form method="dialog" class="modal-backdrop"><button>close</button></form>
+</dialog>
+
+<script>
+const EL = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+const poster = (u) => u ? `/api/poster?u=${encodeURIComponent(u)}` : '';
+const state = { data: null, tab: 'all', sub: {}, playing: null, kw: '' };
+
+/* ---------- 数据 ---------- */
+async function load(force) {
+  EL('view').innerHTML = `<div class="py-24 text-center text-sm text-zinc-500">正在读取豆瓣榜单…</div>`;
+  const r = await fetch(`/api/rank${force ? '?force=1' : ''}`);
+  const j = await r.json();
+  if (j.error && !j.groups) { EL('view').innerHTML = `<div class="alert alert-error text-sm">${esc(j.error)}</div>`; return; }
+  state.data = j;
+  const total = j.groups.reduce((a, g) => a + g.boards.reduce((b, x) => b + x.count, 0), 0);
+  EL('meta').textContent = window.innerWidth < 640
+    ? `${total} 部`
+    : `${j.groups.reduce((a,g)=>a+g.boards.length,0)} 个榜单 · ${total} 部${j.cached ? ' · 缓存' : ''}`;
+  EL('src-note').innerHTML = j.stale
+    ? `<span class="text-amber-400">⚠ 源站暂时不可用，显示 ${new Date(j.fetchedAt).toLocaleString('zh-CN',{hour12:false})} 的数据</span>`
+    : `官方榜单接口 · 抓取于 ${new Date(j.fetchedAt).toLocaleString('zh-CN', { hour12: false })}`;
+  renderTabs(); render();
+}
+
+function renderTabs() {
+  const tabs = [
+    { k: 'all', label: '全部' },
+    ...state.data.groups.map((g) => ({ k: g.key, label: g.label })),
+  ];
+  EL('tabs').innerHTML = tabs.map((t) => `
+    <button data-tab="${t.k}" class="px-3 py-1.5 rounded-lg text-[13px] whitespace-nowrap transition
+      ${state.tab === t.k ? 'bg-white/12 text-white font-medium' : 'text-zinc-400 hover:text-white hover:bg-white/6'}">${t.label}</button>`).join('');
+  EL('tabs').querySelectorAll('[data-tab]').forEach((b) => b.onclick = () => { state.tab = b.dataset.tab; renderTabs(); render(); });
+}
+
+/* ---------- 卡片 ---------- */
+function card(it, rank, opts = {}) {
+  const r = it.rating;
+  const badge = rank <= 3 && opts.rank !== false
+    ? `<div class="absolute top-0 left-0 w-8 h-8 flex items-center justify-center text-[13px] font-black rounded-br-lg shadow-lg
+        ${rank===1?'bg-gradient-to-br from-amber-300 to-amber-500 text-amber-950':rank===2?'bg-gradient-to-br from-zinc-200 to-zinc-400 text-zinc-700':'bg-gradient-to-br from-orange-400 to-orange-700 text-orange-50'}">${rank}</div>`
+    : (opts.rank === false ? '' : `<div class="absolute top-1.5 left-1.5 w-6 h-6 rounded-md bg-black/70 backdrop-blur text-[11px] font-bold flex items-center justify-center text-zinc-300">${rank}</div>`);
+
+  const score = r ? `<div class="absolute bottom-1.5 right-1.5 px-1.5 py-0.5 rounded bg-black/72 backdrop-blur text-[11.5px] font-bold leading-none
+      ${r>=8.5?'text-amber-300':r>=7.5?'text-amber-400':r>=6?'text-zinc-200':'text-zinc-400'}">${r.toFixed(1)}</div>` : '';
+
+  const meta = [it.year, it.episodes].filter(Boolean).join(' · ') || it.region || '';
+
+  return `
+  <div class="group cursor-pointer" data-id="${esc(it.board)}:${esc(it.id)}">
+    <div class="relative aspect-[2/3] rounded-lg overflow-hidden bg-white/5 ring-1 ring-white/8 group-hover:ring-rose-400/50 transition">
+      <img src="${poster(it.pic)}" alt="${esc(it.title)}" decoding="async"
+           onerror="this.style.visibility='hidden';this.parentElement.classList.add('bg-gradient-to-br','from-zinc-800','to-zinc-950')"
+           class="w-full h-full object-cover group-hover:scale-[1.04] transition duration-300">
+      ${badge}${score}
+      <div class="absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-100 transition p-2.5 flex flex-col justify-end">
+        <div class="text-[10.5px] leading-snug text-zinc-300 line-clamp-5">${esc(it.comment || it.subtitle || '')}</div>
+      </div>
+    </div>
+    <div class="mt-1.5 text-[12.5px] font-medium truncate group-hover:text-rose-300 transition">${esc(it.title)}</div>
+    <div class="text-[10.5px] text-zinc-500 truncate">${esc(meta)}</div>
+  </div>`;
+}
+
+const gridCls = 'grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-x-3 gap-y-5';
+
+/* ---------- 渲染 ---------- */
+function render() {
+  if (!state.data) return;
+  const v = EL('view');
+
+  if (state.tab === 'all') {
+    v.innerHTML = state.data.groups.map((g) => {
+      const main = g.boards[0];
+      const items = (main.items || []).slice(0, 8);
+      if (!items.length) return '';
+      return `
+      <section class="mb-10">
+        <div class="flex items-baseline gap-3 mb-3">
+          <h2 class="text-[17px] font-bold tracking-tight">${g.label}热播</h2>
+          <span class="text-[11px] text-zinc-500">${esc(main.label)}</span>
+          <div class="flex-1"></div>
+          <button class="text-[11.5px] text-zinc-500 hover:text-rose-300 transition" data-more="${g.key}">查看全部 →</button>
+        </div>
+        <div class="${gridCls}">${items.map((it, i) => card(it, i + 1)).join('')}</div>
+      </section>`;
+    }).join('');
+    v.querySelectorAll('[data-more]').forEach((b) => b.onclick = () => {
+      state.tab = b.dataset.more; state.sub[state.tab] = 0; renderTabs(); render();
+    });
+  } else {
+    const g = state.data.groups.find((x) => x.key === state.tab);
+    const si = state.sub[state.tab] ?? 0;
+    const board = g.boards[si] || g.boards[0];
+    const chips = g.boards.length > 1 ? `
+      <div class="flex flex-wrap gap-2 mb-4">
+        ${g.boards.map((b, i) => `
+          <button data-sub="${i}" class="px-3 py-1 rounded-full text-[12px] border transition
+            ${i === si ? 'bg-rose-500/15 border-rose-400/40 text-rose-200' : 'bg-white/4 border-white/10 text-zinc-400 hover:text-white'}">
+            ${b.label}<span class="ml-1 opacity-50 text-[10px]">${b.count}</span>
+          </button>`).join('')}
+      </div>` : '';
+    const kw = state.kw.trim();
+    const items = kw ? board.items.filter((x) => (x.title + x.subtitle + x.actors.join(' ')).includes(kw)) : board.items;
+    v.innerHTML = chips + (items.length
+      ? `<div class="${gridCls}">${items.map((it, i) => card(it, i + 1)).join('')}</div>`
+      : `<div class="py-20 text-center text-sm text-zinc-500">${kw ? `该榜单内没有匹配「${esc(kw)}」` : '暂无数据'}</div>`);
+    v.querySelectorAll('[data-sub]').forEach((b) => b.onclick = () => {
+      state.sub[state.tab] = Number(b.dataset.sub); render();
+    });
+  }
+
+  v.querySelectorAll('[data-id]').forEach((el) => el.onclick = () => openDetail(el.dataset.id));
+}
+
+/* ---------- 详情 ---------- */
+/**
+ * 资源站的片名和豆瓣经常一字之差，且同名短剧、解说版极多。
+ * 直接取第一条会出现"搜《生日快乐》(埃及电影) 播出一部垂直短剧"这类错配。
+ */
+function pickBest(items, target) {
+  const clean = (s) => String(s || '').replace(/[（(\[【].*?[)）\]】]/g, '').replace(/\s+/g, '').trim();
+  const want = clean(target.title);
+  const scored = items.map((x) => {
+    const n = clean(x.name);
+    let s = 0;
+    if (n === want) s += 100;
+    else if (n.startsWith(want) || want.startsWith(n)) s += 40;
+    if (/解说|预告|花絮|片段|速看|混剪|彩蛋/.test(x.name || '')) s -= 200;
+    if (target.year && String(x.year || '').includes(String(target.year))) s += 30;
+    s += (x.lines || []).filter((l) => l.playable).length * 2;
+    return { x, s };
+  }).sort((a, b) => b.s - a.s);
+
+  const good = scored.filter((o) => o.s >= 40);
+  const pool = good.length ? good : scored.filter((o) => o.s > 0);
+  return pool.slice(0, 3).map((o) => o.x);
+}
+
+async function openDetail(key) {
+  const [board, id] = key.split(':');
+  let it = null;
+  for (const g of state.data.groups) for (const b of g.boards) {
+    if (b.id === board) it = b.items.find((x) => x.id === id);
+    if (it) break;
+  }
+  if (!it) return;
+
+  EL('m-pic').src = poster(it.picLarge || it.pic);
+  EL('m-title').textContent = it.title;
+  EL('m-sub').textContent = [it.year, it.region, it.episodes].filter(Boolean).join(' · ');
+  EL('m-rating').innerHTML = it.rating
+    ? `<span class="text-2xl font-black ${it.rating>=8.5?'text-amber-300':it.rating>=7.5?'text-amber-400':'text-zinc-300'}">${it.rating.toFixed(1)}</span>
+       <span class="text-[11px] text-zinc-500">${it.ratingCount.toLocaleString()} 人评价</span>
+       ${it.hasPlayable ? '<span class="badge badge-xs bg-emerald-500/15 border-emerald-400/30 text-emerald-300">可在线看</span>' : ''}`
+    : `<span class="text-[11px] text-zinc-500">暂无评分</span>`;
+  EL('m-tags').innerHTML = [...(it.genres||[]), it.region].filter(Boolean)
+    .map((t) => `<span class="badge badge-sm bg-white/5 border-white/10 text-zinc-400 text-[10.5px]">${esc(t)}</span>`).join('');
+  EL('m-desc').textContent = it.comment || '暂无简介';
+  EL('m-credits').innerHTML = [
+    it.director ? `<div>导演 <span class="text-zinc-300">${esc(it.director)}</span></div>` : '',
+    it.actors.length ? `<div>主演 <span class="text-zinc-300">${esc(it.actors.slice(0,6).join(' / '))}</span></div>` : '',
+  ].join('');
+  EL('m-douban').href = it.url;
+  EL('m-lines').innerHTML = `<div class="text-[11.5px] text-zinc-500 py-2">正在检索片源…</div>`;
+  EL('modal').showModal();
+
+  try {
+    const r = await fetch(`/api/search?kw=${encodeURIComponent(it.title)}&resolve=1`);
+    const j = await r.json();
+    const pool = pickBest(j.items || [], it);
+    const lines = pool.flatMap((x) =>
+      x.lines.map((l) => ({ ...l, name: x.name, year: x.year })))
+      .filter((l) => l.playable && l.media);
+    const note = pool.length && pool[0].name !== it.title
+      ? `<div class="text-[11px] text-amber-400/80 mb-1">资源站匹配到《${esc(pool[0].name)}》</div>` : '';
+    EL('m-lines').innerHTML = note + (lines.length
+      ? lines.slice(0, 6).map((l) => `
+        <button data-url="${esc(l.media)}" data-s="${esc(l.stationName)}" data-r="${esc(l.resolution || '')}" data-d="${esc(l.duration || '')}"
+          class="w-full flex items-center gap-3 px-3 py-2 rounded-lg bg-white/4 hover:bg-white/10 border border-white/8 text-left transition">
+          <svg class="w-4 h-4 text-rose-400 shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          <span class="text-[12.5px] font-medium truncate">${esc(l.stationName)}</span>
+          <span class="text-[11px] text-zinc-500">${esc(l.resolution || '—')} · ${esc(l.duration || '')}</span>
+          <span class="ml-auto badge badge-xs bg-emerald-500/15 border-emerald-400/30 text-emerald-300">可播</span>
+        </button>`).join('')
+      : `<div class="text-[11.5px] text-zinc-500 py-2 leading-relaxed">未检索到可用片源。<br><span class="text-zinc-600">该片可能尚未入库，或片源站暂未收录。</span></div>`);
+    EL('m-lines').querySelectorAll('[data-url]').forEach((b) => b.onclick = () =>
+      play(b.dataset.url, it.title, `${b.dataset.s} · ${b.dataset.r} · ${b.dataset.d}`));
+  } catch {
+    EL('m-lines').innerHTML = `<div class="text-[11.5px] text-zinc-500 py-2">片源检索失败，可稍后重试。</div>`;
+  }
+}
+
+/* ---------- 播放 ---------- */
+function play(url, title, meta) {
+  const v = EL('p-video');
+  if (state.playing) { try { state.playing.destroy(); } catch {} state.playing = null; }
+  EL('p-title').textContent = title || '';
+  EL('p-meta').textContent = meta || '';
+  EL('player').showModal();
+  if (window.Hls && Hls.isSupported()) {
+    const hls = new Hls({ enableWorker: true });
+    hls.loadSource(url); hls.attachMedia(v);
+    hls.on(Hls.Events.MANIFEST_PARSED, () => v.play().catch(() => {}));
+    hls.on(Hls.Events.ERROR, (_, d) => { if (d.fatal) EL('p-meta').textContent = `播放失败：${d.details}`; });
+    state.playing = hls;
+  } else { v.src = url; v.play().catch(() => {}); }
+}
+
+/* ---------- 事件 ---------- */
+EL('p-back').onclick = () => { EL('player').close(); EL('modal').showModal(); };
+EL('player').addEventListener('close', () => {
+  if (state.playing) { try { state.playing.destroy(); } catch {} state.playing = null; }
+  EL('p-video').removeAttribute('src');
+});
+EL('refresh').onclick = () => load(true);
+let qt;
+EL('q').oninput = (e) => {
+  clearTimeout(qt); qt = setTimeout(() => { state.kw = e.target.value; if (state.tab === 'all') { state.tab = 'tv'; renderTabs(); } render(); }, 250);
+};
+
+load();
+</script>
+</body>
+</html>

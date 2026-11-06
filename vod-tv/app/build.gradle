@@ -1,0 +1,57 @@
+apply plugin: 'com.android.application'
+
+android {
+    namespace 'com.vodtv'
+    compileSdk 33
+
+    defaultConfig {
+        applicationId "com.vodtv"
+        // 4.4(API 19)：TLS 1.2 原生可用、GridView 尺寸方法可用，不再需要 4.0 那些兼容绕路
+        minSdkVersion 19
+        targetSdkVersion 28
+        versionCode 6
+        versionName "1.2.0"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            // 默认用 debug 签名，方便直接装机；正式发布请换成自己的 keystore
+            signingConfig signingConfigs.debug
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    packagingOptions {
+        resources.excludes += ['META-INF/*']
+    }
+
+    lintOptions {
+        // 之前是 false，等于静态检查一直在跑但从不拦截 —— 这是问题能溜到真机上的直接原因。
+        // 现在只对 error 级别拦截；warning 仍然记录但不挡构建。
+        abortOnError true
+        checkReleaseBuilds false
+    }
+
+    testOptions {
+        unitTests {
+            // 纯逻辑单测不碰 Android 实现，避免 "not mocked" 报错
+            returnDefaultValues = true
+        }
+    }
+}
+
+dependencies {
+    // minSdk 19 起可用 2.19.x（最后一个 2.x 版本，仍支持 API 16+）
+    implementation 'com.google.android.exoplayer:exoplayer-core:2.19.1'
+    implementation 'com.google.android.exoplayer:exoplayer-hls:2.19.1'
+
+    // 只引入 JUnit 4（380KB），跑在 JVM 上，秒级出结果，不装模拟器、不连设备。
+    // 没有引入 Robolectric / Espresso：这个项目就 15 个类，UI 回归靠真机验收更划算。
+    testImplementation 'junit:junit:4.13.2'
+}

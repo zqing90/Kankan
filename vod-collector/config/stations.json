@@ -1,0 +1,461 @@
+{
+  "version": "1.0",
+  "updated": "2026-11-06",
+  "defaults": {
+    "adapter": "maccms",
+    "format": "json",
+    "timeoutMs": 15000,
+    "retry": 1,
+    "concurrencyPerHost": 2,
+    "headers": {
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36"
+    },
+    "params": {
+      "list": "ac=list",
+      "detail": "ac=detail",
+      "search": "ac=detail&wd={kw}",
+      "byIds": "ac=detail&ids={ids}",
+      "json": "at=json"
+    }
+  },
+  "stations": [
+    {
+      "id": "liangzi",
+      "name": "量子资源",
+      "enabled": true,
+      "hosts": [
+        "https://cj.lziapi.com"
+      ],
+      "path": "/api.php/provide/vod/",
+      "priority": 1,
+      "search": "wd",
+      "searchVia": null,
+      "playFrom": "lzm3u8",
+      "note": "综合大库，搜索可用，播放地址是分享页需二次解析",
+      "probe": {
+        "alive": true,
+        "json": true,
+        "items": 3
+      }
+    },
+    {
+      "id": "feifan",
+      "name": "非凡资源",
+      "enabled": true,
+      "hosts": [
+        "https://cj.ffzyapi.com",
+        "https://api.ffzyapi.com"
+      ],
+      "path": "/api.php/provide/vod/",
+      "priority": 1,
+      "search": "wd",
+      "searchVia": null,
+      "playFrom": "ffm3u8",
+      "note": "片库 10 万，m3u8 内嵌在分享页",
+      "probe": {
+        "alive": true,
+        "json": true,
+        "items": 1
+      }
+    },
+    {
+      "id": "bfzy",
+      "name": "暴风资源",
+      "enabled": true,
+      "hosts": [
+        "https://bfzyapi.com"
+      ],
+      "path": "/api.php/provide/vod/",
+      "priority": 1,
+      "search": "wd",
+      "searchVia": null,
+      "playFrom": "bfzym3u8",
+      "note": "直接给 m3u8，无加密，最省事",
+      "probe": {
+        "alive": true,
+        "json": true,
+        "items": 2
+      }
+    },
+    {
+      "id": "guangsu",
+      "name": "光速资源",
+      "enabled": true,
+      "hosts": [
+        "https://api.guangsuapi.com"
+      ],
+      "path": "/api.php/provide/vod/",
+      "priority": 2,
+      "search": "wd",
+      "searchVia": null,
+      "playFrom": "gsm3u8",
+      "note": "AES-128，体育赛事多",
+      "probe": {
+        "alive": true,
+        "json": true,
+        "items": 2
+      }
+    },
+    {
+      "id": "hongniu",
+      "name": "红牛资源",
+      "enabled": true,
+      "hosts": [
+        "https://www.hongniuzy2.com"
+      ],
+      "path": "/api.php/provide/vod/",
+      "priority": 2,
+      "search": "wd",
+      "searchVia": null,
+      "playFrom": "hnm3u8",
+      "note": "AES-128",
+      "probe": {
+        "alive": true,
+        "json": true,
+        "items": 2
+      }
+    },
+    {
+      "id": "jisu",
+      "name": "极速资源",
+      "enabled": true,
+      "hosts": [
+        "https://jszyapi.com"
+      ],
+      "path": "/api.php/provide/vod/",
+      "priority": 2,
+      "search": "wd",
+      "searchVia": null,
+      "playFrom": "jsm3u8",
+      "note": "AES-128",
+      "probe": {
+        "alive": true,
+        "json": true,
+        "items": 2
+      }
+    },
+    {
+      "id": "zuida",
+      "name": "最大资源",
+      "enabled": true,
+      "hosts": [
+        "https://api.zuidapi.com"
+      ],
+      "path": "/api.php/provide/vod/",
+      "priority": 3,
+      "search": "wd",
+      "searchVia": null,
+      "playFrom": "zuidam3u8",
+      "note": "只有 128 分钟枪版",
+      "probe": {
+        "alive": true,
+        "json": true,
+        "items": 2
+      }
+    },
+    {
+      "id": "xinlang",
+      "name": "新浪资源",
+      "enabled": true,
+      "hosts": [
+        "https://api.xinlangapi.com"
+      ],
+      "path": "/xinlangapi.php/provide/vod/",
+      "priority": 2,
+      "search": "wd",
+      "searchVia": null,
+      "playFrom": "xlm3u8",
+      "note": "AES-128，路径带 xinlangapi.php",
+      "probe": {
+        "alive": true,
+        "json": true,
+        "items": 2
+      }
+    },
+    {
+      "id": "wujin",
+      "name": "无尽资源",
+      "enabled": true,
+      "hosts": [
+        "https://api.wujinapi.com"
+      ],
+      "path": "/api.php/provide/vod/",
+      "priority": 2,
+      "search": "wd",
+      "searchVia": null,
+      "playFrom": "wjm3u8",
+      "note": "无加密，4800+ 分片",
+      "probe": {
+        "alive": true,
+        "json": true,
+        "items": 2
+      }
+    },
+    {
+      "id": "jinying",
+      "name": "金鹰资源",
+      "enabled": true,
+      "hosts": [
+        "https://jyzyapi.com"
+      ],
+      "path": "/provide/vod/",
+      "priority": 2,
+      "search": "wd",
+      "searchVia": null,
+      "playFrom": "jinyingm3u8",
+      "note": "AES-128，路径无 api.php",
+      "probe": {
+        "alive": true,
+        "json": true,
+        "items": 2
+      }
+    },
+    {
+      "id": "modu",
+      "name": "魔都资源",
+      "enabled": true,
+      "hosts": [
+        "https://caiji.moduapi.cc"
+      ],
+      "path": "/api.php/provide/vod/",
+      "priority": 2,
+      "search": "wd",
+      "searchVia": null,
+      "playFrom": "modum3u8",
+      "note": "AES-128",
+      "probe": {
+        "alive": true,
+        "json": true,
+        "items": 2
+      }
+    },
+    {
+      "id": "piaoling",
+      "name": "飘零资源",
+      "enabled": true,
+      "hosts": [
+        "https://p2100.net"
+      ],
+      "path": "/api.php/provide/vod/",
+      "priority": 2,
+      "search": "wd",
+      "searchVia": null,
+      "playFrom": "ikm3u8",
+      "note": "AES-128",
+      "probe": {
+        "alive": true,
+        "json": true,
+        "items": 2
+      }
+    },
+    {
+      "id": "huya",
+      "name": "虎牙资源",
+      "enabled": true,
+      "hosts": [
+        "https://www.huyaapi.com"
+      ],
+      "path": "/api.php/provide/vod/",
+      "priority": 2,
+      "search": "wd",
+      "searchVia": null,
+      "playFrom": "hym3u8",
+      "note": "AES-128",
+      "probe": {
+        "alive": true,
+        "json": true,
+        "items": 2
+      }
+    },
+    {
+      "id": "360zy",
+      "name": "360资源",
+      "enabled": true,
+      "hosts": [
+        "https://360zy5.com"
+      ],
+      "path": "/api.php/provide/vod/",
+      "priority": 3,
+      "search": "wd",
+      "searchVia": null,
+      "playFrom": "360zy",
+      "note": "AES-128",
+      "probe": {
+        "alive": true,
+        "json": true,
+        "items": 2
+      }
+    },
+    {
+      "id": "kuaiche",
+      "name": "快车资源",
+      "enabled": true,
+      "hosts": [
+        "https://caiji.kuaichezy.org"
+      ],
+      "path": "/api.php/provide/vod/",
+      "priority": 3,
+      "search": "none",
+      "searchVia": null,
+      "playFrom": null,
+      "note": "搜索关闭，只能全量",
+      "probe": {
+        "alive": true,
+        "json": true,
+        "items": 0
+      }
+    },
+    {
+      "id": "tianya",
+      "name": "天涯影视",
+      "enabled": true,
+      "hosts": [
+        "https://tyyszy.com"
+      ],
+      "path": "/api.php/provide/vod/",
+      "priority": 3,
+      "search": "none",
+      "searchVia": null,
+      "playFrom": null,
+      "note": "搜索关闭",
+      "probe": {
+        "alive": true,
+        "json": true,
+        "items": 0
+      }
+    },
+    {
+      "id": "yinghua",
+      "name": "樱花资源",
+      "enabled": true,
+      "hosts": [
+        "https://m3u8.apiyhzy.com"
+      ],
+      "path": "/api.php/provide/vod/",
+      "priority": 3,
+      "search": "none",
+      "searchVia": null,
+      "playFrom": null,
+      "note": "搜索 403",
+      "probe": {
+        "alive": true,
+        "json": true,
+        "items": 0
+      }
+    },
+    {
+      "id": "maoyan",
+      "name": "猫眼资源",
+      "enabled": true,
+      "hosts": [
+        "https://api.maoyanapi.top"
+      ],
+      "path": "/api.php/provide/vod/",
+      "priority": 3,
+      "search": "wd",
+      "searchVia": null,
+      "playFrom": null,
+      "note": "未收录测试片",
+      "probe": {
+        "alive": true,
+        "json": true,
+        "items": 0
+      }
+    },
+    {
+      "id": "maotai",
+      "name": "茅台资源",
+      "enabled": true,
+      "hosts": [
+        "https://caiji.maotaizy.cc"
+      ],
+      "path": "/api.php/provide/vod/",
+      "priority": 3,
+      "search": "wd",
+      "searchVia": null,
+      "playFrom": null,
+      "note": "未收录测试片",
+      "probe": {
+        "alive": true,
+        "json": true,
+        "items": 0
+      }
+    },
+    {
+      "id": "sony",
+      "name": "索尼资源",
+      "enabled": true,
+      "hosts": [
+        "https://suoniapi.com"
+      ],
+      "path": "/api.php/provide/vod/",
+      "priority": 3,
+      "search": "none",
+      "searchVia": null,
+      "playFrom": null,
+      "note": "Cloudflare 拦截",
+      "probe": {
+        "alive": true,
+        "json": true,
+        "items": 0
+      }
+    },
+    {
+      "id": "shandian",
+      "name": "闪电资源",
+      "enabled": true,
+      "hosts": [
+        "https://xsd.sdzyapi.com"
+      ],
+      "path": "/api.php/provide/vod/",
+      "priority": 3,
+      "search": "none",
+      "searchVia": null,
+      "playFrom": null,
+      "note": "搜索关闭",
+      "probe": {
+        "alive": true,
+        "json": true,
+        "items": 0
+      }
+    },
+    {
+      "id": "yaya",
+      "name": "鸭鸭资源",
+      "enabled": true,
+      "hosts": [
+        "https://cj.yayazy.net"
+      ],
+      "path": "/api.php/provide/vod/",
+      "priority": 3,
+      "search": "none",
+      "searchVia": null,
+      "playFrom": null,
+      "note": "搜索关闭",
+      "probe": {
+        "alive": true,
+        "json": true,
+        "items": 0
+      }
+    },
+    {
+      "id": "niuniu",
+      "name": "牛牛资源",
+      "enabled": true,
+      "hosts": [
+        "https://api.niuniuzy.me"
+      ],
+      "path": "/api.php/provide/vod/",
+      "priority": 2,
+      "search": "none",
+      "searchVia": "suggest",
+      "playFrom": null,
+      "note": "搜索关闭，需走站内 suggest",
+      "probe": {
+        "alive": true,
+        "json": true,
+        "items": 0
+      }
+    }
+  ]
+}

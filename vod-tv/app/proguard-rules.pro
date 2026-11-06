@@ -1,0 +1,3 @@
+-dontwarn com.google.android.exoplayer.**
+-keep class com.google.android.exoplayer.** { *; }
+-keepattributes *Annotation*

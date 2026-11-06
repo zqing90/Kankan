@@ -1,0 +1,15 @@
+{
+  "name": "vod-collector",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "配置化的影视采集器：一套适配层接入所有苹果CMS(maccms V10)资源站",
+  "engines": { "node": ">=18" },
+  "scripts": {
+    "start": "node src/server.js 8765",
+    "health": "node src/cli.js health",
+    "search": "node src/cli.js search",
+    "chart": "node src/cli.js chart",
+    "play": "node src/cli.js play"
+  }
+}
