@@ -4,25 +4,21 @@
     android:layout_height="match_parent"
     android:background="@color/bg">
 
-    <!-- 顶栏：返回 + 输入框 + 搜索 -->
+    <!-- 顶栏：左上返回 + 输入框 + 搜索图标（与其他二级页同一套结构） -->
     <LinearLayout
         android:id="@+id/topbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:paddingLeft="36dp"
-        android:paddingRight="36dp"
+        android:paddingLeft="48dp"
+        android:paddingRight="48dp"
         android:paddingTop="20dp"
         android:paddingBottom="6dp">
 
-        <TextView
+        <include
             android:id="@+id/btn_back"
-            style="@style/TopButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="0dp"
-            android:text="← 返回" />
+            layout="@layout/part_back" />
 
         <EditText
             android:id="@+id/q"
@@ -44,12 +40,67 @@
             android:textColorHint="@color/text_dim"
             android:textSize="15sp" />
 
-        <TextView
+        <ImageView
             android:id="@+id/btn_go"
-            style="@style/TopButton"
-            android:layout_width="wrap_content"
+            style="@style/IconButton"
+            android:src="@drawable/ic_ui_search"
+            android:contentDescription="@string/search" />
+    </LinearLayout>
+
+    <!-- 最近搜索：只在还没输入关键词时显示 -->
+    <LinearLayout
+        android:id="@+id/history_panel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/topbar"
+        android:orientation="vertical"
+        android:paddingLeft="50dp"
+        android:paddingRight="48dp"
+        android:paddingTop="4dp"
+        android:paddingBottom="6dp"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/search" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/search_history"
+                android:textColor="@color/text_secondary"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
+
+            <TextView
+                android:id="@+id/btn_history_clear"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:focusable="true"
+                android:background="@drawable/bg_tab"
+                android:paddingLeft="14dp"
+                android:paddingRight="14dp"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp"
+                android:text="@string/history_clear"
+                android:textColor="@color/text_dim"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <!-- 标签按行动态填：代码里每行最多放 6 个 -->
+        <LinearLayout
+            android:id="@+id/history_tags"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="vertical" />
     </LinearLayout>
 
     <!-- 状态 / 兜底入口 -->
@@ -57,11 +108,11 @@
         android:id="@+id/status_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/topbar"
+        android:layout_below="@id/history_panel"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:paddingLeft="38dp"
-        android:paddingRight="38dp"
+        android:paddingLeft="50dp"
+        android:paddingRight="48dp"
         android:paddingBottom="10dp">
 
         <TextView
@@ -69,7 +120,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="输入片名后按「搜索」，也可以直接按遥控器确认键"
+            android:text="输入片名后按搜索图标，也可以直接按遥控器确认键"
             android:textColor="@color/text_dim"
             android:textSize="12sp" />
 
@@ -92,8 +143,8 @@
         android:numColumns="6"
         android:horizontalSpacing="14dp"
         android:verticalSpacing="20dp"
-        android:paddingLeft="32dp"
-        android:paddingRight="32dp"
+        android:paddingLeft="44dp"
+        android:paddingRight="44dp"
         android:paddingTop="8dp"
         android:paddingBottom="32dp"
         android:clipChildren="false"

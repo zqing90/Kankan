@@ -5,21 +5,18 @@
     android:orientation="vertical"
     android:background="@color/bg">
 
-    <!-- 返回入口：手机上没有实体返回键，全靠它；物理返回键同时保留 -->
+    <!-- 返回入口：手机上没有实体返回键，全靠它；物理返回键同时保留。
+         位置固定左上角，和其他页面共用同一份 part_back（PROJECT.md §15） -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:paddingLeft="40dp"
+        android:paddingLeft="48dp"
         android:paddingTop="18dp">
 
-        <TextView
+        <include
             android:id="@+id/btn_back"
-            style="@style/TopButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="0dp"
-            android:text="← 返回" />
+            layout="@layout/part_back" />
     </LinearLayout>
 
     <!-- 上半：影片信息 -->

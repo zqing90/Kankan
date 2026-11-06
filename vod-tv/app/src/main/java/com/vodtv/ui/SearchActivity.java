@@ -12,7 +12,9 @@ import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.vodtv.R;
 import com.vodtv.data.ImageLoader;
@@ -20,6 +22,7 @@ import com.vodtv.data.PlayCache;
 import com.vodtv.data.PlayResolver;
 import com.vodtv.data.RankItem;
 import com.vodtv.data.RankRepository;
+import com.vodtv.data.SearchHistory;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -43,6 +46,10 @@ public class SearchActivity extends Activity {
     private TextView status;
     private TextView empty;
     private TextView btnOnline;
+    /* 最近搜索标签组 */
+    private LinearLayout historyPanel;
+    private LinearLayout historyTags;
+    private TextView btnHistoryClear;
 
     private ResultAdapter adapter;
     private final List<RankItem> results = new ArrayList<RankItem>();
@@ -70,6 +77,17 @@ public class SearchActivity extends Activity {
         status = (TextView) findViewById(R.id.status);
         empty = (TextView) findViewById(R.id.empty);
         btnOnline = (TextView) findViewById(R.id.btn_online);
+        historyPanel = (LinearLayout) findViewById(R.id.history_panel);
+        historyTags = (LinearLayout) findViewById(R.id.history_tags);
+        btnHistoryClear = (TextView) findViewById(R.id.btn_history_clear);
+
+        btnHistoryClear.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SearchHistory.clear();
+                renderHistoryTags();
+            }
+        });
 
         findViewById(R.id.btn_back).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -104,6 +122,22 @@ public class SearchActivity extends Activity {
             }
         });
 
+        // 一输入就收起「最近搜索」，清空后又露出来
+        input.addTextChangedListener(new android.text.TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(android.text.Editable s) {
+                renderHistoryTags();
+            }
+        });
+
         adapter = new ResultAdapter();
         grid.setAdapter(adapter);
         grid.post(new Runnable() {
@@ -129,6 +163,94 @@ public class SearchActivity extends Activity {
         });
     }
 
+    /* ---------- 最近搜索 ---------- */
+
+    /** 输入框有内容、或历史为空时，整块隐藏 */
+    private void renderHistoryTags() {
+        if (historyPanel == null || historyTags == null) return;
+        List<String> hist = SearchHistory.list();
+        boolean typing = input.getText().toString().trim().length() > 0;
+        if (typing || hist.isEmpty()) {
+            historyPanel.setVisibility(View.GONE);
+            return;
+        }
+        historyPanel.setVisibility(View.VISIBLE);
+        historyTags.removeAllViews();
+
+        LinearLayout row = null;
+        for (int i = 0; i < hist.size(); i++) {
+            if (i % 6 == 0) {
+                row = new LinearLayout(this);
+                row.setOrientation(LinearLayout.HORIZONTAL);
+                LinearLayout.LayoutParams rlp = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                if (i > 0) rlp.topMargin = dp(8);
+                historyTags.addView(row, rlp);
+            }
+            row.addView(makeTag(hist.get(i)));
+        }
+    }
+
+    /** 一个关键词标签：点即搜，长按 / 菜单键删掉 */
+    private View makeTag(final String kw) {
+        final TextView tv = new TextView(this);
+        tv.setText(kw);
+        tv.setTextSize(14);
+        tv.setTextColor(getResources().getColor(R.color.text_secondary));
+        tv.setBackgroundResource(R.drawable.bg_tab);
+        tv.setPadding(dp(16), dp(8), dp(16), dp(8));
+        tv.setSingleLine(true);
+        tv.setFocusable(true);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        lp.rightMargin = dp(8);
+        tv.setLayoutParams(lp);
+
+        tv.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                tv.setTextColor(getResources().getColor(
+                        hasFocus ? R.color.text_primary : R.color.text_secondary));
+            }
+        });
+        tv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                input.setText(kw);
+                input.setSelection(kw.length());
+                doSearch();
+            }
+        });
+        tv.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (event.getAction() != KeyEvent.ACTION_UP) return false;
+                if (isConfirmKey(keyCode)) {
+                    input.setText(kw);
+                    doSearch();
+                    return true;
+                }
+                if (keyCode == KeyEvent.KEYCODE_MENU) {
+                    SearchHistory.remove(kw);
+                    renderHistoryTags();
+                    return true;
+                }
+                return false;
+            }
+        });
+        // 触摸设备没有菜单键，长按等同删除
+        tv.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                SearchHistory.remove(kw);
+                renderHistoryTags();
+                Toast.makeText(SearchActivity.this, "已删除这条搜索记录", Toast.LENGTH_SHORT).show();
+                return true;
+            }
+        });
+        return tv;
+    }
+
     /* ---------- 搜索 ---------- */
 
     private void doSearch() {
@@ -138,6 +260,8 @@ public class SearchActivity extends Activity {
             btnOnline.setVisibility(View.GONE);
             return;
         }
+        SearchHistory.add(keyword);
+        renderHistoryTags();       // 已经有输入了，标签组收起来
         // 收起键盘，把屏幕让给结果
         input.clearFocus();
 
@@ -286,6 +410,7 @@ public class SearchActivity extends Activity {
     protected void onResume() {
         super.onResume();
         opening = false;
+        renderHistoryTags();
     }
 
     private class ResultAdapter extends BaseAdapter {

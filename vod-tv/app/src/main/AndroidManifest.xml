@@ -60,6 +60,12 @@
             android:windowSoftInputMode="adjustPan" />
 
         <activity
+            android:name=".ui.HistoryActivity"
+            android:exported="false"
+            android:screenOrientation="landscape"
+            android:configChanges="orientation|screenSize|keyboardHidden" />
+
+        <activity
             android:name=".player.PlayerActivity"
             android:exported="false"
             android:screenOrientation="landscape"

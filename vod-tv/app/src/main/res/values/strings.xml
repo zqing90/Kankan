@@ -8,4 +8,18 @@
     <string name="back">返回</string>
     <string name="search">搜索</string>
     <string name="search_hint">输入片名或演员，比如「漫长的季节」</string>
+
+    <!-- 统一顶栏（规范见 PROJECT.md §15） -->
+    <string name="history">观看记录</string>
+    <string name="history_short">继续观看</string>
+    <string name="history_empty">还没有播放记录\n看过的片会自动出现在这里</string>
+    <string name="history_clear">清空</string>
+    <string name="history_clear_confirm">清空全部观看记录？</string>
+    <string name="history_cancel">取消</string>
+    <string name="history_hint">OK 继续播放 · 菜单键删除这一条</string>
+    <string name="history_all">全部记录</string>
+    <string name="history_count">共 %1$d 部</string>
+    <string name="history_deleted">已删除这条记录</string>
+    <string name="history_cleared">观看记录已清空</string>
+    <string name="search_history">最近搜索</string>
 </resources>

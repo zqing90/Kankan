@@ -35,7 +35,7 @@ public class SettingsActivity extends Activity {
         etServer = (EditText) findViewById(R.id.et_server);
         etServer.setText(Prefs.serverUrl());
 
-        findViewById(R.id.btn_close).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.btn_back).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 finish();

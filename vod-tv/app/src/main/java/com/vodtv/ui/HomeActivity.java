@@ -47,13 +47,17 @@ public class HomeActivity extends Activity {
     private LinearLayout tabs;
     private TextView status;
     private TextView empty;
-    private TextView btnRefresh;
-    private TextView btnSearch;
+    private View btnRefresh;
+    private View btnSearch;
+    private View btnHistory;
+    private View btnSettings;
 
     /* 继续观看横条 */
     private LinearLayout historyBlock;
     private LinearLayout historyRow;
     private final List<View> historyCards = new ArrayList<View>();
+    /** 横条末尾的「全部记录」入口卡 */
+    private View historyMore;
 
     private RankRepository.RankData data;
     private String group = null;          // null = 全部
@@ -94,8 +98,10 @@ public class HomeActivity extends Activity {
         tabs = (LinearLayout) findViewById(R.id.tabs);
         status = (TextView) findViewById(R.id.status);
         empty = (TextView) findViewById(R.id.empty);
-        btnRefresh = (TextView) findViewById(R.id.btn_refresh);
-        btnSearch = (TextView) findViewById(R.id.btn_search);
+        btnRefresh = findViewById(R.id.btn_refresh);
+        btnSearch = findViewById(R.id.btn_search);
+        btnHistory = findViewById(R.id.btn_history);
+        btnSettings = findViewById(R.id.btn_settings);
         historyBlock = (LinearLayout) findViewById(R.id.history_block);
         historyRow = (LinearLayout) findViewById(R.id.history_row);
 
@@ -145,7 +151,13 @@ public class HomeActivity extends Activity {
                 startActivity(new Intent(HomeActivity.this, SearchActivity.class));
             }
         });
-        findViewById(R.id.btn_settings).setOnClickListener(new View.OnClickListener() {
+        btnHistory.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(HomeActivity.this, HistoryActivity.class));
+            }
+        });
+        btnSettings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(HomeActivity.this, SettingsActivity.class));
@@ -319,10 +331,16 @@ public class HomeActivity extends Activity {
         }
         if (!tabViews.isEmpty()) {
             grid.setNextFocusUpId(tabViews.get(0).getId());
-            // 顶栏最左边现在是「搜索」，从最后一个 tab 往右走要能落到它上面
-            if (btnSearch != null) {
-                btnSearch.setNextFocusLeftId(tabViews.get(tabViews.size() - 1).getId());
-            }
+            // 顶栏右侧是一排图标：分类最右 → 搜索 → 记录 → 更新 → 设置 → 回到分类最左
+            View lastTab = tabViews.get(tabViews.size() - 1);
+            btnSearch.setNextFocusLeftId(lastTab.getId());
+            btnSearch.setNextFocusRightId(btnHistory.getId());
+            btnHistory.setNextFocusLeftId(btnSearch.getId());
+            btnHistory.setNextFocusRightId(btnRefresh.getId());
+            btnRefresh.setNextFocusLeftId(btnHistory.getId());
+            btnRefresh.setNextFocusRightId(btnSettings.getId());
+            btnSettings.setNextFocusLeftId(btnRefresh.getId());
+            btnSettings.setNextFocusRightId(tabViews.get(0).getId());
         }
     }
 
@@ -423,6 +441,7 @@ public class HomeActivity extends Activity {
         if (historyRow == null) return;
         historyRow.removeAllViews();
         historyCards.clear();
+        historyMore = null;
 
         List<HistoryStore.Entry> list = HistoryStore.recent(10);
         if (list.isEmpty()) {
@@ -462,6 +481,33 @@ public class HomeActivity extends Activity {
             historyRow.addView(card, lp);
             historyCards.add(card);
         }
+
+        // 末尾挂一张「全部记录」入口卡：横条最多 10 条而且删不掉，得有地方看全集
+        historyMore = LayoutInflater.from(this).inflate(R.layout.item_history_more, historyRow, false);
+        historyMore.setId(View.generateViewId());
+        ((TextView) historyMore.findViewById(R.id.more_sub)).setText(
+                getString(R.string.history_count, HistoryStore.all(HistoryStore.MAX_ENTRIES).size()));
+        historyMore.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(HomeActivity.this, HistoryActivity.class));
+            }
+        });
+        historyMore.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (event.getAction() == KeyEvent.ACTION_UP && isConfirmKey(keyCode)) {
+                    startActivity(new Intent(HomeActivity.this, HistoryActivity.class));
+                    return true;
+                }
+                return false;
+            }
+        });
+        LinearLayout.LayoutParams mlp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT);
+        mlp.rightMargin = dp(12);
+        historyRow.addView(historyMore, mlp);
 
         updateFocusChain();
     }
@@ -516,6 +562,14 @@ public class HomeActivity extends Activity {
                 c.setNextFocusDownId(R.id.grid);
                 if (i > 0) c.setNextFocusLeftId(historyCards.get(i - 1).getId());
                 if (i < historyCards.size() - 1) c.setNextFocusRightId(historyCards.get(i + 1).getId());
+            }
+            // 最后一张卡的右边接「全部记录」
+            View last = historyCards.get(historyCards.size() - 1);
+            if (historyMore != null) {
+                last.setNextFocusRightId(historyMore.getId());
+                historyMore.setNextFocusLeftId(last.getId());
+                historyMore.setNextFocusDownId(R.id.grid);
+                if (tabId != View.NO_ID) historyMore.setNextFocusUpId(tabId);
             }
             grid.setNextFocusUpId(historyCards.get(0).getId());
         } else if (tabId != View.NO_ID) {
@@ -683,6 +737,8 @@ public class HomeActivity extends Activity {
         super.onResume();
         // 从详情页/设置页回来，允许再次打开
         opening = false;
+        // 从播放页回来进度变了、或刚在记录页删了记录，横条要跟着变
+        renderHistory();
         // 从设置页回来时源配置可能变了，刷新一下状态栏文案即可
         renderStatus();
     }

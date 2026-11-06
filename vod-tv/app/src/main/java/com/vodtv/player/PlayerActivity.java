@@ -8,6 +8,7 @@ import android.view.KeyEvent;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -56,11 +57,11 @@ public class PlayerActivity extends Activity implements Player.Listener {
     private TextView timeText;
     private TextView pTitle;
     private TextView pSource;
-    private TextView btnBack;
-    private TextView btnPrev;
-    private TextView btnNext;
-    private TextView btnPlay;
-    private TextView btnEps;
+    private View btnBack;
+    private View btnPrev;
+    private View btnNext;
+    private ImageView btnPlay;
+    private View btnEps;
     private TextView epTitle;
 
     private boolean controlsShowing = false;
@@ -126,11 +127,11 @@ public class PlayerActivity extends Activity implements Player.Listener {
         timeText = (TextView) findViewById(R.id.p_time);
         pTitle = (TextView) findViewById(R.id.p_title);
         pSource = (TextView) findViewById(R.id.p_source);
-        btnBack = (TextView) findViewById(R.id.p_back);
-        btnPrev = (TextView) findViewById(R.id.p_prev);
-        btnNext = (TextView) findViewById(R.id.p_next);
-        btnPlay = (TextView) findViewById(R.id.p_play);
-        btnEps = (TextView) findViewById(R.id.p_eps);
+        btnBack = findViewById(R.id.p_back);
+        btnPrev = findViewById(R.id.p_prev);
+        btnNext = findViewById(R.id.p_next);
+        btnPlay = findViewById(R.id.p_play);
+        btnEps = findViewById(R.id.p_eps);
         epPanel = (LinearLayout) findViewById(R.id.ep_panel);
         epBox = (LinearLayout) findViewById(R.id.ep_box);
         epTitle = (TextView) findViewById(R.id.ep_title);
@@ -290,7 +291,7 @@ public class PlayerActivity extends Activity implements Player.Listener {
     private void updatePlayButton() {
         if (btnPlay == null) return;
         boolean playing = player != null && player.getPlayWhenReady();
-        btnPlay.setText(playing ? "暂停" : "播放");
+        btnPlay.setImageResource(playing ? R.drawable.ic_ui_pause : R.drawable.ic_ui_play);
     }
 
     private void seekBy(long deltaMs) {
@@ -498,7 +499,7 @@ public class PlayerActivity extends Activity implements Player.Listener {
         btnNext.setVisibility(multi ? View.VISIBLE : View.GONE);
     }
 
-    private void setEnabled(TextView v, boolean on) {
+    private void setEnabled(View v, boolean on) {
         v.setEnabled(on);
         v.setAlpha(on ? 1f : 0.32f);
         // 不可用的按钮不能再接焦点，否则遥控器会停在死按钮上

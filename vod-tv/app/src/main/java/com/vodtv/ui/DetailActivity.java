@@ -46,7 +46,8 @@ public class DetailActivity extends Activity {
     private boolean inEpisodes = false;
 
     private TextView btnResume;
-    private TextView btnBack;
+    private View btnBack;
+    private TextView btnBackLabel;
     private HistoryStore.Entry resumeEntry;
     private PlayResolver.PlayLine resumeLine;
     private PlayResolver.Ep resumeEp;
@@ -68,7 +69,8 @@ public class DetailActivity extends Activity {
 
         bindInfo();
 
-        btnBack = (TextView) findViewById(R.id.btn_back);
+        btnBack = findViewById(R.id.btn_back);
+        btnBackLabel = (TextView) findViewById(R.id.back_label);
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -200,7 +202,7 @@ public class DetailActivity extends Activity {
 
     private void renderLines(List<PlayResolver.PlayLine> list) {
         inEpisodes = false;
-        if (btnBack != null) btnBack.setText("← 返回");
+        if (btnBackLabel != null) btnBackLabel.setText(R.string.back);
         currentLines = list;
         linesBox.removeAllViews();
         scroll.scrollTo(0, 0);
@@ -395,7 +397,7 @@ public class DetailActivity extends Activity {
 
     private void showEpisodes(final PlayResolver.PlayLine l) {
         inEpisodes = true;
-        if (btnBack != null) btnBack.setText("← 片源列表");
+        if (btnBackLabel != null) btnBackLabel.setText("片源列表");
         linesBox.removeAllViews();
         linesTitle.setText("选集 · " + l.sourceName + "（共 " + l.eps.size() + " 集）");
         scroll.scrollTo(0, 0);

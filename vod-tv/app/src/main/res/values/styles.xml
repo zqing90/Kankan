@@ -53,6 +53,32 @@
         <item name="android:layout_marginLeft">8dp</item>
     </style>
 
+    <!-- 顶栏图标按钮（搜索 / 记录 / 更新 / 设置）。电视上只放图标，配 contentDescription；
+         44dp 触达区，图标 24dp，未聚焦时压暗到 0.85，聚焦靠 bg_tab 的强调色描边 -->
+    <style name="IconButton">
+        <item name="android:layout_width">44dp</item>
+        <item name="android:layout_height">44dp</item>
+        <item name="android:padding">10dp</item>
+        <item name="android:background">@drawable/bg_tab</item>
+        <item name="android:scaleType">fitCenter</item>
+        <item name="android:alpha">0.85</item>
+        <item name="android:focusable">true</item>
+        <item name="android:layout_marginLeft">8dp</item>
+    </style>
+
+    <!-- 播放页控制栏的图标按钮：48dp 触达区、图标 24dp，比文字按钮更快被认出来。
+         遥控器上「快退10秒」用 Material 的 replay_10，不用中文文字 -->
+    <style name="PlayerIconBtn">
+        <item name="android:layout_width">48dp</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:padding">12dp</item>
+        <item name="android:scaleType">fitCenter</item>
+        <item name="android:background">@drawable/bg_tab</item>
+        <item name="android:focusable">true</item>
+        <item name="android:alpha">0.9</item>
+        <item name="android:layout_marginRight">8dp</item>
+    </style>
+
     <!-- 播放页 / 选集浮层里的按钮。刻意不写 focusableInTouchMode：
          一旦写了，触摸模式下第一次点击只会抢焦点、不触发 click，
          手机上就变成"每个按钮要点两次" -->

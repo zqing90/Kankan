@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 观看记录页的网格卡片：宽度由 GridView 列宽决定，高度固定 96dp -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="96dp"
+    android:orientation="horizontal"
+    android:focusable="true"
+    android:background="@drawable/bg_card"
+    android:padding="5dp">
+
+    <ImageView
+        android:id="@+id/poster"
+        android:layout_width="58dp"
+        android:layout_height="86dp"
+        android:scaleType="centerCrop"
+        android:background="@drawable/ph_poster"
+        android:contentDescription="@null" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="6dp"
+        android:orientation="vertical"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/h_title"
+            style="@style/CardTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/h_sub"
+            style="@style/CardSub"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:textSize="11sp" />
+
+        <!-- 进度条：两段 weight 由代码按百分比设置 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginRight="4dp"
+            android:orientation="horizontal">
+
+            <View
+                android:id="@+id/h_bar_done"
+                android:layout_width="0dp"
+                android:layout_height="3dp"
+                android:layout_weight="0"
+                android:background="@color/accent" />
+
+            <View
+                android:id="@+id/h_bar_rest"
+                android:layout_width="0dp"
+                android:layout_height="3dp"
+                android:layout_weight="100"
+                android:background="#33FFFFFF" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

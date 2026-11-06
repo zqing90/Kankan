@@ -18,12 +18,18 @@ import java.util.Iterator;
  */
 public class HistoryStore {
 
-    /** 低于这个位置不值得续播 */
-    private static final long MIN_POS = 30 * 1000L;
+    /**
+     * 低于这个位置就不写记录。
+     * 定 5 秒而不是 30 秒：用户点开看一眼就退出的情况很常见，
+     * 30 秒门槛会让「观看记录」看起来像坏了（2026-11-06 反馈「看不到播放记录」的直接原因）。
+     */
+    private static final long MIN_POS = 5 * 1000L;
+    /** 低于这个位置不续播：刚看 5 秒就跳回去没有意义，从头开始更符合直觉 */
+    private static final long MIN_RESUME = 30 * 1000L;
     /** 距离结尾小于这个值就当作看完了 */
     private static final long TAIL = 60 * 1000L;
     /** 最多保留多少部片的记录 */
-    private static final int MAX_ENTRIES = 80;
+    public static final int MAX_ENTRIES = 80;
 
     public static class Entry {
         public String title;
@@ -125,9 +131,21 @@ public class HistoryStore {
 
     /**
      * 最近看过的片，按时间倒序。首页「继续观看」横条用。
-     * 只返回 pos 有效（能续播）的记录。
+     * 只返回 pos 有效（能续播）的记录——刚看几秒的片放上去，点进去却从头播，反而奇怪。
+     * 完整的「看过」清单走 {@link #all(int)}。
      */
     public static java.util.List<Entry> recent(int limit) {
+        return query(limit, MIN_RESUME);
+    }
+
+    /**
+     * 全部观看记录（含只看了几秒的），按时间倒序。观看记录页用。
+     */
+    public static java.util.List<Entry> all(int limit) {
+        return query(limit, MIN_POS);
+    }
+
+    private static java.util.List<Entry> query(int limit, long minPos) {
         java.util.List<Entry> out = new java.util.ArrayList<Entry>();
         try {
             JSONObject all = all();
@@ -138,7 +156,7 @@ public class HistoryStore {
                 JSONObject o = all.optJSONObject(k);
                 if (o == null) continue;
                 Entry e = read(k, o);
-                if (e.pos >= MIN_POS) tmp.add(e);
+                if (e.pos >= minPos) tmp.add(e);
             }
             java.util.Collections.sort(tmp, new java.util.Comparator<Entry>() {
                 @Override
@@ -175,7 +193,7 @@ public class HistoryStore {
         if (ep != null && ep.length() > 0 && e.ep != null && e.ep.length() > 0 && !ep.equals(e.ep)) {
             return 0;
         }
-        if (e.pos < MIN_POS) return 0;
+        if (e.pos < MIN_RESUME) return 0;
         if (e.dur > 0 && e.pos > e.dur - TAIL) return 0;
         return e.pos;
     }
@@ -187,6 +205,14 @@ public class HistoryStore {
                 all.remove(title);
                 commit(all);
             }
+        } catch (Exception ignored) {
+        }
+    }
+
+    /** 清空全部记录（观看记录页的「清空」） */
+    public static void clearAll() {
+        try {
+            commit(new JSONObject());
         } catch (Exception ignored) {
         }
     }

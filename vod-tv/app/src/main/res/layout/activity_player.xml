@@ -55,12 +55,11 @@
             android:orientation="horizontal"
             android:gravity="center_vertical">
 
-            <TextView
+            <ImageView
                 android:id="@+id/p_back"
-                style="@style/PlayerBtn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="← 返回"
+                style="@style/PlayerIconBtn"
+                android:src="@drawable/ic_ui_back"
+                android:contentDescription="@string/back"
                 android:nextFocusRight="@id/p_prev" />
 
             <TextView
@@ -128,48 +127,42 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
-                <TextView
+                <ImageView
                     android:id="@+id/p_prev"
-                    style="@style/PlayerBtn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="上一集" />
+                    style="@style/PlayerIconBtn"
+                    android:src="@drawable/ic_ui_prev"
+                    android:contentDescription="上一集" />
 
-                <TextView
+                <ImageView
                     android:id="@+id/p_rew"
-                    style="@style/PlayerBtn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="快退 10 秒" />
+                    style="@style/PlayerIconBtn"
+                    android:src="@drawable/ic_ui_replay10"
+                    android:contentDescription="快退 10 秒" />
 
-                <TextView
+                <ImageView
                     android:id="@+id/p_play"
-                    style="@style/PlayerBtn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="暂停"
+                    style="@style/PlayerIconBtn"
+                    android:src="@drawable/ic_ui_pause"
+                    android:contentDescription="暂停"
                     android:nextFocusRight="@id/p_ff" />
 
-                <TextView
+                <ImageView
                     android:id="@+id/p_ff"
-                    style="@style/PlayerBtn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="快进 10 秒" />
+                    style="@style/PlayerIconBtn"
+                    android:src="@drawable/ic_ui_forward10"
+                    android:contentDescription="快进 10 秒" />
 
-                <TextView
+                <ImageView
                     android:id="@+id/p_next"
-                    style="@style/PlayerBtn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="下一集" />
+                    style="@style/PlayerIconBtn"
+                    android:src="@drawable/ic_ui_next"
+                    android:contentDescription="下一集" />
 
-                <TextView
+                <ImageView
                     android:id="@+id/p_eps"
-                    style="@style/PlayerBtn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="选集" />
+                    style="@style/PlayerIconBtn"
+                    android:src="@drawable/ic_ui_episodes"
+                    android:contentDescription="选集" />
             </LinearLayout>
         </HorizontalScrollView>
     </LinearLayout>

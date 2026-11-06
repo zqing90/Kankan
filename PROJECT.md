@@ -20,9 +20,9 @@
 ```bash
 cd /d/code/kankan/vod-tv
 ./gradlew assembleDebug
-cp app/build/outputs/apk/debug/app-debug.apk dist/Kankan-1.2.0-debug.apk
-cp dist/Kankan-1.2.0-debug.apk /e/share/
-md5sum dist/Kankan-1.2.0-debug.apk /e/share/Kankan-1.2.0-debug.apk
+cp app/build/outputs/apk/debug/app-debug.apk dist/Kankan-1.3.0-debug.apk
+cp dist/Kankan-1.3.0-debug.apk /e/share/
+md5sum dist/Kankan-1.3.0-debug.apk /e/share/Kankan-1.3.0-debug.apk
 ```
 
 规则细则：
@@ -97,7 +97,7 @@ vod-tv/
 ├── gradle.properties
 ├── local.properties             ⚠️ 不入库，需自己写 sdk.dir
 ├── gradlew / gradlew.bat
-├── dist/Kankan-1.2.0-debug.apk  已构建产物（同时复制一份到 E:\share\）
+├── dist/Kankan-1.3.0-debug.apk  已构建产物（同时复制一份到 E:\share\）
 ├── README.md                    使用与构建说明（面向人）
 ├── PROJECT.md                   本文件（面向 AI）
 └── app/
@@ -116,24 +116,34 @@ vod-tv/
         │   │   ├── PlayResolver.java        ⭐ 搜片 → 拆线路/分集 → 解析 m3u8 → 探测 → 排序
         │   │   ├── PlayCache.java           ⭐ 源检测结果按自然日缓存（每部片一个文件）
         │   │   ├── MovieInfo.java           影片信息模型（Intent ↔ JSON 双向转换）
-        │   │   ├── HistoryStore.java        ⭐ 播放进度 + 影片信息快照（首页继续观看用）
+        │   │   ├── HistoryStore.java        ⭐ 播放进度 + 影片信息快照（首页继续观看 / 记录页用）
+│   │   ├── SearchHistory.java        搜索关键词历史（最多 12 条，去重、最新的在前）
         │   │   ├── ImageLoader.java         海报加载（Referer + 内存/磁盘缓存）
         │   │   └── Http.java                极简 HTTP，只用 HttpURLConnection
         │   ├── ui/
         │   │   ├── HomeActivity.java        6 列海报墙、5 个分组 tab、继续观看、搜索入口
         │   │   ├── DetailActivity.java      影片信息 + 片源列表 + 选集 + 继续观看
-        │   │   ├── SearchActivity.java      本地榜单过滤 + 片源站联网兜底
+        │   │   ├── SearchActivity.java      本地榜单过滤 + 最近搜索标签 + 片源站联网兜底
+        │   │   ├── HistoryActivity.java     观看记录页（网格 / 单条删除 / 清空）
         │   │   └── SettingsActivity.java    源配置、服务端地址、清缓存、强制更新
         │   └── player/PlayerActivity.java   ExoPlayer 播放页 + 控制栏 + 选集浮层 + 进度落盘
         └── res/
-            ├── layout/                      9 个布局，全部手写原生 View
+            ├── layout/                      13 个布局，全部手写原生 View
+            │                                （含 part_back.xml：所有二级页共用的返回按钮）
             ├── values/                      colors / strings / styles
             ├── mipmap-*/                    ic_launcher（5 档密度）+ ic_launcher_foreground
             ├── mipmap-anydpi-v26/           自适应图标（API 26+）
-            └── drawable-{m,xh,xxh}dpi/      tv_banner（320×180 / 640×360 / 960×540）
+            └── drawable-{m,h,xh,xxh,xxxh}dpi/
 ```
 
-图标与横幅由 `tools/make_icons.py` 生成（纯几何绘制 + 4 倍超采样），改样式就改脚本重跑，不要手改 PNG。
+图标分两类，**都不要手改 PNG**：
+
+| 类型 | 来源 | 脚本 |
+|---|---|---|
+| App 图标 / TV banner | 自己画（纯色底 + 白色播放三角，参照夸克/UU 远程） | `tools/make_icons.py` |
+| 顶栏 / 播放控制图标 | **Google Material Icons（Apache-2.0），不自己画** | `tools/fetch_material_icons.py` |
+
+Material 图标的 SVG 缓存在 `tools/icons_src/`，改图标只改脚本里的映射表再重跑。
 
 ### 2.2 vod-collector（Node）
 
@@ -487,8 +497,8 @@ echo "sdk.dir=D:\\Android\\Sdk" > local.properties
 
 ./gradlew assembleDebug
 # 产物：app/build/outputs/apk/debug/app-debug.apk
-# 留档：dist/Kankan-1.2.0-debug.apk
-# 分发：E:\share\Kankan-1.2.0-debug.apk   ← 见顶部「铁律 · APK 产出后必须分发」
+# 留档：dist/Kankan-1.3.0-debug.apk
+# 分发：E:\share\Kankan-1.3.0-debug.apk   ← 见顶部「铁律 · APK 产出后必须分发」
 ```
 
 环境（本机已装好，可直接构建）：
@@ -517,7 +527,7 @@ echo "sdk.dir=D:\\Android\\Sdk" > local.properties
 
 ```bash
 adb connect 192.168.x.x:5555
-adb install -r Kankan-1.2.0-debug.apk
+adb install -r Kankan-1.3.0-debug.apk
 ```
 
 ### 9.2 跑采集器
@@ -651,3 +661,90 @@ git show <commit> --stat             # 某次改了什么
 git checkout main -- <file>          # 单独把 main 上某文件取回来（慎用）
 git revert <commit>                  # 撤销一次提交（不用 reset）
 ```
+
+---
+
+## 15. UI 规范（TV 优先，手机兼容）
+
+用户 2026-11-06 反馈：「返回按钮一会儿在左、一会儿在右」「搜索是个文字按钮」。这一节是之后所有页面必须遵守的硬规范。
+
+### 15.1 依据
+
+- Android 官方 TV 导航指南（[training/tv/start/navigation](https://developer.android.google.cn/training/tv/start/navigation)）：
+  **电视上不应该在屏幕上放虚拟「返回」按钮**，遥控器返回键就是电视的返回导航。
+- Android 官方 TV 布局指南：导航控件放左右两侧；布局四周留 overscan 安全区，
+  **左右 48dp、上下 27dp**。
+- 本项目同时要在手机上跑（没有实体返回键），所以保留屏幕返回按钮 —— 但**只允许出现在左上角一处**，且全项目共用同一份布局。
+
+### 15.2 顶栏结构（唯一模板）
+
+```
+[← 返回]   页面标题                 ……        [图标] [图标]
+ └ 二级页固定第一项                └ 右对齐，页面级动作
+```
+
+| 页面 | 第一项 | 中间 | 右侧动作 |
+|---|---|---|---|
+| 首页 | `看看` | 分类 tab | 搜索 / 记录 / 更新 / 设置（4 个图标） |
+| 详情 | `← 返回` | 片名 | — |
+| 播放 | `← 返回`（浮层内） | 片名 + 当前源 | 控制按钮图标行 |
+| 搜索 | `← 返回` | 输入框 | 搜索图标 |
+| 记录 | `← 返回` | `观看记录` + 条数 | 清空 |
+| 设置 | `← 返回` | `设置` | — |
+
+- 返回按钮**只能**用 `layout/part_back.xml`（`<include android:id="@+id/btn_back">`），不许再手写第二份。
+- 顶栏左右 padding 统一 **48dp**；内容区（海报墙）**44dp**；文字左对齐线 50dp。
+- 顶栏垂直居中，返回按钮 8dp 内边距、图标 18dp、文字 14sp。
+
+### 15.3 图标
+
+**先找现成的，不许上来就自己画。** 顺序：
+
+1. 优先 **Google Material Icons**（Apache-2.0），本项目顶栏/播放控制全部用它，
+   由 `tools/fetch_material_icons.py` 抓 SVG → 光栅化成 5 档密度 PNG。
+2. Material 没有合适的图标，再换同类开源库（Lucide / Tabler / Feather，均 MIT）。
+3. 以上都没有，才允许自己画（`tools/make_icons.py` 那只用于 App 图标和 TV banner）。
+
+已固定的映射（改图标只改脚本映射表）：
+
+| 用途 | 图标 | Material 名 |
+|---|---|---|
+| 返回 | `ic_ui_back` | navigation/arrow_back |
+| 搜索 | `ic_ui_search` | action/search |
+| 观看记录 | `ic_ui_history` | action/history |
+| 更新榜单 | `ic_ui_refresh` | navigation/refresh |
+| 设置 | `ic_ui_settings` | action/settings |
+| 删除 / 清空 | `ic_ui_delete` | action/delete |
+| 后退 10 秒 | `ic_ui_replay10` | av/replay_10 |
+| 前进 10 秒 | `ic_ui_forward10` | av/forward_10 |
+| 播放 / 暂停 | `ic_ui_play` / `ic_ui_pause` | av/play_arrow / av/pause |
+| 上一集 / 下一集 | `ic_ui_prev` / `ic_ui_next` | av/skip_previous / skip_next |
+| 选集 | `ic_ui_episodes` | av/playlist_play |
+
+规矩：
+
+- **纯文字动作按钮不许再出现**（「搜索」「更新」「设置」原来都是文字，已全部换图标）。
+  ±10 秒这类动作有现成图标（replay_10 / forward_10），不许写「快进 10 秒」四个字。
+- 图标按钮一律 44dp（顶栏）/ 48dp（播放页）触达区，`@style/IconButton` / `@style/PlayerIconBtn`。
+- 图标本身是白色 PNG，非聚焦态压暗（alpha 0.85~0.9），聚焦靠 `bg_tab` 的强调色描边，不换图标颜色。
+- 每个图标必须有 `android:contentDescription`（无障碍 + 语音遥控）。
+
+### 15.4 字号与颜色
+
+| 用途 | 字号 | 颜色 |
+|---|---|---|
+| App 名 | 26sp bold | `text_primary` |
+| 页面标题 | 20~22sp bold | `text_primary` |
+| 分类 tab | 15sp | 选中 `text_primary` / 未选 `text_secondary` |
+| 卡片标题 | 14~15sp | `text_primary` |
+| 卡片副标题 | 11~12sp | `text_secondary` |
+| 说明 / 提示 | 11~12sp | `text_dim` |
+
+强调色只有一个：`accent #FF4D6A`（焦点描边、进度条、选中态）。不要临时加新色值。
+
+### 15.5 焦点
+
+- 所有可聚焦控件必须显式串 `nextFocusLeft/Right/Up/Down`（FocusFinder 在 TV 上不可靠）。
+- 焦点样式统一 `bg_tab`（2dp accent 描边 + 半透明底），卡片可叠加 1.07 放大。
+- 列表条目自己 `focusable="true"` 时，OK 键会被条目吃掉 —— 必须同时挂 `setOnKeyListener` + `setOnClickListener`（见 §8.10）。
+- 布局里**不要**给可点击控件写 `focusableInTouchMode="true"`（见 §8.11）。

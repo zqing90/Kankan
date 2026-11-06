@@ -11,8 +11,8 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:paddingLeft="36dp"
-        android:paddingRight="36dp"
+        android:paddingLeft="48dp"
+        android:paddingRight="48dp"
         android:paddingTop="22dp"
         android:paddingBottom="4dp">
 
@@ -36,27 +36,32 @@
             android:layout_height="1dp"
             android:layout_weight="1" />
 
-        <TextView
+        <!-- 动作一律用图标（Material Icons），顺序固定：搜索 / 记录 / 更新 / 设置 -->
+        <ImageView
             android:id="@+id/btn_search"
-            style="@style/TopButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/search" />
+            style="@style/IconButton"
+            android:src="@drawable/ic_ui_search"
+            android:contentDescription="@string/search" />
 
-        <TextView
-            android:id="@+id/btn_refresh"
-            style="@style/TopButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/refresh"
+        <ImageView
+            android:id="@+id/btn_history"
+            style="@style/IconButton"
+            android:src="@drawable/ic_ui_history"
+            android:contentDescription="@string/history"
             android:nextFocusDown="@id/grid" />
 
-        <TextView
+        <ImageView
+            android:id="@+id/btn_refresh"
+            style="@style/IconButton"
+            android:src="@drawable/ic_ui_refresh"
+            android:contentDescription="@string/refresh"
+            android:nextFocusDown="@id/grid" />
+
+        <ImageView
             android:id="@+id/btn_settings"
-            style="@style/TopButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/settings"
+            style="@style/IconButton"
+            android:src="@drawable/ic_ui_settings"
+            android:contentDescription="@string/settings"
             android:nextFocusDown="@id/grid" />
     </LinearLayout>
 
@@ -66,7 +71,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/topbar"
-        android:paddingLeft="38dp"
+        android:paddingLeft="50dp"
         android:paddingTop="6dp"
         android:paddingBottom="10dp"
         android:text="@string/loading"
@@ -88,7 +93,7 @@
             android:id="@+id/history_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingLeft="38dp"
+            android:paddingLeft="50dp"
             android:paddingBottom="8dp"
             android:text="继续观看"
             android:textColor="@color/text_primary"
@@ -98,8 +103,8 @@
         <HorizontalScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingLeft="32dp"
-            android:paddingRight="32dp"
+            android:paddingLeft="44dp"
+            android:paddingRight="44dp"
             android:clipToPadding="false"
             android:scrollbars="none">
 
@@ -120,8 +125,8 @@
         android:numColumns="6"
         android:horizontalSpacing="14dp"
         android:verticalSpacing="20dp"
-        android:paddingLeft="32dp"
-        android:paddingRight="32dp"
+        android:paddingLeft="44dp"
+        android:paddingRight="44dp"
         android:paddingTop="8dp"
         android:paddingBottom="32dp"
         android:clipChildren="false"
