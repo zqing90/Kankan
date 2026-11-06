@@ -35,6 +35,24 @@ md5sum dist/Kankan-1.2.0-debug.apk /e/share/Kankan-1.2.0-debug.apk
 
 ---
 
+## 铁律 · 先提交 dev，用户验收后才合 main
+
+> 用户 2026-11-06 明确要求，属**长期规则**。仓库为纯本地 git（无远程）。
+
+- **所有改动只提交到 `dev`**；`main` 是稳定基线，只放用户真机验收过的版本。
+- 不许直接往 `main` 提交，不许 `push` / `reset --hard` / `push -f`。
+- 交付话术固定：「已提交到 dev（commit `xxxxxxx`），等你验收」。用户说合并后才执行：
+  `git checkout main && git merge --no-ff dev`，合完立刻 `git checkout dev` 切回。
+- 用户说「有问题」就不合并，在 dev 上追加修复提交（不 amend 已交付的提交）。
+
+## 铁律 · 按改动范围选测试，不跑无关测试
+
+> 用户 2026-11-06 要求：「根据 git 的提交内容来测试，没涉及的改动就不跑对应测试」。
+
+判定依据只看 `git status --short` / `git diff --name-only dev`，映射表见 **§14.2**。回复中必须写明「改了哪类文件 → 因此跑了哪些检查 → 结果」。
+
+---
+
 ## 0. 一句话概括
 
 一个 Android TV 客户端（应用名「看看」），首页是豆瓣热播榜海报墙，点开影片自动到 14 个盗版资源站检索片源、解析 m3u8、按稳定性排序、可用遥控器播放，并记住每部片看到第几集第几秒。
@@ -573,3 +591,63 @@ node src/cli.js play <站id> <片名>
   有 adb 时更省事：`adb logcat -b crash -d` 或 `adb logcat -d | grep -E "AndroidRuntime|Kankan"`
 
 - 资源站的接口随时可能变，遇到「全部源失败」先跑 `node src/cli.js health` 确认是站挂了还是代码挂了
+
+---
+
+## 14. Git 工作流与测试策略
+
+### 14.1 分支与提交
+
+```
+main   ●────────────●───────────────●   ← 只放用户真机验收过的版本（merge --no-ff）
+        \          /               /
+dev      ●──●──●──●───●──●──●─────●     ← 所有改动都落这里
+```
+
+| 项 | 约定 |
+|---|---|
+| 仓库位置 | `D:/code/kankan/.git`，**纯本地，无 remote** |
+| 提交身份 | 仓库局部配置 `kankan-dev <kankan@localhost>`（未写全局，不影响其他项目） |
+| 长期分支 | `main`（稳定基线）、`dev`（开发） |
+| 当前工作分支 | `dev` |
+| 提交粒度 | 一个可交付的改动集 = 一次提交；构建/测试通过后才提交 |
+| 提交信息 | `<type>: <一句话>`，type ∈ `feat` / `fix` / `refactor` / `docs` / `chore` / `test`；正文写清「改了什么、为什么、验证了什么」 |
+| 合并 | 用户验收通过 → `git checkout main && git merge --no-ff dev` → 立刻切回 `dev` |
+| 禁止 | 直接提交 main、amend 已交付提交、`reset --hard`、`push -f`（无远程） |
+
+新需求开工前先确认分支：
+
+```bash
+git -C D:/code/kankan branch --show-current   # 必须是 dev
+git -C D:/code/kankan status --short          # 工作区有脏文件先弄清来源
+```
+
+### 14.2 改动 → 测试映射（核心：不跑无关测试）
+
+| 改动的文件 | 必跑 | 明确不跑 |
+|---|---|---|
+| `PlayResolver.java`、`SourceStats.java`（纯逻辑，有单测） | `testDebugUnitTest` → `assembleDebug` → `lintDebug` | — |
+| 其他 `*.java`、`res/**`、`AndroidManifest.xml` | `assembleDebug` → `lintDebug` | `testDebugUnitTest` |
+| `*.gradle`、`settings.gradle`、`gradle.properties`、`lint.xml`、`gradle/wrapper/**` | `clean assembleDebug` → `testDebugUnitTest` → `lintDebug` | — |
+| `app/src/test/**` | `testDebugUnitTest` | `assembleDebug`、`lintDebug` |
+| 仅 `*.md`、`.gitignore`、`.gitattributes`、`.workbuddy/**` | **不跑任何构建** | 全部 |
+| `vod-collector/**/*.js` | `node --check <改动文件>` | Gradle 全套 |
+| `vod-collector/web/*.html`、`config/*.json` | 静态语法检查；必要时 `node src/cli.js health`（会联网） | Gradle 全套 |
+
+跨类改动取并集。纯文档改动跑 Gradle 属于镀金，**明确禁止**。
+
+### 14.3 交付话术（固定格式）
+
+> 改动：`xxx.java`、`yyy.xml`（→ 命中「其他 java/res」行）
+> 检查：`assembleDebug` 通过（37s）、`lintDebug` 0 error；未跑单测（本次未碰解析逻辑）
+> 提交：`dev` @ `a1b2c3d` ｜ APK 已同步 `E:/share/`（MD5 校验一致）
+> 待你验收后我再合到 `main`。
+
+### 14.4 回滚与对比
+
+```bash
+git log --oneline --graph --all      # 看两条分支的合并历史
+git show <commit> --stat             # 某次改了什么
+git checkout main -- <file>          # 单独把 main 上某文件取回来（慎用）
+git revert <commit>                  # 撤销一次提交（不用 reset）
+```
