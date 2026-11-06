@@ -4,7 +4,8 @@
 
 为什么不自己画：Material Icons 是 Apache-2.0 许可的现成图形库，
 形状、光学居中、描边粗细都经过大量设备验证，手画只会更难看。
-源：https://github.com/google/material-design-icons （src/<category>/<name>/materialicons/24px.svg）
+源：https://github.com/google/material-design-icons （src/<category>/<name>/<variant>/24px.svg）
+变体由环境变量 MATERIAL_VARIANT 指定，默认 materialiconsround（圆头）。
 
 流程：拉 SVG（缓存到 icons_src/）→ 填充改白 → svglib 转 PDF → pdfium 光栅化到 96px
      → LANCZOS 缩到各密度 → 写入 res/drawable-*/。
@@ -26,8 +27,12 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 RES = os.path.join(HERE, "..", "app", "src", "main", "res")
 CACHE = os.path.join(HERE, "icons_src")
 
+# 图标变体：materialicons=filled / materialiconsround=圆头 / materialiconsoutlined=细线
+# 本项目选 Rounded —— 界面圆角是 8dp，圆头图标才和它同一种语言
+VARIANT = os.environ.get("MATERIAL_VARIANT", "materialiconsround")
+
 BASE = ("https://raw.githubusercontent.com/google/material-design-icons/master/"
-        "src/%s/%s/materialicons/24px.svg")
+        "src/%s/%s/" + VARIANT + "/24px.svg")
 
 # 本地文件名 -> (Material 分类, Material 图标名)
 ICONS = {
@@ -37,7 +42,6 @@ ICONS = {
     "ic_ui_settings":  ("action", "settings"),
     "ic_ui_back":      ("navigation", "arrow_back"),
     "ic_ui_delete":    ("action", "delete"),
-    "ic_ui_close":     ("navigation", "close"),
     # 播放控制：Material 原生就有 ±10 秒图标，不用自己拿文字凑
     "ic_ui_replay10":  ("av", "replay_10"),
     "ic_ui_forward10": ("av", "forward_10"),
@@ -54,9 +58,10 @@ RENDER_PX = 96          # 先渲染到最大密度再往下缩，边缘更干净
 
 def fetch(category, name):
     """返回 SVG 文本；本地有缓存就不联网"""
-    if not os.path.isdir(CACHE):
-        os.makedirs(CACHE)
-    path = os.path.join(CACHE, name + ".svg")
+    cache_dir = os.path.join(CACHE, VARIANT)
+    if not os.path.isdir(cache_dir):
+        os.makedirs(cache_dir)
+    path = os.path.join(cache_dir, name + ".svg")
     if os.path.isfile(path):
         with open(path, encoding="utf-8") as f:
             return f.read()

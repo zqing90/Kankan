@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 图片上的角标胶囊（排名 TOP1 / 评分 8.5）。压在画面上，必须半透明黑底保证可读 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="@color/scrim" />
+    <corners android:radius="99dp" />
+</shape>

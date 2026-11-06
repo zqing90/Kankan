@@ -42,7 +42,7 @@ public class HistoryActivity extends Activity {
 
     private GridView grid;
     private TextView count;
-    private TextView empty;
+    private View empty;
     /** 续播准备遮罩 */
     private LinearLayout busyPanel;
     private TextView busyText;
@@ -68,7 +68,7 @@ public class HistoryActivity extends Activity {
 
         grid = (GridView) findViewById(R.id.rgrid);
         count = (TextView) findViewById(R.id.tv_count);
-        empty = (TextView) findViewById(R.id.empty);
+        empty = findViewById(R.id.empty);
         busyPanel = (LinearLayout) findViewById(R.id.busy_panel);
         busyText = (TextView) findViewById(R.id.busy_text);
 

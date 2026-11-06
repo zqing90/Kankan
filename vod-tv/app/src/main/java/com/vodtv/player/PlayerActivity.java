@@ -394,15 +394,16 @@ public class PlayerActivity extends Activity implements Player.Listener {
             final int idx = i;
             TextView b = new TextView(this);
             b.setText(epLabels.get(i));
-            b.setTextSize(13);
+            b.setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX,
+                    getResources().getDimensionPixelSize(R.dimen.text_caption));
             b.setTextColor(getResources().getColor(R.color.text_primary));
             b.setPadding(dp(12), dp(9), dp(12), dp(9));
-            b.setBackgroundResource(R.drawable.bg_tab);
+            b.setBackgroundResource(R.drawable.bg_chip);
             b.setFocusable(true);
             b.setSingleLine(true);
             b.setEllipsize(TextUtils.TruncateAt.END);
             b.setGravity(android.view.Gravity.CENTER);
-            // 当前正在播的那一集标红，一眼能找到自己在哪
+            // 当前正在播的那一集用品牌蓝实底标出（bg_chip 的 selected 态），一眼能找到自己在哪
             b.setSelected(i == epIndex);
             b.setOnClickListener(new View.OnClickListener() {
                 @Override

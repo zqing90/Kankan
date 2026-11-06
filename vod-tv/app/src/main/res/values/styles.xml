@@ -1,4 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  组件样式表
+  ─────────────────────────────────────────────────────────────
+  规则：
+  1. 字号一律引用 @dimen/text_*，不许在布局里写 15sp 这种字面量。
+  2. 颜色一律引用 @color/*，不许写 #FFFFFF。
+  3. 同一类控件只允许一个样式；要变体就加 style，不要就地改属性。
+-->
 <resources>
 
     <!-- 基础主题：TV 全屏深色，无 ActionBar -->
@@ -13,84 +21,137 @@
         <item name="android:keepScreenOn">true</item>
     </style>
 
-    <!-- 卡片标题 -->
-    <style name="CardTitle">
+    <!-- ============ 文字层级：五档，不许新增 ============ -->
+
+    <!-- 空父样式。带点号的 style 名（Text.Micro）会被 Android 推断出父样式 Text，
+         不显式声明就会报 "resource style/Text not found"。 -->
+    <style name="Text" />
+
+    <!-- App 名 / 详情页片名 -->
+    <style name="Text.Hero">
         <item name="android:textColor">@color/text_primary</item>
-        <item name="android:textSize">15sp</item>
+        <item name="android:textSize">@dimen/text_hero</item>
+        <item name="android:textStyle">bold</item>
         <item name="android:singleLine">true</item>
         <item name="android:ellipsize">end</item>
     </style>
 
-    <style name="CardSub">
+    <!-- 页面标题 / 区块标题 -->
+    <style name="Text.Title">
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textSize">@dimen/text_title</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:ellipsize">end</item>
+    </style>
+
+    <!-- 卡片标题 / 列表主行 -->
+    <style name="Text.Body">
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textSize">@dimen/text_body</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:ellipsize">end</item>
+    </style>
+
+    <!-- 卡片副标题 / 次要信息 -->
+    <style name="Text.Caption">
         <item name="android:textColor">@color/text_secondary</item>
-        <item name="android:textSize">12sp</item>
+        <item name="android:textSize">@dimen/text_caption</item>
         <item name="android:singleLine">true</item>
         <item name="android:ellipsize">end</item>
     </style>
 
-    <!-- 顶部分类 tab -->
+    <!-- 角标 / 时间码 / 提示 -->
+    <style name="Text.Micro">
+        <item name="android:textColor">@color/text_tertiary</item>
+        <item name="android:textSize">@dimen/text_micro</item>
+        <item name="android:singleLine">true</item>
+    </style>
+
+    <!-- 兼容旧引用 -->
+    <style name="CardTitle" parent="Text.Body" />
+    <style name="CardSub" parent="Text.Caption" />
+
+    <!-- ============ 可交互控件 ============ -->
+
+    <!-- 分类 tab。未选中透明底、蓝底白字为选中态 -->
     <style name="TabText">
         <item name="android:textColor">@color/text_secondary</item>
-        <item name="android:textSize">17sp</item>
-        <item name="android:paddingLeft">20dp</item>
-        <item name="android:paddingRight">20dp</item>
-        <item name="android:paddingTop">8dp</item>
-        <item name="android:paddingBottom">8dp</item>
+        <item name="android:textSize">@dimen/text_body</item>
+        <item name="android:paddingLeft">@dimen/space_lg</item>
+        <item name="android:paddingRight">@dimen/space_lg</item>
+        <item name="android:paddingTop">@dimen/space_sm</item>
+        <item name="android:paddingBottom">@dimen/space_sm</item>
         <item name="android:background">@drawable/bg_tab</item>
         <item name="android:focusable">true</item>
-        <item name="android:layout_marginRight">6dp</item>
+        <item name="android:layout_marginRight">@dimen/space_xs</item>
     </style>
 
+    <!-- 顶栏图标按钮：只放图标 + contentDescription，命中区随屏幕档位 40/48dp -->
+    <style name="IconButton">
+        <item name="android:layout_width">@dimen/icon_btn_size</item>
+        <item name="android:layout_height">@dimen/icon_btn_size</item>
+        <item name="android:padding">@dimen/space_sm</item>
+        <item name="android:background">@drawable/bg_icon</item>
+        <item name="android:scaleType">fitCenter</item>
+        <item name="android:alpha">0.72</item>
+        <item name="android:focusable">true</item>
+        <item name="android:layout_marginLeft">@dimen/space_xs</item>
+    </style>
+
+    <!-- 文字按钮（少量场景：清空、重试） -->
     <style name="TopButton">
         <item name="android:textColor">@color/text_secondary</item>
-        <item name="android:textSize">14sp</item>
-        <item name="android:paddingLeft">16dp</item>
-        <item name="android:paddingRight">16dp</item>
-        <item name="android:paddingTop">8dp</item>
-        <item name="android:paddingBottom">8dp</item>
-        <item name="android:background">@drawable/bg_tab</item>
+        <item name="android:textSize">@dimen/text_caption</item>
+        <item name="android:paddingLeft">@dimen/space_md</item>
+        <item name="android:paddingRight">@dimen/space_md</item>
+        <item name="android:paddingTop">@dimen/space_sm</item>
+        <item name="android:paddingBottom">@dimen/space_sm</item>
+        <item name="android:background">@drawable/bg_card</item>
         <item name="android:focusable">true</item>
-        <item name="android:layout_marginLeft">8dp</item>
+        <item name="android:layout_marginLeft">@dimen/space_sm</item>
     </style>
 
-    <!-- 顶栏图标按钮（搜索 / 记录 / 更新 / 设置）。电视上只放图标，配 contentDescription；
-         44dp 触达区，图标 24dp，未聚焦时压暗到 0.85，聚焦靠 bg_tab 的强调色描边 -->
-    <style name="IconButton">
-        <item name="android:layout_width">44dp</item>
-        <item name="android:layout_height">44dp</item>
-        <item name="android:padding">10dp</item>
-        <item name="android:background">@drawable/bg_tab</item>
-        <item name="android:scaleType">fitCenter</item>
-        <item name="android:alpha">0.85</item>
-        <item name="android:focusable">true</item>
-        <item name="android:layout_marginLeft">8dp</item>
-    </style>
-
-    <!-- 播放页控制栏的图标按钮：48dp 触达区、图标 24dp，比文字按钮更快被认出来。
-         遥控器上「快退10秒」用 Material 的 replay_10，不用中文文字 -->
+    <!-- 播放页控制栏图标：48dp 命中区、24dp 图形，比文字按钮更快被认出来。
+         遥控器上「快退 10 秒」用 Material 的 replay_10，不写中文。 -->
     <style name="PlayerIconBtn">
         <item name="android:layout_width">48dp</item>
         <item name="android:layout_height">48dp</item>
         <item name="android:padding">12dp</item>
         <item name="android:scaleType">fitCenter</item>
-        <item name="android:background">@drawable/bg_tab</item>
+        <item name="android:background">@drawable/bg_icon</item>
         <item name="android:focusable">true</item>
         <item name="android:alpha">0.9</item>
-        <item name="android:layout_marginRight">8dp</item>
+        <item name="android:layout_marginRight">@dimen/space_sm</item>
     </style>
 
-    <!-- 播放页 / 选集浮层里的按钮。刻意不写 focusableInTouchMode：
+    <!-- 主行动按钮（详情页「继续观看」这类一屏只有一个的动作）。
+         实底品牌蓝 + 白字，焦点时加白描边 —— 蓝底蓝边会糊在一起，所以焦点色反过来用白。 -->
+    <style name="ButtonPrimary">
+        <item name="android:textColor">#FFFFFFFF</item>
+        <item name="android:textSize">@dimen/text_body</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:background">@drawable/bg_primary</item>
+        <item name="android:focusable">true</item>
+        <item name="android:paddingLeft">20dp</item>
+        <item name="android:paddingRight">20dp</item>
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:paddingBottom">10dp</item>
+    </style>
+
+    <!-- 播放页浮层里的文字按钮。刻意不写 focusableInTouchMode：
          一旦写了，触摸模式下第一次点击只会抢焦点、不触发 click，
-         手机上就变成"每个按钮要点两次" -->
+         手机上就变成「每个按钮要点两次」（见 PROJECT.md §8.11）。 -->
     <style name="PlayerBtn">
         <item name="android:textColor">@color/text_primary</item>
-        <item name="android:textSize">14sp</item>
+        <item name="android:textSize">@dimen/text_body</item>
         <item name="android:paddingLeft">18dp</item>
         <item name="android:paddingRight">18dp</item>
         <item name="android:paddingTop">9dp</item>
         <item name="android:paddingBottom">9dp</item>
-        <item name="android:background">@drawable/bg_tab</item>
+        <item name="android:background">@drawable/bg_card</item>
         <item name="android:focusable">true</item>
-        <item name="android:layout_marginRight">8dp</item>
+        <item name="android:layout_marginRight">@dimen/space_sm</item>
     </style>
+
 </resources>

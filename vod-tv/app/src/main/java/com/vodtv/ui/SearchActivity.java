@@ -44,7 +44,8 @@ public class SearchActivity extends Activity {
     private EditText input;
     private GridView grid;
     private TextView status;
-    private TextView empty;
+    private View empty;
+    private TextView emptyTitle;
     /* 最近搜索标签组 */
     private LinearLayout historyPanel;
     private LinearLayout historyTags;
@@ -77,7 +78,8 @@ public class SearchActivity extends Activity {
         input = (EditText) findViewById(R.id.q);
         grid = (GridView) findViewById(R.id.sgrid);
         status = (TextView) findViewById(R.id.status);
-        empty = (TextView) findViewById(R.id.empty);
+        empty = findViewById(R.id.empty);
+        emptyTitle = (TextView) findViewById(R.id.empty_title);
         historyPanel = (LinearLayout) findViewById(R.id.history_panel);
         historyTags = (LinearLayout) findViewById(R.id.history_tags);
         btnHistoryClear = (TextView) findViewById(R.id.btn_history_clear);
@@ -140,11 +142,12 @@ public class SearchActivity extends Activity {
                 // 与首页同一套算法：列宽按屏幕算，海报 2:3
                 int cols = grid.getNumColumns();
                 int screenW = getResources().getDisplayMetrics().widthPixels;
+                int gap = getResources().getDimensionPixelSize(R.dimen.card_gap_h);
                 int usable = screenW - grid.getPaddingLeft() - grid.getPaddingRight()
-                        - dp(14) * (cols - 1);
+                        - gap * (cols - 1);
                 int colW = usable / cols;
                 if (colW > 0) {
-                    posterHeight = (int) (colW * 1.5f);
+                    posterHeight = (int) ((colW - dp(4)) * 1.5f);
                     adapter.notifyDataSetChanged();
                 }
             }
@@ -189,9 +192,10 @@ public class SearchActivity extends Activity {
     private View makeTag(final String kw) {
         final TextView tv = new TextView(this);
         tv.setText(kw);
-        tv.setTextSize(14);
+        tv.setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX,
+                getResources().getDimensionPixelSize(R.dimen.text_caption));
         tv.setTextColor(getResources().getColor(R.color.text_secondary));
-        tv.setBackgroundResource(R.drawable.bg_tab);
+        tv.setBackgroundResource(R.drawable.bg_chip);
         tv.setPadding(dp(16), dp(8), dp(16), dp(8));
         tv.setSingleLine(true);
         tv.setFocusable(true);
@@ -345,7 +349,7 @@ public class SearchActivity extends Activity {
         if (results.isEmpty()) {
             if (done) {
                 empty.setVisibility(View.VISIBLE);
-                empty.setText("没找到「" + keyword + "」");
+                emptyTitle.setText("没找到「" + keyword + "」");
                 status.setText("本地榜单和片源站都没有 · 换个说法，或者只输片名的一部分试试");
             }
             return;
@@ -543,7 +547,7 @@ public class SearchActivity extends Activity {
             v.setOnFocusChangeListener(new View.OnFocusChangeListener() {
                 @Override
                 public void onFocusChange(View view, boolean has) {
-                    float s = has ? 1.07f : 1.0f;
+                    float s = has ? 1.06f : 1.0f;
                     view.animate().scaleX(s).scaleY(s).setDuration(120).start();
                 }
             });
@@ -567,8 +571,8 @@ public class SearchActivity extends Activity {
                 }
             });
 
-            v.setScaleX(v.isFocused() ? 1.07f : 1.0f);
-            v.setScaleY(v.isFocused() ? 1.07f : 1.0f);
+            v.setScaleX(v.isFocused() ? 1.06f : 1.0f);
+            v.setScaleY(v.isFocused() ? 1.06f : 1.0f);
             return v;
         }
     }

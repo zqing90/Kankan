@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 播放/暂停按钮的底：品牌蓝圆形。整条控制栏里它是唯一有实底的按钮，一眼能找到 -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_focused="true">
+        <shape android:shape="oval">
+            <solid android:color="@color/brand" />
+            <stroke android:width="@dimen/focus_stroke" android:color="@color/text_primary" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="#D92B5CFF" />
+        </shape>
+    </item>
+</selector>

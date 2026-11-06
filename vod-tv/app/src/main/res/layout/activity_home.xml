@@ -1,10 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  首页
+  ─────────────────────────────────────────────────────────────
+  垂直顺序：品牌栏 → 状态行 →（继续观看）→ 海报墙
+  顶栏左右 48dp / 手机 20dp（@dimen/topbar_pad_h），是 Android TV overscan 安全区。
+  动作按钮全部是图标，顺序固定：搜索 / 记录 / 更新 / 设置。
+-->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/bg">
+    android:layout_height="match_parent">
 
-    <!-- 顶栏 -->
+    <!-- ============ 顶栏 ============ -->
     <LinearLayout
         android:id="@+id/topbar"
         android:layout_width="match_parent"
@@ -13,8 +19,17 @@
         android:gravity="center_vertical"
         android:paddingLeft="@dimen/topbar_pad_h"
         android:paddingRight="@dimen/topbar_pad_h"
-        android:paddingTop="22dp"
-        android:paddingBottom="4dp">
+        android:paddingTop="@dimen/space_xl"
+        android:paddingBottom="@dimen/space_xs">
+
+        <!-- 品牌标记 + App 名。标记与桌面上那个蓝底白三角图标同一套视觉，
+             让人一眼认出「点进来的是同一个 App」 -->
+        <ImageView
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:src="@drawable/ic_brand_mark"
+            android:layout_marginRight="@dimen/space_sm"
+            android:contentDescription="@null" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -23,10 +38,10 @@
             android:textColor="@color/text_primary"
             android:textSize="@dimen/app_title_size"
             android:textStyle="bold"
-            android:layout_marginRight="28dp" />
+            android:layout_marginRight="@dimen/space_xl" />
 
         <!-- 分类 tab 放进横向滚动并吃掉剩余宽度：
-             窄屏（手机）上 6 个 tab + 4 个图标按钮会溢出，图标被挤出屏幕就点不到了 -->
+             窄屏（手机）上 5 个 tab + 4 个图标按钮会溢出，图标被挤出屏幕就点不到了 -->
         <HorizontalScrollView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -41,7 +56,7 @@
                 android:orientation="horizontal" />
         </HorizontalScrollView>
 
-        <!-- 动作一律用图标（Material Icons），顺序固定：搜索 / 记录 / 更新 / 设置 -->
+        <!-- 动作一律用图标（Material Rounded），顺序固定：搜索 / 记录 / 更新 / 设置 -->
         <ImageView
             android:id="@+id/btn_search"
             style="@style/IconButton"
@@ -70,18 +85,17 @@
             android:nextFocusDown="@id/grid" />
     </LinearLayout>
 
-    <!-- 数据源 / 更新时间 -->
+    <!-- 数据源 / 更新时间。11sp 三级文字，不再抢视觉重心 -->
     <TextView
         android:id="@+id/status"
+        style="@style/Text.Micro"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/topbar"
         android:paddingLeft="@dimen/content_pad_h"
-        android:paddingTop="6dp"
-        android:paddingBottom="10dp"
-        android:text="@string/loading"
-        android:textColor="@color/text_dim"
-        android:textSize="12sp" />
+        android:paddingTop="@dimen/space_xs"
+        android:paddingBottom="@dimen/space_md"
+        android:text="@string/loading" />
 
     <!-- 继续观看：无历史时整块 gone，GridView 会自动贴回 status 下方 -->
     <LinearLayout
@@ -90,20 +104,44 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/status"
         android:orientation="vertical"
-        android:paddingTop="2dp"
-        android:paddingBottom="6dp"
+        android:paddingBottom="@dimen/space_md"
         android:visibility="gone">
 
-        <TextView
-            android:id="@+id/history_title"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
             android:paddingLeft="@dimen/content_pad_h"
-            android:paddingBottom="8dp"
-            android:text="继续观看"
-            android:textColor="@color/text_primary"
-            android:textSize="15sp"
-            android:textStyle="bold" />
+            android:paddingRight="@dimen/content_pad_h"
+            android:paddingBottom="@dimen/space_sm">
+
+            <TextView
+                android:id="@+id/history_title"
+                style="@style/Text.Body"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/continue_watching"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/history_count"
+                style="@style/Text.Micro"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginLeft="@dimen/space_sm" />
+
+            <TextView
+                android:id="@+id/btn_all_history"
+                style="@style/Text.Caption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="@dimen/space_md"
+                android:paddingTop="@dimen/space_xs"
+                android:paddingBottom="@dimen/space_xs"
+                android:text="@string/see_all" />
+        </LinearLayout>
 
         <HorizontalScrollView
             android:layout_width="match_parent"
@@ -127,27 +165,41 @@
         android:layout_height="match_parent"
         android:layout_below="@id/history_block"
         android:layout_alignParentBottom="true"
-        android:numColumns="6"
-        android:horizontalSpacing="14dp"
-        android:verticalSpacing="20dp"
+        android:numColumns="@integer/grid_cols"
+        android:horizontalSpacing="@dimen/card_gap_h"
+        android:verticalSpacing="@dimen/card_gap_v"
         android:paddingLeft="@dimen/content_pad_h"
         android:paddingRight="@dimen/content_pad_h"
-        android:paddingTop="8dp"
-        android:paddingBottom="32dp"
+        android:paddingTop="@dimen/space_sm"
+        android:paddingBottom="@dimen/space_xxl"
         android:clipChildren="false"
         android:clipToPadding="false"
         android:listSelector="@android:color/transparent"
         android:scrollbars="none"
         android:nextFocusUp="@id/tabs" />
 
-    <!-- 空态 -->
-    <TextView
+    <!-- 空态：主文案 + 副文案，不再是孤零零一行灰字 -->
+    <LinearLayout
         android:id="@+id/empty"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:text="@string/empty"
-        android:textColor="@color/text_secondary"
-        android:textSize="15sp"
-        android:visibility="gone" />
+        android:orientation="vertical"
+        android:gravity="center"
+        android:visibility="gone">
+
+        <TextView
+            style="@style/Text.Body"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/empty_title"
+            android:textStyle="bold" />
+
+        <TextView
+            style="@style/Text.Caption"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_sm"
+            android:text="@string/empty" />
+    </LinearLayout>
 </RelativeLayout>

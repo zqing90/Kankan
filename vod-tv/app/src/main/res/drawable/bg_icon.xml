@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  顶栏图标按钮的底。默认给一层 6% 白，让图标有「可点区域」的暗示；
+  焦点则交给统一的 2dp 焦点描边。
+  不直接用 bg_tab 是因为 tab 未选中要完全透明（贴着标题排），两者语义不同。
+-->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_focused="true">
+        <shape android:shape="rectangle">
+            <solid android:color="#1FFFFFFF" />
+            <corners android:radius="@dimen/radius_md" />
+            <stroke android:width="@dimen/focus_stroke" android:color="@color/focus" />
+        </shape>
+    </item>
+    <item android:state_pressed="true">
+        <shape android:shape="rectangle">
+            <solid android:color="#33FFFFFF" />
+            <corners android:radius="@dimen/radius_md" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#0FFFFFFF" />
+            <corners android:radius="@dimen/radius_md" />
+        </shape>
+    </item>
+</selector>

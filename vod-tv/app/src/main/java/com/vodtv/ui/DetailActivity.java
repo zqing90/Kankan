@@ -259,7 +259,7 @@ public class DetailActivity extends Activity {
                     firstPlayable = row;
                 }
             } else {
-                name.setTextColor(getResources().getColor(R.color.text_dim));
+                name.setTextColor(getResources().getColor(R.color.text_tertiary));
                 spec.setText(l.error == null ? "不可用" : l.error);
                 stat.setText("");
                 row.setFocusable(false);

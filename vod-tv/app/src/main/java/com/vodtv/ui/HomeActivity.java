@@ -46,7 +46,7 @@ public class HomeActivity extends Activity {
     private GridView grid;
     private LinearLayout tabs;
     private TextView status;
-    private TextView empty;
+    private View empty;
     private View btnRefresh;
     private View btnSearch;
     private View btnHistory;
@@ -57,7 +57,8 @@ public class HomeActivity extends Activity {
     private LinearLayout historyRow;
     private final List<View> historyCards = new ArrayList<View>();
     /** 横条末尾的「全部记录」入口卡 */
-    private View historyMore;
+    private TextView btnAllHistory;
+    private TextView historyCount;
 
     private RankRepository.RankData data;
     private String group = null;          // null = 全部
@@ -97,7 +98,7 @@ public class HomeActivity extends Activity {
         grid = (GridView) findViewById(R.id.grid);
         tabs = (LinearLayout) findViewById(R.id.tabs);
         status = (TextView) findViewById(R.id.status);
-        empty = (TextView) findViewById(R.id.empty);
+        empty = findViewById(R.id.empty);
         btnRefresh = findViewById(R.id.btn_refresh);
         btnSearch = findViewById(R.id.btn_search);
         btnHistory = findViewById(R.id.btn_history);
@@ -120,14 +121,16 @@ public class HomeActivity extends Activity {
             @Override
             public void run() {
                 // getColumnWidth / getHorizontalSpacing 都是 API 16 的方法，4.0/4.1 上会 NoSuchMethodError，
-                // 所以列宽和间距都按布局里写死的值自己算（horizontalSpacing=14dp，见 activity_home.xml）
+                // 所以列宽和间距按布局里的 @dimen/card_gap_h 自己算
                 int cols = grid.getNumColumns();
                 int screenW = getResources().getDisplayMetrics().widthPixels;
+                int gap = getResources().getDimensionPixelSize(R.dimen.card_gap_h);
                 int usable = screenW - grid.getPaddingLeft() - grid.getPaddingRight()
-                        - dp(14) * (cols - 1);
+                        - gap * (cols - 1);
                 int colW = usable / cols;
                 if (colW > 0) {
-                    posterHeight = (int) (colW * 1.5f); // 2:3 海报
+                    // 卡片根布局左右各 2dp padding（给焦点描边留位置），海报宽要减掉这 4dp
+                    posterHeight = (int) ((colW - dp(4)) * 1.5f); // 2:3 海报
                     adapter.notifyDataSetChanged();
                 }
             }
@@ -149,6 +152,14 @@ public class HomeActivity extends Activity {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(HomeActivity.this, SearchActivity.class));
+            }
+        });
+        btnAllHistory = (TextView) findViewById(R.id.btn_all_history);
+        historyCount = (TextView) findViewById(R.id.history_count);
+        btnAllHistory.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(HomeActivity.this, HistoryActivity.class));
             }
         });
         btnHistory.setOnClickListener(new View.OnClickListener() {
@@ -441,7 +452,6 @@ public class HomeActivity extends Activity {
         if (historyRow == null) return;
         historyRow.removeAllViews();
         historyCards.clear();
-        historyMore = null;
 
         List<HistoryStore.Entry> list = HistoryStore.recent(10);
         if (list.isEmpty()) {
@@ -482,32 +492,11 @@ public class HomeActivity extends Activity {
             historyCards.add(card);
         }
 
-        // 末尾挂一张「全部记录」入口卡：横条最多 10 条而且删不掉，得有地方看全集
-        historyMore = LayoutInflater.from(this).inflate(R.layout.item_history_more, historyRow, false);
-        historyMore.setId(View.generateViewId());
-        ((TextView) historyMore.findViewById(R.id.more_sub)).setText(
-                getString(R.string.history_count, HistoryStore.all(HistoryStore.MAX_ENTRIES).size()));
-        historyMore.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(HomeActivity.this, HistoryActivity.class));
-            }
-        });
-        historyMore.setOnKeyListener(new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if (event.getAction() == KeyEvent.ACTION_UP && isConfirmKey(keyCode)) {
-                    startActivity(new Intent(HomeActivity.this, HistoryActivity.class));
-                    return true;
-                }
-                return false;
-            }
-        });
-        LinearLayout.LayoutParams mlp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT);
-        mlp.rightMargin = dp(12);
-        historyRow.addView(historyMore, mlp);
+        // 「全部记录」入口改到标题行右侧（尾卡方案已移除，横条只留海报）
+        if (historyCount != null) {
+            historyCount.setText(getString(R.string.history_count,
+                    HistoryStore.all(HistoryStore.MAX_ENTRIES).size()));
+        }
 
         updateFocusChain();
     }
@@ -563,13 +552,11 @@ public class HomeActivity extends Activity {
                 if (i > 0) c.setNextFocusLeftId(historyCards.get(i - 1).getId());
                 if (i < historyCards.size() - 1) c.setNextFocusRightId(historyCards.get(i + 1).getId());
             }
-            // 最后一张卡的右边接「全部记录」
+            // 横条最后一张按 ↑ 直达标题行右侧的「全部 ›」，再 ↓ 回到第一张
             View last = historyCards.get(historyCards.size() - 1);
-            if (historyMore != null) {
-                last.setNextFocusRightId(historyMore.getId());
-                historyMore.setNextFocusLeftId(last.getId());
-                historyMore.setNextFocusDownId(R.id.grid);
-                if (tabId != View.NO_ID) historyMore.setNextFocusUpId(tabId);
+            if (btnAllHistory != null) {
+                last.setNextFocusUpId(btnAllHistory.getId());
+                btnAllHistory.setNextFocusDownId(historyCards.get(0).getId());
             }
             grid.setNextFocusUpId(historyCards.get(0).getId());
         } else if (tabId != View.NO_ID) {
@@ -658,14 +645,14 @@ public class HomeActivity extends Activity {
 
             if (position < 3) {
                 rank.setVisibility(View.VISIBLE);
-                rank.setText(String.valueOf(position + 1));
+                rank.setText("TOP " + (position + 1));
                 // 三个分支必须都是资源 ID —— 不能把 R.color.gold 和 0xFFC0C8D4 这种
                 // 颜色字面量混在一个三元表达式里，否则 getColor() 会当成资源 ID 去查表，
                 // 抛 Resources$NotFoundException（第 2、3 名会直接崩溃）。
                 int badgeRes = position == 0 ? R.color.gold
                         : position == 1 ? R.color.silver : R.color.bronze;
-                rank.setBackgroundColor(getResources().getColor(badgeRes));
-                rank.setTextColor(position == 0 ? 0xFF3A2A00 : 0xFF21252E);
+                // 底统一是 bg_pill 的半透明黑胶囊，只换字色，不再整块铺色
+                rank.setTextColor(getResources().getColor(badgeRes));
             } else {
                 rank.setVisibility(View.GONE);
             }
@@ -683,7 +670,7 @@ public class HomeActivity extends Activity {
             v.setOnFocusChangeListener(new View.OnFocusChangeListener() {
                 @Override
                 public void onFocusChange(View view, boolean has) {
-                    float s = has ? 1.07f : 1.0f;
+                    float s = has ? 1.06f : 1.0f;
                     view.animate().scaleX(s).scaleY(s).setDuration(120).start();
                 }
             });
@@ -710,8 +697,8 @@ public class HomeActivity extends Activity {
             });
 
             // 复用时要复位，否则滑出屏幕的卡片会保持放大状态
-            v.setScaleX(v.isFocused() ? 1.07f : 1.0f);
-            v.setScaleY(v.isFocused() ? 1.07f : 1.0f);
+            v.setScaleX(v.isFocused() ? 1.06f : 1.0f);
+            v.setScaleY(v.isFocused() ? 1.06f : 1.0f);
 
             return v;
         }

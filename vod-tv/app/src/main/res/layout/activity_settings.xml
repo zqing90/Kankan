@@ -1,12 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  设置页
+  ─────────────────────────────────────────────────────────────
+  两个分组：数据源 / 片源。分组标题用品牌蓝，说明用次级文字，动作按钮用次级按钮样式。
+  版本号由代码从 BuildConfig 读，不再写死（原来硬编码 1.0.0，早就不对了）。
+-->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/bg"
     android:paddingLeft="@dimen/topbar_pad_h"
     android:paddingRight="@dimen/topbar_pad_h"
-    android:paddingTop="28dp">
+    android:paddingTop="@dimen/space_xl">
 
     <!-- 顶栏：返回固定左上（曾经放在右上，与其他页面不一致） -->
     <LinearLayout
@@ -20,13 +25,11 @@
             layout="@layout/part_back" />
 
         <TextView
+            style="@style/Text.Title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="18dp"
-            android:text="设置"
-            android:textColor="@color/text_primary"
-            android:textSize="22sp"
-            android:textStyle="bold" />
+            android:layout_marginLeft="@dimen/space_lg"
+            android:text="@string/settings" />
 
         <View
             android:layout_width="0dp"
@@ -37,110 +40,107 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="@dimen/space_md"
         android:scrollbars="none">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingBottom="40dp">
+            android:paddingBottom="@dimen/space_xxl">
 
-            <!-- 数据源 -->
+            <!-- ============ 数据源 ============ -->
             <TextView
+                style="@style/Text.Caption"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="数据源"
-                android:textColor="@color/accent"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:layout_marginTop="6dp" />
+                android:layout_marginTop="@dimen/space_sm"
+                android:text="@string/settings_group_source"
+                android:textColor="@color/brand"
+                android:textStyle="bold" />
 
             <TextView
+                style="@style/Text.Caption"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:text="留空 = 直连豆瓣榜单（推荐）。填了就走自建服务，需先在电脑上跑 node src/server.js。"
-                android:textColor="@color/text_secondary"
-                android:textSize="12sp" />
+                android:layout_marginTop="@dimen/space_sm"
+                android:singleLine="false"
+                android:text="@string/settings_server_hint" />
+
+            <EditText
+                android:id="@+id/et_server"
+                style="@style/Text.Caption"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_md"
+                android:background="@drawable/bg_input"
+                android:hint="http://192.168.1.10:8765"
+                android:padding="@dimen/space_md"
+                android:singleLine="true"
+                android:textColorHint="@color/text_tertiary"
+                android:inputType="textUri"
+                android:focusable="true"
+                android:focusableInTouchMode="true" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginTop="10dp"
-                android:gravity="center_vertical">
-
-                <EditText
-                    android:id="@+id/et_server"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:background="@drawable/bg_tab"
-                    android:hint="http://192.168.1.10:8765"
-                    android:padding="12dp"
-                    android:singleLine="true"
-                    android:textColor="@color/text_primary"
-                    android:textColorHint="@color/text_dim"
-                    android:textSize="13sp"
-                    android:inputType="textUri"
-                    android:focusable="true"
-                    android:focusableInTouchMode="true" />
+                android:layout_marginTop="@dimen/space_md">
 
                 <TextView
                     android:id="@+id/btn_save_server"
                     style="@style/TopButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="保存" />
+                    android:layout_marginLeft="0dp"
+                    android:text="@string/settings_save" />
 
                 <TextView
                     android:id="@+id/btn_force_update"
                     style="@style/TopButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="强制更新榜单" />
+                    android:text="@string/settings_force_update" />
             </LinearLayout>
 
             <TextView
                 android:id="@+id/tv_update_status"
+                style="@style/Text.Micro"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text=""
-                android:textColor="@color/text_dim"
-                android:textSize="11sp" />
+                android:layout_marginTop="@dimen/space_sm" />
 
-            <!-- 片源 -->
+            <!-- ============ 片源 ============ -->
             <TextView
+                style="@style/Text.Caption"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="片源"
-                android:textColor="@color/accent"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:layout_marginTop="24dp" />
+                android:layout_marginTop="@dimen/space_xl"
+                android:text="@string/settings_group_sites"
+                android:textColor="@color/brand"
+                android:textStyle="bold" />
 
             <TextView
+                style="@style/Text.Caption"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:text="按 OK 启用 / 停用。播放默认选「成功率 × 响应速度」得分最高的一路，标星的就是当前默认源。"
-                android:textColor="@color/text_secondary"
-                android:textSize="12sp" />
+                android:layout_marginTop="@dimen/space_sm"
+                android:singleLine="false"
+                android:text="@string/settings_sites_hint" />
 
             <LinearLayout
                 android:id="@+id/source_list"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:layout_marginTop="10dp" />
+                android:layout_marginTop="@dimen/space_md" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginTop="16dp">
+                android:layout_marginTop="@dimen/space_lg">
 
                 <TextView
                     android:id="@+id/btn_sync_sources"
@@ -148,30 +148,29 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="0dp"
-                    android:text="从服务端同步源" />
+                    android:text="@string/settings_sync_sources" />
 
                 <TextView
                     android:id="@+id/btn_reset_sources"
                     style="@style/TopButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="恢复默认源清单" />
+                    android:text="@string/settings_reset_sources" />
 
                 <TextView
                     android:id="@+id/btn_clear_stats"
                     style="@style/TopButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="清空稳定性统计" />
+                    android:text="@string/settings_clear_stats" />
             </LinearLayout>
 
             <TextView
+                android:id="@+id/tv_version"
+                style="@style/Text.Micro"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="28dp"
-                android:text="版本 1.0.0 · 最低支持 Android 4.0（建议 4.4 以上，4.0~4.3 的 HTTPS 支持不完整）"
-                android:textColor="@color/text_dim"
-                android:textSize="11sp" />
+                android:layout_marginTop="@dimen/space_xl" />
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

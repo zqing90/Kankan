@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 手机：3 列。6 列时每张海报只有 55dp 宽，标题会被省略号吃掉 -->
+<resources>
+    <integer name="grid_cols">3</integer>
+</resources>

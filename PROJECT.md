@@ -20,9 +20,9 @@
 ```bash
 cd /d/code/kankan/vod-tv
 ./gradlew assembleDebug
-cp app/build/outputs/apk/debug/app-debug.apk dist/Kankan-1.3.2-debug.apk
-cp dist/Kankan-1.3.2-debug.apk /e/share/
-md5sum dist/Kankan-1.3.2-debug.apk /e/share/Kankan-1.3.2-debug.apk
+cp app/build/outputs/apk/debug/app-debug.apk dist/Kankan-1.4.0-debug.apk
+cp dist/Kankan-1.4.0-debug.apk /e/share/
+md5sum dist/Kankan-1.4.0-debug.apk /e/share/Kankan-1.4.0-debug.apk
 ```
 
 规则细则：
@@ -97,7 +97,7 @@ vod-tv/
 ├── gradle.properties
 ├── local.properties             ⚠️ 不入库，需自己写 sdk.dir
 ├── gradlew / gradlew.bat
-├── dist/Kankan-1.3.2-debug.apk  已构建产物（同时复制一份到 E:\share\）
+├── dist/Kankan-1.4.0-debug.apk  已构建产物（同时复制一份到 E:\share\）
 ├── README.md                    使用与构建说明（面向人）
 ├── PROJECT.md                   本文件（面向 AI）
 └── app/
@@ -117,20 +117,21 @@ vod-tv/
         │   │   ├── PlayCache.java           ⭐ 源检测结果按自然日缓存（每部片一个文件）
         │   │   ├── MovieInfo.java           影片信息模型（Intent ↔ JSON 双向转换）
         │   │   ├── HistoryStore.java        ⭐ 播放进度 + 影片信息快照（首页继续观看 / 记录页用）
-│   │   ├── SearchHistory.java        搜索关键词历史（最多 12 条，去重、最新的在前）
+        │   │   ├── SearchHistory.java       搜索关键词历史（最多 12 条，去重、最新的在前）
         │   │   ├── ImageLoader.java         海报加载（Referer + 内存/磁盘缓存）
         │   │   └── Http.java                极简 HTTP，只用 HttpURLConnection
         │   ├── ui/
-        │   │   ├── HomeActivity.java        6 列海报墙、5 个分组 tab、继续观看、搜索入口
+        │   │   ├── HomeActivity.java        海报墙（手机 3 列 / 电视 6 列）、分组 tab、继续观看
         │   │   ├── DetailActivity.java      影片信息 + 片源列表 + 选集 + 继续观看
         │   │   ├── SearchActivity.java      搜索页：本地榜单 + 片源站候选合并、最近搜索标签
         │   │   ├── HistoryActivity.java     观看记录页（网格 / 单条删除 / 清空）
         │   │   └── SettingsActivity.java    源配置、服务端地址、清缓存、强制更新
+        │   ├── widget/RoundImageView.java   圆角图片（API 19 无 setClipToOutline，走 clipPath）
         │   └── player/PlayerActivity.java   ExoPlayer 播放页 + 控制栏 + 选集浮层 + 进度落盘
         └── res/
-            ├── layout/                      13 个布局，全部手写原生 View
+            ├── layout/                      12 个布局，全部手写原生 View
             │                                （含 part_back.xml：所有二级页共用的返回按钮）
-            ├── values/                      colors / strings / styles
+            ├── values/ + values-sw600dp/    colors / strings / styles / dimens / integers（两档）
             ├── mipmap-*/                    ic_launcher（5 档密度）+ ic_launcher_foreground
             ├── mipmap-anydpi-v26/           自适应图标（API 26+）
             └── drawable-{m,h,xh,xxh,xxxh}dpi/
@@ -141,9 +142,12 @@ vod-tv/
 | 类型 | 来源 | 脚本 |
 |---|---|---|
 | App 图标 / TV banner | 自己画（纯色底 + 白色播放三角，参照夸克/UU 远程） | `tools/make_icons.py` |
-| 顶栏 / 播放控制图标 | **Google Material Icons（Apache-2.0），不自己画** | `tools/fetch_material_icons.py` |
+| 顶栏 / 播放控制图标 | **Google Material Rounded（Apache-2.0），不自己画** | `tools/fetch_material_icons.py` |
 
-Material 图标的 SVG 缓存在 `tools/icons_src/`，改图标只改脚本里的映射表再重跑。
+Material 图标的 SVG 缓存在 `tools/icons_src/<变体>/`，改图标只改脚本里的映射表再重跑：
+`MATERIAL_VARIANT=materialiconsround python tools/fetch_material_icons.py`（默认就是 Rounded）。
+
+交付前跑 `python tools/check_ids.py`（见 §18.7）。
 
 ### 2.2 vod-collector（Node）
 
@@ -497,8 +501,8 @@ echo "sdk.dir=D:\\Android\\Sdk" > local.properties
 
 ./gradlew assembleDebug
 # 产物：app/build/outputs/apk/debug/app-debug.apk
-# 留档：dist/Kankan-1.3.2-debug.apk
-# 分发：E:\share\Kankan-1.3.2-debug.apk   ← 见顶部「铁律 · APK 产出后必须分发」
+# 留档：dist/Kankan-1.4.0-debug.apk
+# 分发：E:\share\Kankan-1.4.0-debug.apk   ← 见顶部「铁律 · APK 产出后必须分发」
 ```
 
 环境（本机已装好，可直接构建）：
@@ -527,7 +531,7 @@ echo "sdk.dir=D:\\Android\\Sdk" > local.properties
 
 ```bash
 adb connect 192.168.x.x:5555
-adb install -r Kankan-1.3.2-debug.apk
+adb install -r Kankan-1.4.0-debug.apk
 ```
 
 ### 9.2 跑采集器
@@ -700,6 +704,9 @@ git revert <commit>                  # 撤销一次提交（不用 reset）
 
 **先找现成的，不许上来就自己画。** 顺序：
 
+> 1.4.0 起图标统一用 **Material Rounded** 变体（圆头收笔与 8dp 圆角界面同一种语言），
+> 详见 §18.5。下表仍有效，只是图形换成了 Rounded。
+
 1. 优先 **Google Material Icons**（Apache-2.0），本项目顶栏/播放控制全部用它，
    由 `tools/fetch_material_icons.py` 抓 SVG → 光栅化成 5 档密度 PNG。
 2. Material 没有合适的图标，再换同类开源库（Lucide / Tabler / Feather，均 MIT）。
@@ -855,3 +862,117 @@ git revert <commit>                  # 撤销一次提交（不用 reset）
 - 记录里的 `sourceId` 只是**优先项**，那个源挂了要能退到任意可播线路，不能因此判失败。
 - 多集时集名对不上就**不猜**，返回 null 交给详情页让人挑（单集电影例外）。
 - 详情页 `autoResumePending` 只消费一次：用户手动「重新检测」或被降级进来后，不该再次自动跳播放页。
+
+---
+
+## 18. 视觉系统（1.4.0 定型）
+
+### 18.1 三条原则
+
+1. **品牌连贯**：桌面图标是 `#2B5CFF` 蓝底白三角，界面强调色必须同值。1.3.x 界面用粉红 `#FF4D6A`，和图标完全对不上 —— 用户点进来像换了个 App。
+2. **一种焦点语言**：1.3.x 有两套 —— 海报卡 3dp **白边**、按钮 2dp **粉边**。现在全应用只有一种：**2dp 焦点蓝 `#5B82FF`**。
+3. **海报即卡片**：1.3.x 的卡片是「5dp 深灰框 + 海报 + 3dp 白边」三层套着，海报亮度被吃掉一圈。现在去掉框，海报本体就是卡片。
+
+### 18.2 颜色 token（`res/values/colors.xml`）
+
+| Token | 值 | 用途 |
+|---|---|---|
+| `bg` | `#08090D` | 页面底（比旧版更深，让海报跳出来） |
+| `surface` | `#12151C` | 卡片 / 列表行 / 面板 |
+| `surface_2` | `#1B1F28` | 聚焦态、浮层、二级面 |
+| `stroke` | `#1FFFFFFF` | 1dp 分隔线 |
+| `stroke_strong` | `#33FFFFFF` | 面板外框 |
+| `brand` | `#2B5CFF` | **与 ic_launcher_bg 同值**，唯一强调色 |
+| `brand_dim` | `#1F47D6` | 按下态 |
+| `focus` | `#5B82FF` | 焦点描边（比 brand 亮一档，深底上更清楚） |
+| `text_primary` | `#F5F7FA` | 18.4:1 |
+| `text_secondary` | `#9BA4B4` | 7.6:1 |
+| `text_tertiary` | `#76808F` | 5.0:1（旧值 `#5F6878` 只有 3.4:1，11sp 在电视上看不清） |
+| `gold` / `green` / `red` / `amber` | — | 只给语义：评分 / 可播 / 失败 / 警告 |
+| `scrim` | `#B3000000` | 压在图片上的角标底 |
+
+三档文本全部过 WCAG AA（4.5:1）。
+
+### 18.3 字号与尺寸（`dimens.xml` + `values-sw600dp/dimens.xml`）
+
+字号只有五档，布局里**不许再出现 `15sp` 这种字面量**：
+
+| Token | 手机 | 电视 | 用途 |
+|---|---|---|---|
+| `text_hero` | 26sp | 30sp | App 名、详情页片名 |
+| `text_title` | 20sp | 22sp | 页面标题、区块标题 |
+| `text_body` | 15sp | 16sp | 卡片标题、列表主行 |
+| `text_caption` | 13sp | 14sp | 副标题、次要信息 |
+| `text_micro` | 11sp | 12sp | 角标、时间码、提示 |
+
+| Token | 手机 | 电视 | 说明 |
+|---|---|---|---|
+| `topbar_pad_h` | 20dp | 48dp | 顶栏左右（电视是 overscan 安全区） |
+| `content_pad_h` | 16dp | 44dp | 内容区左右 |
+| `icon_btn_size` | 40dp | 48dp | 顶栏图标命中区 |
+| `grid_cols` | 3 | 6 | 海报列数（手机 6 列时每张只 55dp，标题全被省略号吃掉） |
+| `card_gap_h` / `_v` | 10/16dp | 14/20dp | 网格间距 |
+| `radius_sm/md/lg/xl` | 4/8/12/16dp | 同 | 旧版是 0/6/8/14 四个没规律的值 |
+| `space_xs…xxl` | 4/8/12/16/24/32dp | 同 | 4 的倍数 |
+
+### 18.4 组件规范
+
+| 组件 | Drawable | 规则 |
+|---|---|---|
+| 卡片 / 列表行 | `bg_card` | 默认 surface + 1dp 描边；焦点 = surface_2 + 2dp 焦点蓝 |
+| 海报卡 | `bg_poster` | 底永远透明，只画描边；根布局留 **2dp padding** 让描边不压画面 |
+| 分类 tab | `bg_tab` | 未选中**完全透明**；选中 = brand 实底白字；选中+焦点 = 白描边（蓝底蓝边会糊） |
+| 顶栏图标按钮 | `bg_icon` | 默认 6% 白；焦点 = 2dp 焦点蓝 |
+| 主行动按钮 | `bg_primary` | brand 实底白字，焦点白描边（一屏只允许一个） |
+| 输入框 | `bg_input` | surface + 1dp 描边，焦点换 2dp 蓝 |
+| 胶囊 | `bg_chip` | 标签/集数格；`selected` = brand 实底，用来标「当前这一集」 |
+| 图片角标 | `bg_pill` | 半透明黑 + 99dp 圆角 |
+| 播放控制栏 | `bg_player_controls` | 上透明→下近黑的渐变，不用整块黑条压画面 |
+| 播放键 | `bg_play` | 品牌蓝圆形，整条控制栏里唯一有实底的按钮 |
+
+**焦点统一参数**：`1.06` 倍放大 + `@dimen/focus_stroke`(2dp) 描边。以前是 1.07，和 2dp/3dp 混用，看不出差别但代码不一致。
+
+### 18.5 图标
+
+- 全部 **Material Rounded**（`materialiconsround`），圆头收笔和 8dp 圆角界面同一种语言。
+  `tools/fetch_material_icons.py` 用环境变量 `MATERIAL_VARIANT` 切换变体，缓存按变体分目录。
+- 品牌标记 `ic_brand_mark.png`（蓝底白三角，与 ic_launcher 同款）由 tools 脚本生成，5 档密度。
+- 角标：排名 `TOP 1/2/3` 用金/银/铜字色 + 半透明黑胶囊；评分金色数字 + 同款胶囊。
+  **不再用整块红底包住海报左上角**（旧版 30dp 红色直角方块，压住海报最关键的视觉区）。
+
+### 18.6 圆角在 API 19 上怎么实现
+
+`setClipToOutline` 是 API 21 的，minSdk 19 直接调用会崩。方案：`widget/RoundImageView`
+用 `Canvas.clipPath` 裁剪，只影响绘制、不占额外内存。
+
+没有选「在 ImageLoader 里把 Bitmap 裁成圆角」，是因为那会把 RGB_565 转成 ARGB_8888，
+内存翻倍；6 列海报墙一次可见二十多张，很容易顶到 LruCache 上限后反复重解码。
+
+### 18.7 交付前机械自检
+
+```bash
+cd vod-tv
+python tools/check_ids.py     # java 强转类型 vs 布局标签，防止改结构后运行时 ClassCastException
+```
+
+**为什么需要它**：把空态的 `TextView` 换成 `LinearLayout` 后，`(TextView) findViewById(...)`
+依然能编译通过，强转在编译期不校验，装上机器才崩。1.4.0 改动中就靠它抓到了
+`HomeActivity` 的这一处（其余 88 个 id 全部兼容）。
+
+### 18.8 1.3.2 → 1.4.0 改了什么
+
+| 项 | 1.3.2 | 1.4.0 |
+|---|---|---|
+| 强调色 | 粉红 `#FF4D6A` | 品牌蓝 `#2B5CFF`（图标同值） |
+| 焦点 | 白边 3dp / 粉边 2dp 两套 | 焦点蓝 2dp 一套 |
+| 海报卡 | 深灰框 + 白边 + 双角标 | 海报即卡 + 蓝描边 + 单胶囊 |
+| 图标 | Material Filled | Material **Rounded** |
+| 字号 | 11/12/14/15/17/20/26 散装 | 五档 token |
+| 圆角 | 0/6/8/14 无规律 | 4/8/12/16 |
+| 手机列数 | 6（每张 55dp） | 3 |
+| 首页动作 | 文字按钮 | 图标按钮 |
+| 顶栏 | 各页 padding 不统一 | 统一 48/44dp + 品牌标记 |
+| 播放控制栏 | 整块 `#D9000000` 黑条 | 渐变 + 居中图标组 + 蓝色圆形播放键 |
+| 时间码 | 默认字体（跳秒会左右晃） | 等宽字体 |
+| 全部记录入口 | 横条末尾一张卡 | 标题行右侧「全部 ›」 |
+| 版本号 | 布局里硬编码 1.0.0 | 从 PackageInfo 读 |

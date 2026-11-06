@@ -1,22 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- 片源站一行：序号 + 站名/域名 + 统计 + 可用状态胶囊 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="horizontal"
+    android:gravity="center_vertical"
     android:focusable="true"
-    android:background="@drawable/bg_tab"
-    android:paddingLeft="16dp"
-    android:paddingRight="16dp"
-    android:paddingTop="12dp"
-    android:paddingBottom="12dp"
-    android:layout_marginBottom="8dp">
+    android:background="@drawable/bg_card"
+    android:paddingLeft="@dimen/space_lg"
+    android:paddingRight="@dimen/space_lg"
+    android:paddingTop="@dimen/space_md"
+    android:paddingBottom="@dimen/space_md"
+    android:layout_marginBottom="@dimen/space_sm">
 
     <TextView
         android:id="@+id/src_index"
+        style="@style/Text.Micro"
         android:layout_width="28dp"
-        android:layout_height="wrap_content"
-        android:textColor="@color/text_dim"
-        android:textSize="12sp" />
+        android:layout_height="wrap_content" />
 
     <LinearLayout
         android:layout_width="0dp"
@@ -26,40 +27,37 @@
 
         <TextView
             android:id="@+id/src_name"
+            style="@style/Text.Body"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="@color/text_primary"
-            android:textSize="15sp"
-            android:singleLine="true" />
+            android:layout_height="wrap_content" />
 
         <TextView
             android:id="@+id/src_host"
+            style="@style/Text.Micro"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/text_dim"
-            android:textSize="11sp"
             android:layout_marginTop="2dp"
-            android:singleLine="true"
             android:ellipsize="middle" />
     </LinearLayout>
 
     <TextView
         android:id="@+id/src_stat"
+        style="@style/Text.Micro"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="12dp"
-        android:textColor="@color/text_secondary"
-        android:textSize="11sp" />
+        android:layout_marginLeft="@dimen/space_md"
+        android:textColor="@color/text_secondary" />
 
     <TextView
         android:id="@+id/src_state"
+        style="@style/Text.Micro"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="14dp"
+        android:layout_marginLeft="@dimen/space_md"
+        android:background="@drawable/bg_chip"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
         android:paddingTop="3dp"
         android:paddingBottom="3dp"
-        android:textColor="@color/green"
-        android:textSize="11sp" />
+        android:textColor="@color/green" />
 </LinearLayout>

@@ -34,6 +34,7 @@ public class SettingsActivity extends Activity {
         updateStatus = (TextView) findViewById(R.id.tv_update_status);
         etServer = (EditText) findViewById(R.id.et_server);
         etServer.setText(Prefs.serverUrl());
+        showVersion();
 
         findViewById(R.id.btn_back).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -114,6 +115,18 @@ public class SettingsActivity extends Activity {
 
     /* ---------- 强制更新 ---------- */
 
+    /** 版本号从包信息读，别写死在布局里（原来硬编码 1.0.0，几个版本都没改过） */
+    private void showVersion() {
+        TextView tv = (TextView) findViewById(R.id.tv_version);
+        if (tv == null) return;
+        String vn = "";
+        try {
+            vn = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
+        } catch (Exception ignored) {
+        }
+        tv.setText("版本 " + vn + " · 最低支持 Android 4.4（API 19）");
+    }
+
     private void doUpdate() {
         updateStatus.setText("正在更新…");
         Prefs.setServerUrl(etServer.getText().toString());
@@ -164,7 +177,7 @@ public class SettingsActivity extends Activity {
 
             TextView state = (TextView) row.findViewById(R.id.src_state);
             state.setText(s.enabled ? "已启用" : "已停用");
-            state.setTextColor(getResources().getColor(s.enabled ? R.color.green : R.color.text_dim));
+            state.setTextColor(getResources().getColor(s.enabled ? R.color.green : R.color.text_tertiary));
             state.setBackgroundColor(s.enabled ? 0x2233CC88 : 0x22FFFFFF);
 
             if (!s.enabled) row.setAlpha(0.55f);

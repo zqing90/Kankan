@@ -11,15 +11,47 @@
 
     <!-- 统一顶栏（规范见 PROJECT.md §15） -->
     <string name="history">观看记录</string>
-    <string name="history_short">继续观看</string>
     <string name="history_empty">还没有播放记录\n看过的片会自动出现在这里</string>
+    <string name="history_empty_title">还没有播放记录</string>
+    <string name="history_empty_sub">看过的片会自动出现在这里</string>
     <string name="history_clear">清空</string>
     <string name="history_clear_confirm">清空全部观看记录？</string>
     <string name="history_cancel">取消</string>
     <string name="history_hint">OK 继续播放 · 菜单键删除这一条</string>
-    <string name="history_all">全部记录</string>
     <string name="history_count">共 %1$d 部</string>
     <string name="history_deleted">已删除这条记录</string>
     <string name="history_cleared">观看记录已清空</string>
     <string name="search_history">最近搜索</string>
+
+    <!-- 1.4.0 UI 改版新增 -->
+    <string name="continue_watching">继续观看</string>
+    <string name="see_all">全部 ›</string>
+    <string name="empty_title">还没有榜单数据</string>
+    <string name="search_empty_title">没有找到匹配的片</string>
+    <string name="search_empty_sub">换个片名试试，或只输入片名的一部分</string>
+    <string name="search_hint_status">输入片名后按搜索图标，也可以直接按遥控器确认键</string>
+    <string name="source_list_title">片源（按稳定性排序）</string>
+    <string name="retry">重新检索</string>
+
+    <!-- 设置页 -->
+    <string name="settings_group_source">数据源</string>
+    <string name="settings_server_hint">留空 = 直连豆瓣榜单（推荐）。填了就走自建服务，需先在电脑上跑 node src/server.js。</string>
+    <string name="settings_save">保存</string>
+    <string name="settings_force_update">强制更新榜单</string>
+    <string name="settings_group_sites">片源</string>
+    <string name="settings_sites_hint">按 OK 启用 / 停用。播放默认选「成功率 × 响应速度」得分最高的一路，标星的就是当前默认源。</string>
+    <string name="settings_sync_sources">从服务端同步源</string>
+    <string name="settings_reset_sources">恢复默认源清单</string>
+    <string name="settings_clear_stats">清空稳定性统计</string>
+
+    <!-- 播放页 -->
+    <string name="player_hint">↑ 控制栏 / 选集   OK 暂停   ← → 快退/快进</string>
+    <string name="prev_episode">上一集</string>
+    <string name="next_episode">下一集</string>
+    <string name="rewind_10">快退 10 秒</string>
+    <string name="forward_10">快进 10 秒</string>
+    <string name="play">播放</string>
+    <string name="pause">暂停</string>
+    <string name="episodes">选集</string>
+    <string name="close">关闭</string>
 </resources>

@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
   观看记录页。顶栏结构与其他二级页完全一致：左上返回、标题、右侧页面级动作。
-  规范见 PROJECT.md §15。
+  规范见 PROJECT.md §15 / §18。
 -->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/bg">
+    android:layout_height="match_parent">
 
     <!-- 顶栏：返回 + 标题 + 条数 + 清空 -->
     <LinearLayout
@@ -18,21 +17,19 @@
         android:gravity="center_vertical"
         android:paddingLeft="@dimen/topbar_pad_h"
         android:paddingRight="@dimen/topbar_pad_h"
-        android:paddingTop="22dp"
-        android:paddingBottom="6dp">
+        android:paddingTop="@dimen/space_xl"
+        android:paddingBottom="@dimen/space_xs">
 
         <include
             android:id="@+id/btn_back"
             layout="@layout/part_back" />
 
         <TextView
+            style="@style/Text.Title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="18dp"
-            android:text="@string/history"
-            android:textColor="@color/text_primary"
-            android:textSize="20sp"
-            android:textStyle="bold" />
+            android:layout_marginLeft="@dimen/space_lg"
+            android:text="@string/history" />
 
         <View
             android:layout_width="0dp"
@@ -41,11 +38,10 @@
 
         <TextView
             android:id="@+id/tv_count"
+            style="@style/Text.Micro"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginRight="14dp"
-            android:textColor="@color/text_dim"
-            android:textSize="12sp" />
+            android:layout_marginRight="@dimen/space_md" />
 
         <LinearLayout
             android:id="@+id/btn_clear"
@@ -54,40 +50,37 @@
             android:orientation="horizontal"
             android:gravity="center_vertical"
             android:focusable="true"
-            android:background="@drawable/bg_tab"
-            android:paddingLeft="14dp"
-            android:paddingRight="16dp"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp">
+            android:background="@drawable/bg_icon"
+            android:paddingLeft="@dimen/space_md"
+            android:paddingRight="@dimen/space_lg"
+            android:paddingTop="@dimen/space_sm"
+            android:paddingBottom="@dimen/space_sm">
 
             <ImageView
                 android:layout_width="17dp"
                 android:layout_height="17dp"
                 android:src="@drawable/ic_ui_delete"
-                android:alpha="0.85"
                 android:contentDescription="@null" />
 
             <TextView
+                style="@style/Text.Caption"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="6dp"
-                android:text="@string/history_clear"
-                android:textColor="@color/text_secondary"
-                android:textSize="14sp" />
+                android:layout_marginLeft="@dimen/space_xs"
+                android:text="@string/history_clear" />
         </LinearLayout>
     </LinearLayout>
 
     <TextView
         android:id="@+id/hint"
+        style="@style/Text.Micro"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/topbar"
         android:paddingLeft="@dimen/content_pad_h"
         android:paddingTop="2dp"
-        android:paddingBottom="8dp"
-        android:text="@string/history_hint"
-        android:textColor="@color/text_dim"
-        android:textSize="11sp" />
+        android:paddingBottom="@dimen/space_sm"
+        android:text="@string/history_hint" />
 
     <GridView
         android:id="@+id/rgrid"
@@ -96,28 +89,42 @@
         android:layout_below="@id/hint"
         android:layout_alignParentBottom="true"
         android:numColumns="3"
-        android:horizontalSpacing="14dp"
-        android:verticalSpacing="12dp"
+        android:horizontalSpacing="@dimen/card_gap_h"
+        android:verticalSpacing="@dimen/space_md"
         android:paddingLeft="@dimen/topbar_pad_h"
         android:paddingRight="@dimen/topbar_pad_h"
-        android:paddingTop="6dp"
-        android:paddingBottom="32dp"
+        android:paddingTop="@dimen/space_xs"
+        android:paddingBottom="@dimen/space_xxl"
         android:clipChildren="false"
         android:clipToPadding="false"
         android:listSelector="@android:color/transparent"
         android:scrollbars="none" />
 
-    <TextView
+    <!-- 空态：主文案 + 副文案 -->
+    <LinearLayout
         android:id="@+id/empty"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
+        android:orientation="vertical"
         android:gravity="center"
-        android:lineSpacingExtra="6dp"
-        android:text="@string/history_empty"
-        android:textColor="@color/text_secondary"
-        android:textSize="15sp"
-        android:visibility="gone" />
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/empty_title"
+            style="@style/Text.Body"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/history_empty_title"
+            android:textStyle="bold" />
+
+        <TextView
+            style="@style/Text.Caption"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_sm"
+            android:text="@string/history_empty_sub" />
+    </LinearLayout>
 
     <!--
       续播准备遮罩：点记录后要落地解析一次 m3u8（没缓存时还要重新检索 14 个站），
@@ -140,11 +147,10 @@
 
         <TextView
             android:id="@+id/busy_text"
+            style="@style/Text.Body"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
-            android:gravity="center"
-            android:textColor="@color/text_primary"
-            android:textSize="14sp" />
+            android:layout_marginTop="@dimen/space_lg"
+            android:gravity="center" />
     </LinearLayout>
 </RelativeLayout>

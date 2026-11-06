@@ -1,9 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  详情页
+  ─────────────────────────────────────────────────────────────
+  上：影片信息（海报 + 片名 + 评分/年份 + 类型 + 简介 + 演职员）
+  下：片源列表（按稳定性排序，可重新检索）
+  「继续观看」是全页唯一的主行动，用主按钮样式（蓝底白字），其余一律次要按钮。
+-->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@color/bg">
+    android:orientation="vertical">
 
     <!-- 返回入口：手机上没有实体返回键，全靠它；物理返回键同时保留。
          位置固定左上角，和其他页面共用同一份 part_back（PROJECT.md §15） -->
@@ -12,7 +18,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:paddingLeft="@dimen/topbar_pad_h"
-        android:paddingTop="18dp">
+        android:paddingTop="@dimen/space_xl">
 
         <include
             android:id="@+id/btn_back"
@@ -27,13 +33,13 @@
         android:orientation="horizontal"
         android:paddingLeft="@dimen/content_pad_h"
         android:paddingRight="@dimen/content_pad_h"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp">
+        android:paddingTop="@dimen/space_lg"
+        android:paddingBottom="@dimen/space_md">
 
-        <ImageView
+        <com.vodtv.widget.RoundImageView
             android:id="@+id/poster"
-            android:layout_width="196dp"
-            android:layout_height="280dp"
+            android:layout_width="180dp"
+            android:layout_height="270dp"
             android:scaleType="centerCrop"
             android:background="@drawable/ph_poster"
             android:contentDescription="@null" />
@@ -42,71 +48,63 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:layout_marginLeft="28dp"
+            android:layout_marginLeft="@dimen/space_xl"
             android:orientation="vertical">
 
             <TextView
                 android:id="@+id/title"
+                style="@style/Text.Hero"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="@color/text_primary"
-                android:textSize="@dimen/app_title_size"
-                android:textStyle="bold"
-                android:singleLine="true"
-                android:ellipsize="end" />
+                android:layout_height="wrap_content" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginTop="8dp">
+                android:gravity="center_vertical"
+                android:layout_marginTop="@dimen/space_sm">
 
                 <TextView
                     android:id="@+id/rating"
+                    style="@style/Text.Title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/gold"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
                     android:visibility="gone" />
 
                 <TextView
                     android:id="@+id/meta"
+                    style="@style/Text.Caption"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="12dp"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="13sp" />
+                    android:layout_marginLeft="@dimen/space_md" />
             </LinearLayout>
 
             <TextView
                 android:id="@+id/genres"
+                style="@style/Text.Caption"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:textColor="@color/accent"
-                android:textSize="12sp" />
+                android:layout_marginTop="@dimen/space_sm"
+                android:textColor="@color/brand" />
 
             <TextView
                 android:id="@+id/desc"
+                style="@style/Text.Caption"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:textColor="@color/text_secondary"
-                android:textSize="13sp"
-                android:lineSpacingExtra="3dp"
+                android:layout_marginTop="@dimen/space_md"
+                android:ellipsize="end"
+                android:lineSpacingExtra="4dp"
                 android:maxLines="5"
-                android:ellipsize="end" />
+                android:singleLine="false" />
 
             <TextView
                 android:id="@+id/credits"
+                style="@style/Text.Micro"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:textColor="@color/text_dim"
-                android:textSize="12sp"
-                android:singleLine="true"
-                android:ellipsize="end" />
+                android:layout_marginTop="@dimen/space_sm" />
         </LinearLayout>
     </LinearLayout>
 
@@ -114,9 +112,9 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_marginLeft="44dp"
-        android:layout_marginRight="44dp"
-        android:background="#1AFFFFFF" />
+        android:layout_marginLeft="@dimen/content_pad_h"
+        android:layout_marginRight="@dimen/content_pad_h"
+        android:background="@color/stroke" />
 
     <!-- 下半：片源 -->
     <LinearLayout
@@ -126,7 +124,7 @@
         android:orientation="vertical"
         android:paddingLeft="@dimen/content_pad_h"
         android:paddingRight="@dimen/content_pad_h"
-        android:paddingTop="14dp">
+        android:paddingTop="@dimen/space_lg">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -136,21 +134,20 @@
 
             <TextView
                 android:id="@+id/lines_title"
+                style="@style/Text.Body"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="片源（按稳定性排序）"
-                android:textColor="@color/text_primary"
-                android:textSize="15sp"
+                android:text="@string/source_list_title"
                 android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/btn_resume"
-                style="@style/TopButton"
+                style="@style/ButtonPrimary"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="10dp"
-                android:text="继续观看"
+                android:layout_marginRight="@dimen/space_sm"
+                android:text="@string/continue_watching"
                 android:visibility="gone" />
 
             <TextView
@@ -158,14 +155,14 @@
                 style="@style/TopButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="重新检索" />
+                android:text="@string/retry" />
         </LinearLayout>
 
         <ScrollView
             android:id="@+id/scroll"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="@dimen/space_md"
             android:scrollbars="none">
 
             <LinearLayout
@@ -173,7 +170,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:paddingBottom="20dp" />
+                android:paddingBottom="@dimen/space_xl" />
         </ScrollView>
     </LinearLayout>
 </LinearLayout>

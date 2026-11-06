@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 电视：6 列。1920 宽下每张约 289px，3 米外仍能看清片名 -->
+<resources>
+    <integer name="grid_cols">6</integer>
+</resources>
