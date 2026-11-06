@@ -976,3 +976,52 @@ python tools/check_ids.py     # java 强转类型 vs 布局标签，防止改结
 | 时间码 | 默认字体（跳秒会左右晃） | 等宽字体 |
 | 全部记录入口 | 横条末尾一张卡 | 标题行右侧「全部 ›」 |
 | 版本号 | 布局里硬编码 1.0.0 | 从 PackageInfo 读 |
+
+---
+
+## 19. 播放页长按快进/快退（1.4.4）
+
+### 19.1 交互
+
+| 入口 | 单击 | 按住 |
+|---|---|---|
+| 遥控器 ← → | 快退/快进 10 秒 | 连续跳，松手即停 |
+| 遥控器 MEDIA_REWIND / FF | 同上 | 同上 |
+| 手机画面左半屏 | 切换控制栏 | 连续快退，松手即停 |
+| 手机画面右半屏 | 切换控制栏 | 连续快进，松手即停 |
+| 控制栏 ⏪ ⏩ 按钮 | 10 秒 | —（按钮不做长按） |
+
+节奏：按下立刻跳一次（保持原单击手感），480ms 后开始连跳，之后每 350ms 一跳，
+约 28 倍速。连续跳期间屏幕中央浮层常亮，显示「快进 37 秒 / 12:34 / 45:00」。
+
+### 19.2 三条不能改的实现约束
+
+1. **目标位置自己累加，绝不回读 `getCurrentPosition()`。**
+   `seekTo()` 之后短时间内 `getCurrentPosition()` 仍可能是旧值，用「当前 + 10s」
+   去累加，第二跳起就会重复落到同一位置，表现为越按越慢甚至倒退。
+   正确做法：`seekTargetMs` 自增，`player.seekTo(seekTargetMs)`。
+
+2. **只在 `repeatCount == 0` 的 DOWN 起步，不用系统 repeat 驱动连跳。**
+   系统重复键的节奏是「先 500ms、之后约 50ms」，50ms 跳 10 秒等于 200 倍速，
+   完全没法用。系统 repeat 只当心跳（刷新 `seekKeyBeat`），不影响节奏。
+
+3. **必须有 UP 丢失的兜底。**
+   某些遥控器 / 输入设备不发 UP，按住时会一直快进。按住期间系统会持续发 repeat 的
+   DOWN，因此用「最后心跳超过 3 秒就 `stopSeek()`」兜底。同理 `onPause()`
+   里也要停，否则按着时来电/回桌面，回来还在冲。
+
+### 19.3 与触摸层的分工
+
+`touch_layer` 是全屏透明层，轻点切控制栏、长按左右半屏快进快退，两种手势在同一层上，
+所以整层自己吃下全部事件（`onTouch` 返回 true），只在**没触发长按**的 `ACTION_UP`
+里调 `performClick()` 走点击逻辑（不是直接调方法，无障碍服务要的是这次点击本身）。
+长按松手不能再切一次控制栏，这是最容易写错的地方。
+
+连跳期间每次 seek 都会短暂进入 `STATE_BUFFERING`，`onPlaybackStateChanged` 里
+`if (seekDir != 0) return;` 跳过「缓冲中…」，否则它和浮层叠字。
+
+### 19.4 相关文件
+
+- `player/PlayerActivity.java`：`startSeek / stepSeek / stopSeek / showSeekHud`、`onKeyUp`
+- `res/layout/activity_player.xml`：`seek_hud / seek_hud_action / seek_hud_time`
+- `res/values/strings.xml`：`seek_forward_n / seek_backward_n / seek_at_start / seek_at_end`
