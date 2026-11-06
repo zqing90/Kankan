@@ -45,6 +45,39 @@
         android:gravity="center"
         android:visibility="gone" />
 
+    <!-- 长按快进/快退的反馈浮层：连续跳的时候画面一直在跳，
+         没有文字提示就不知道到底跳了多少、跳到哪了。
+         刻意不设 clickable/focusable：这层只负责显示，不能挡住下面 touch_layer 的手指事件 -->
+    <LinearLayout
+        android:id="@+id/seek_hud"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:background="@drawable/bg_panel"
+        android:paddingLeft="@dimen/space_xl"
+        android:paddingRight="@dimen/space_xl"
+        android:paddingTop="@dimen/space_lg"
+        android:paddingBottom="@dimen/space_lg"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/seek_hud_action"
+            style="@style/Text.Title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/seek_hud_time"
+            style="@style/Text.Micro"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:fontFamily="monospace"
+            android:textColor="@color/text_secondary" />
+    </LinearLayout>
+
     <!-- ============ 控制栏 ============ -->
     <LinearLayout
         android:id="@+id/controls"
