@@ -56,6 +56,9 @@
     <string name="next_episode">下一集</string>
     <string name="rewind_10">快退 10 秒</string>
     <string name="forward_10">快进 10 秒</string>
+    <!-- 控制栏按钮上的短标签 -->
+    <string name="rewind_short">快退</string>
+    <string name="forward_short">快进</string>
     <!-- 长按快进/快退时屏幕中央的浮层文案 -->
     <string name="seek_forward_n">快进 %1$d 秒</string>
     <string name="seek_backward_n">快退 %1$d 秒</string>

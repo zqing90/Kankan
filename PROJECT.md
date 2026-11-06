@@ -1025,3 +1025,35 @@ python tools/check_ids.py     # java 强转类型 vs 布局标签，防止改结
 - `player/PlayerActivity.java`：`startSeek / stepSeek / stopSeek / showSeekHud`、`onKeyUp`
 - `res/layout/activity_player.xml`：`seek_hud / seek_hud_action / seek_hud_time`
 - `res/values/strings.xml`：`seek_forward_n / seek_backward_n / seek_at_start / seek_at_end`
+
+### 19.5 按钮长什么样（1.4.5）
+
+1.4.4 交付后用户反馈「播放页没有看到快进快退的按钮」。其实两个键一直在控制栏里，
+但 **Material 的 `replay_10` / `forward_10` 在 24dp 尺寸下，圆里的「10」只有约 4dp 高**，
+实机上就是两个「旋转箭头」，被当成刷新图标。同时 1.4.4 的图标还有系统性偏移
+（见 §19.6），把「10」挤到左下角，更加看不见。
+
+改法：
+
+| 项 | 1.4.4 | 1.4.5 |
+|---|---|---|
+| 快退/快进 | 48dp 纯图标 | 58×56dp，**图标 26dp + 「快退/快进」标签** |
+| 图标居中 | 偏 (-3dp, +3dp) | 居中 |
+| 按钮行 | `layout_gravity=center_horizontal` | `fillViewport=true` + 子布局 `gravity=center` |
+
+按钮行那一条是给窄屏兜底：`layout_gravity="center_horizontal"` 在内容比视口宽时
+会得到**负的左边距**，两头对称截掉；换成 `fillViewport` 后，够宽就居中、不够宽就
+从左排并可横向滚动，永远不会把两端的按钮切掉。
+
+### 19.6 图标导出偏移（管线级 bug，别再犯）
+
+`tools/fetch_material_icons.py` 的链路是 SVG → svglib 转 PDF → pdfium 光栅化。
+PDF 页面尺寸和图形 bbox 不一致，光栅化后**字形落在画布偏左下**：
+1.4.4 实测 96px 画布偏 (-12, +12)，缩到 72px 就是 (-9, +9)，即 1/8 画幅全错位。
+所有图标（返回、搜索、记录、刷新、设置、播放系列）都受影响。
+
+修法：渲染完先按 alpha bbox 裁出来、贴回画布正中再接缩放（`center_glyph()`），
+只改位置不改尺寸——Material 各图标的相对大小是设计好的，按 bbox 缩放会让
+`play_arrow` 这类形状失衡。
+
+配套自检 `tools/check_icons.py`（见 AGENTS.md §5.3）：偏差 ≤2% 画幅、字形占 40%~92%。

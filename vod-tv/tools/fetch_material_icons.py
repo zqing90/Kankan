@@ -80,6 +80,24 @@ def to_white(svg):
     return svg
 
 
+def center_glyph(im):
+    """把字形挪到画布正中（只改位置，不改字形尺寸）。
+
+    svglib → PDF → pdfium 这条链路里，PDF 页面比图形 bbox 大，光栅化后
+    字形会落在画布的偏左下（实测 96px 画布上偏 (-12, +12)，即 1/8 画幅）。
+    结果是每个图标在按钮里都往左下角歪，右上留一大片空，字显得又小又飘。
+    按 alpha bbox 居中即可，不缩放：Material 各图标的相对大小是设计好的。
+    """
+    bb = im.split()[3].getbbox()
+    if not bb:
+        return im
+    glyph = im.crop(bb)
+    out = Image.new("RGBA", im.size, (0, 0, 0, 0))
+    out.paste(glyph, ((im.width - glyph.width) // 2,
+                      (im.height - glyph.height) // 2), glyph)
+    return out
+
+
 def render(svg_text, px):
     drawing = svg2rlg(io.StringIO(svg_text))
     if drawing is None:
@@ -100,7 +118,7 @@ def render(svg_text, px):
             os.remove(pdf)
         except OSError:
             pass
-    return pil.convert("RGBA").resize((px, px), Image.LANCZOS)
+    return center_glyph(pil.convert("RGBA")).resize((px, px), Image.LANCZOS)
 
 
 def main():
