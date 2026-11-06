@@ -26,6 +26,8 @@ public class RankItem {
     public List<String> genres = new ArrayList<String>();
     public double rating;
     public int ratingCount;
+    /** 搜索结果里由片源站补上来的条目：命中几个源。榜单条目为 0，不显示 */
+    public int sourceCount;
 
     public String metaLine() {
         StringBuilder sb = new StringBuilder();
@@ -33,6 +35,10 @@ public class RankItem {
         if (episodes != null && episodes.length() > 0) {
             if (sb.length() > 0) sb.append(" · ");
             sb.append(episodes);
+        }
+        if (sourceCount > 0) {
+            if (sb.length() > 0) sb.append(" · ");
+            sb.append(sourceCount).append(" 个源");
         }
         if (sb.length() == 0 && region != null) sb.append(region);
         return sb.toString();

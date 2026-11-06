@@ -103,7 +103,7 @@
             android:orientation="vertical" />
     </LinearLayout>
 
-    <!-- 状态 / 兜底入口 -->
+    <!-- 状态行：搜索进度 / 结果条数 -->
     <LinearLayout
         android:id="@+id/status_bar"
         android:layout_width="match_parent"
@@ -117,21 +117,11 @@
 
         <TextView
             android:id="@+id/status"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:text="输入片名后按搜索图标，也可以直接按遥控器确认键"
             android:textColor="@color/text_dim"
             android:textSize="12sp" />
-
-        <!-- 本地榜单没有时才出现：去 14 个片源站搜 -->
-        <TextView
-            android:id="@+id/btn_online"
-            style="@style/TopButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="联网搜索片源"
-            android:visibility="gone" />
     </LinearLayout>
 
     <GridView

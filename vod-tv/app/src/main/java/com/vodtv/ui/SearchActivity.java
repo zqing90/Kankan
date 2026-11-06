@@ -18,7 +18,6 @@ import android.widget.Toast;
 
 import com.vodtv.R;
 import com.vodtv.data.ImageLoader;
-import com.vodtv.data.PlayCache;
 import com.vodtv.data.PlayResolver;
 import com.vodtv.data.RankItem;
 import com.vodtv.data.RankRepository;
@@ -33,11 +32,12 @@ import java.util.Set;
 /**
  * 搜索页。
  *
- * 两层：先在已经缓存到本地的榜单里过滤（秒出，不联网）；
- * 本地一条都没有时，才提供「联网搜索片源」，去 14 个站跑一遍。
+ * 一次搜索 = 两条腿同时跑，结果合并成同一屏卡片：
+ *   1. 本地榜单缓存里按片名 / 导演 / 演员过滤 —— 同步，立刻出；
+ *   2. 各片源站按关键词搜 —— 后台并发，回来一部补一部。
  *
- * 联网结果会按关键词写进当天的片源缓存，跳进详情页就能秒开，
- * 不至于为了一个搜索结果再等第二遍。
+ * 两边的结果按片名归一后合并，同一部片只留一张卡，卡上标「N 个源」。
+ * 点卡片才进详情页，那里才真正去解析线路、探 m3u8、选集播放。
  */
 public class SearchActivity extends Activity {
 
@@ -45,7 +45,6 @@ public class SearchActivity extends Activity {
     private GridView grid;
     private TextView status;
     private TextView empty;
-    private TextView btnOnline;
     /* 最近搜索标签组 */
     private LinearLayout historyPanel;
     private LinearLayout historyTags;
@@ -56,7 +55,10 @@ public class SearchActivity extends Activity {
     private int posterHeight = 0;
 
     private String keyword = "";
-    private boolean searching = false;
+    /** 每次搜索自增，用来丢弃上一次搜索迟到的回调 */
+    private int searchSeq = 0;
+    /** 本地榜单命中数，只用于状态栏文案 */
+    private int localCount = 0;
     /** 防止一次按键既走 onKey 又走 onClick 打开两个详情页 */
     private boolean opening = false;
 
@@ -76,7 +78,6 @@ public class SearchActivity extends Activity {
         grid = (GridView) findViewById(R.id.sgrid);
         status = (TextView) findViewById(R.id.status);
         empty = (TextView) findViewById(R.id.empty);
-        btnOnline = (TextView) findViewById(R.id.btn_online);
         historyPanel = (LinearLayout) findViewById(R.id.history_panel);
         historyTags = (LinearLayout) findViewById(R.id.history_tags);
         btnHistoryClear = (TextView) findViewById(R.id.btn_history_clear);
@@ -112,13 +113,6 @@ public class SearchActivity extends Activity {
                     return true;
                 }
                 return false;
-            }
-        });
-
-        btnOnline.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onlineSearch();
             }
         });
 
@@ -256,30 +250,151 @@ public class SearchActivity extends Activity {
     private void doSearch() {
         keyword = input.getText().toString().trim();
         if (keyword.length() == 0) {
-            status.setText("先输入片名，再按搜索");
-            btnOnline.setVisibility(View.GONE);
+            status.setText("输入片名后按搜索图标，也可以直接按遥控器确认键");
             return;
         }
         SearchHistory.add(keyword);
         renderHistoryTags();       // 已经有输入了，标签组收起来
-        // 收起键盘，把屏幕让给结果
-        input.clearFocus();
+        input.clearFocus();        // 收起键盘，把屏幕让给结果
 
+        final int seq = ++searchSeq;
+
+        // 先秒出本地榜单的命中，别让用户对着空屏等片源站
         results.clear();
         results.addAll(localMatch(keyword));
+        localCount = results.size();
         adapter.notifyDataSetChanged();
         scrollGridToTop();
 
-        if (results.isEmpty()) {
-            empty.setVisibility(View.VISIBLE);
-            empty.setText("本地榜单里没有「" + keyword + "」");
-            status.setText("本地榜单没有匹配 · 可以点右侧按钮去片源站找");
-            btnOnline.setVisibility(View.VISIBLE);
+        empty.setVisibility(View.GONE);
+        int n = com.vodtv.data.SourceStore.enabled().size();
+        if (localCount > 0) {
+            status.setText("本地榜单 " + localCount + " 部 · 同时搜 " + n + " 个片源站…");
         } else {
-            empty.setVisibility(View.GONE);
-            status.setText("本地榜单 · 找到 " + results.size() + " 部");
-            btnOnline.setVisibility(View.GONE);
+            status.setText("正在 " + n + " 个片源站搜索「" + keyword + "」…");
         }
+
+        searchSources(seq);
+    }
+
+    /** 后台去片源站搜，回来一批补一批 */
+    private void searchSources(final int seq) {
+        final String kw = keyword;
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                List<PlayResolver.Candidate> got = PlayResolver.findCandidates(kw,
+                        new PlayResolver.CandidateCb() {
+                            @Override
+                            public void onProgress(final List<PlayResolver.Candidate> snapshot) {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        if (seq != searchSeq || isFinishing()) return;
+                                        applyCandidates(snapshot, false);
+                                    }
+                                });
+                            }
+                        });
+                final List<PlayResolver.Candidate> last = got;
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (seq != searchSeq || isFinishing()) return;
+                        applyCandidates(last, true);
+                        scrollGridToTop();
+                    }
+                });
+            }
+        }, "search-sources").start();
+    }
+
+    /**
+     * 把片源站候选并进结果。榜单里已有的只补「N 个源」，封面评分仍以榜单为准；
+     * 榜单没有的才新建一张卡。
+     */
+    private void applyCandidates(List<PlayResolver.Candidate> list, boolean done) {
+        boolean changed = false;
+        for (int i = 0; i < list.size(); i++) {
+            PlayResolver.Candidate c = list.get(i);
+            if (c == null || c.title == null || c.title.length() == 0) continue;
+
+            int idx = indexOfTitle(c.title);
+            if (idx >= 0) {
+                RankItem old = results.get(idx);
+                int merged = Math.max(old.sourceCount, c.sources);
+                if (merged != old.sourceCount) {
+                    old.sourceCount = merged;
+                    changed = true;
+                }
+                continue;
+            }
+
+            RankItem it = new RankItem();
+            it.title = c.title;
+            it.pic = c.pic;
+            it.picLarge = c.pic;
+            it.year = c.year;
+            it.episodes = c.remarks;
+            it.sourceCount = c.sources;
+            results.add(it);
+            changed = true;
+        }
+        if (changed) adapter.notifyDataSetChanged();
+
+        if (results.isEmpty()) {
+            if (done) {
+                empty.setVisibility(View.VISIBLE);
+                empty.setText("没找到「" + keyword + "」");
+                status.setText("本地榜单和片源站都没有 · 换个说法，或者只输片名的一部分试试");
+            }
+            return;
+        }
+
+        empty.setVisibility(View.GONE);
+        if (done) {
+            status.setText("找到 " + results.size() + " 部 · 点海报看片源");
+        } else {
+            status.setText("本地 " + localCount + " 部 · 片源站已补充 "
+                    + Math.max(0, results.size() - localCount) + " 部 · 还在搜…");
+        }
+    }
+
+    /** 同一部片在榜单和片源站里的片名不完全一样，归一后再比对 */
+    private int indexOfTitle(String title) {
+        String t = normTitle(title);
+        if (t.length() == 0) return -1;
+        for (int i = 0; i < results.size(); i++) {
+            if (normTitle(results.get(i).title).equals(t)) return i;
+        }
+        for (int i = 0; i < results.size(); i++) {
+            if (isSameWithSuffix(normTitle(results.get(i).title), t)) return i;
+        }
+        return -1;
+    }
+
+    /** 去掉括注、空白与常见分隔符，转小写 */
+    private static String normTitle(String s) {
+        if (s == null) return "";
+        return s.replaceAll("[（(\\[【].*?[)）\\]】]", "")
+                .replaceAll("[\\s·:：\\-_—、,，.。]", "")
+                .toLowerCase(Locale.US);
+    }
+
+    /**
+     * 「狂飙」和「狂飙2023」「狂飙第二季」算同一部；
+     * 「狂飙」和「狂飙之某某」不算——多出来的得是年份/季集/语言清晰度这类版本尾巴。
+     */
+    private static boolean isSameWithSuffix(String a, String b) {
+        if (a.length() == 0 || b.length() == 0) return false;
+        String shorter = a.length() <= b.length() ? a : b;
+        String longer = a.length() <= b.length() ? b : a;
+        if (shorter.length() < 2 || !longer.startsWith(shorter)) return false;
+        String rest = longer.substring(shorter.length());
+        return rest.matches("\\d{4}.*")
+                || rest.matches("第[一二三四五六七八九十\\d]+[季部].*")
+                || rest.matches("(全|更新至|连载)?\\d+集?.*")
+                || rest.matches("(国语|粤语|英语|中字|高清|hd|蓝光|4k).*");
     }
 
     /** 在本地缓存的榜单里按片名 / 导演 / 演员过滤，同一部片只留一条 */
@@ -313,49 +428,6 @@ public class SearchActivity extends Activity {
             }
         }
         return false;
-    }
-
-    /** 兜底：本地没有就去片源站搜，搜到了直接进详情页看片源 */
-    private void onlineSearch() {
-        if (searching || keyword.length() == 0) return;
-        searching = true;
-        btnOnline.setEnabled(false);
-        btnOnline.setAlpha(0.4f);
-        status.setText("正在 " + com.vodtv.data.SourceStore.enabled().size()
-                + " 个片源站搜索「" + keyword + "」，可能要十几秒…");
-
-        final String kw = keyword;
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                final List<PlayResolver.PlayLine> list = PlayResolver.search(kw, null);
-                boolean any = false;
-                for (PlayResolver.PlayLine l : list) {
-                    if (l.ok) {
-                        any = true;
-                        break;
-                    }
-                }
-                final boolean anyOk = any;
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        searching = false;
-                        btnOnline.setEnabled(true);
-                        btnOnline.setAlpha(1f);
-                        if (!anyOk) {
-                            status.setText("片源站也没找到「" + kw + "」，换个说法或只输片名的一部分试试");
-                            return;
-                        }
-                        // 按关键词写进当天缓存：详情页进去就是现成的片源列表，不用再搜一遍
-                        PlayCache.save(kw, list);
-                        Intent i = new Intent(SearchActivity.this, DetailActivity.class);
-                        i.putExtra("title", kw);
-                        startActivity(i);
-                    }
-                });
-            }
-        }, "search-online").start();
     }
 
     /* ---------- 结果列表 ---------- */

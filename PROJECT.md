@@ -20,9 +20,9 @@
 ```bash
 cd /d/code/kankan/vod-tv
 ./gradlew assembleDebug
-cp app/build/outputs/apk/debug/app-debug.apk dist/Kankan-1.3.0-debug.apk
-cp dist/Kankan-1.3.0-debug.apk /e/share/
-md5sum dist/Kankan-1.3.0-debug.apk /e/share/Kankan-1.3.0-debug.apk
+cp app/build/outputs/apk/debug/app-debug.apk dist/Kankan-1.3.1-debug.apk
+cp dist/Kankan-1.3.1-debug.apk /e/share/
+md5sum dist/Kankan-1.3.1-debug.apk /e/share/Kankan-1.3.1-debug.apk
 ```
 
 规则细则：
@@ -97,7 +97,7 @@ vod-tv/
 ├── gradle.properties
 ├── local.properties             ⚠️ 不入库，需自己写 sdk.dir
 ├── gradlew / gradlew.bat
-├── dist/Kankan-1.3.0-debug.apk  已构建产物（同时复制一份到 E:\share\）
+├── dist/Kankan-1.3.1-debug.apk  已构建产物（同时复制一份到 E:\share\）
 ├── README.md                    使用与构建说明（面向人）
 ├── PROJECT.md                   本文件（面向 AI）
 └── app/
@@ -123,7 +123,7 @@ vod-tv/
         │   ├── ui/
         │   │   ├── HomeActivity.java        6 列海报墙、5 个分组 tab、继续观看、搜索入口
         │   │   ├── DetailActivity.java      影片信息 + 片源列表 + 选集 + 继续观看
-        │   │   ├── SearchActivity.java      本地榜单过滤 + 最近搜索标签 + 片源站联网兜底
+        │   │   ├── SearchActivity.java      搜索页：本地榜单 + 片源站候选合并、最近搜索标签
         │   │   ├── HistoryActivity.java     观看记录页（网格 / 单条删除 / 清空）
         │   │   └── SettingsActivity.java    源配置、服务端地址、清缓存、强制更新
         │   └── player/PlayerActivity.java   ExoPlayer 播放页 + 控制栏 + 选集浮层 + 进度落盘
@@ -497,8 +497,8 @@ echo "sdk.dir=D:\\Android\\Sdk" > local.properties
 
 ./gradlew assembleDebug
 # 产物：app/build/outputs/apk/debug/app-debug.apk
-# 留档：dist/Kankan-1.3.0-debug.apk
-# 分发：E:\share\Kankan-1.3.0-debug.apk   ← 见顶部「铁律 · APK 产出后必须分发」
+# 留档：dist/Kankan-1.3.1-debug.apk
+# 分发：E:\share\Kankan-1.3.1-debug.apk   ← 见顶部「铁律 · APK 产出后必须分发」
 ```
 
 环境（本机已装好，可直接构建）：
@@ -527,7 +527,7 @@ echo "sdk.dir=D:\\Android\\Sdk" > local.properties
 
 ```bash
 adb connect 192.168.x.x:5555
-adb install -r Kankan-1.3.0-debug.apk
+adb install -r Kankan-1.3.1-debug.apk
 ```
 
 ### 9.2 跑采集器
@@ -748,3 +748,65 @@ git revert <commit>                  # 撤销一次提交（不用 reset）
 - 焦点样式统一 `bg_tab`（2dp accent 描边 + 半透明底），卡片可叠加 1.07 放大。
 - 列表条目自己 `focusable="true"` 时，OK 键会被条目吃掉 —— 必须同时挂 `setOnKeyListener` + `setOnClickListener`（见 §8.10）。
 - 布局里**不要**给可点击控件写 `focusableInTouchMode="true"`（见 §8.11）。
+
+---
+
+## 16. 搜索链路（1.3.1 定型）
+
+### 16.1 一句话
+
+> 搜索 = 一次搜索同时问两边，出一屏**剧集卡片**；**点某一张才进详情页**。
+> 详情页才是解析线路、探 m3u8、选集播放的地方。
+
+之前（1.3.0 及更早）是两条互不相干的路：本地榜单命中就出卡片，没命中就给一个「联网搜索片源」文字按钮，
+点了之后——**搜到直接跳详情页，片名就是关键词**。用户没法确认「这是不是我要的那部剧」，也没法在多条候选里挑。
+1.3.1 把这条错误路径整个删掉了。
+
+### 16.2 两条腿
+
+| 来源 | 时机 | 做什么 | 速度 |
+|---|---|---|---|
+| 本地榜单缓存 | 同步，搜索瞬间 | `RankRepository.loadCache` 按片名 / 导演 / 演员过滤 | 立即 |
+| 各片源站 | 异步并发（4 线程，35s 兜底超时） | `PlayResolver.findCandidates` 只读 JSON 元信息 | 2~10 秒，回来一批补一批 |
+
+两边结果按片名归一后合并成同一屏；同一部片只留一张卡，卡上标「N 个源」。
+
+### 16.3 数据层的两件事，别混
+
+| 方法 | 用途 | 特征 |
+|---|---|---|
+| `PlayResolver.search(keyword, cb)` | 已知片名，要拿到**能播的线路** | 每站取一条最佳，逐条探 m3u8，慢（十几秒） |
+| `PlayResolver.findCandidates(keyword, cb)` | 只知道关键词，要先列出**搜到了哪几部片** | 每站最多收 10 条候选，**完全不探流**，快 |
+
+搜索页只调后者；详情页只调前者。列表页去探流会把 14 个站乘上几十次请求，手机上等到超时。
+
+### 16.4 合并规则（`PlayResolver.addCandidate`）
+
+- 归一键：`clean(片名)` 去掉 `（）() [] 【】` 里的括注 + 去空白 + 转小写。
+  `The Last of Us` / `the last of us` / `The Last of Us（美剧）` 合并成一条。
+- 同一个站重复给出同名条目**只算一个源**（`sourceNames` 去重），否则「N 个源」会虚高。
+- 合并时只补空字段，不覆盖已有值（先到的站留下的封面/集数优先）。
+- 排序：源多的在前 → 都是单源时标题短的在前（「狂飙」不该排在「狂飙 全39集」后面）。
+- 过滤：`relevant()` 要求名字与关键词互相包含，并排除「解说 / 预告 / 花絮 / 片段 / 速看 / 混剪 / 彩蛋」；
+  用户关键词本身含这些词时不排除。
+
+### 16.5 跨来源去重（`SearchActivity.indexOfTitle`）
+
+榜单叫「狂飙」，片源站叫「狂飙 2023」「狂飙 第二季」，要认成同一部。判定顺序：
+
+1. `normTitle` 归一后**完全相等** → 同一部；
+2. 否则一方以另一方开头，且**多出来的部分必须是版本尾巴**（年份 / 第 N 季第 N 部 / 全 N 集 / 国语粤语高清蓝光 4K）→ 同一部。
+
+「狂飙」与「狂飙之某某」**不算**同一部——多出来的是副标题，不是版本尾巴。
+归一后的对比函数是纯字符串逻辑，`PlayResolverCandidateTest` 覆盖。
+
+### 16.6 搜索历史
+
+- `data/SearchHistory`：最多 12 条，去重（不分大小写），最新在前，存 SharedPreferences。
+- 搜索页空白态显示「最近搜索」标签组，点标签直接重搜；菜单键 / 长按删单条，右上角一键清空。
+- 一旦输入框有内容，标签组自动收起；清空后又露出来。
+
+> ⚠️ **1.3.0 的坑**：`SearchHistory.init()` 从来没被调用过，`sp` 一直是 null，
+> `add()` 第一行就 `return`、`list()` 永远返回空 → 标签组整块永久 `GONE`。
+> 表现就是「搜索记录没有」，而且不报错、不崩溃，只能靠肉眼发现。
+> **新增任何依赖 `init(Context)` 的数据类，必须同时改 `App.onCreate()`，并在此处登记。**

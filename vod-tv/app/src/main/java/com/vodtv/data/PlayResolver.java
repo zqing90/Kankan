@@ -282,4 +282,171 @@ public class PlayResolver {
     public static String statLine(String sourceId) {
         return SourceStats.summary(sourceId);
     }
+
+    /* ======================================================================
+     * 搜索：出一批「剧集候选」
+     *
+     * 与上面的 search() 是两件事，别混：
+     *   search()        = 已知片名，要拿到能播的线路（每站取一条最佳，逐条探 m3u8，慢）
+     *   findCandidates() = 只知道关键词，要先列出「搜到了哪几部片」（不探流，快）
+     *
+     * 搜索页要的是后者：先出卡片让人挑，点进去才让详情页跑 search()。
+     * ====================================================================== */
+
+    /** 搜索结果里的一部片。多个源命中同一部时合并成一条，用 sources 记录有几个源 */
+    public static class Candidate {
+        public String title;
+        public String pic;
+        public String year;
+        public String remarks;          // 更新至 26 集 / 全 40 集 这类
+        public int sources;
+        public final List<String> sourceNames = new ArrayList<String>();
+    }
+
+    /** 单站最多收多少条候选，防止某站一次返回几百条把列表撑爆 */
+    private static final int MAX_PER_SOURCE = 10;
+
+    /** 有进展就回调一次，参数是当前完整快照（已排序，可安全遍历） */
+    public interface CandidateCb {
+        void onProgress(List<Candidate> snapshot);
+    }
+
+    /**
+     * 并发到各站按关键词搜，合并去重后返回候选列表。
+     * 只读 JSON 里的元信息，不探 m3u8——探测一部片要十几次请求，不能放在列表页。
+     */
+    public static List<Candidate> findCandidates(final String keyword, final CandidateCb cb) {
+        final List<Candidate> merged = new ArrayList<Candidate>();
+        if (keyword == null || keyword.trim().length() == 0) return merged;
+
+        final List<SourceConfig> sources = SourceStore.enabled();
+        if (sources.isEmpty()) return merged;
+
+        final Object lock = new Object();
+        final CountDownLatch latch = new CountDownLatch(sources.size());
+        ExecutorService pool = Executors.newFixedThreadPool(4);
+
+        for (final SourceConfig s : sources) {
+            pool.execute(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        String url = s.endpoint() + "?ac=detail&at=json&wd="
+                                + java.net.URLEncoder.encode(keyword.trim(), "UTF-8");
+                        String body = Http.getText(url, Http.headers(Http.UA_DESKTOP, null), 12000);
+                        JSONArray list = new JSONObject(body).optJSONArray("list");
+                        if (list == null || list.length() == 0) return;
+
+                        List<Candidate> snapshot;
+                        synchronized (lock) {
+                            int taken = 0;
+                            for (int i = 0; i < list.length() && taken < MAX_PER_SOURCE; i++) {
+                                JSONObject o = list.optJSONObject(i);
+                                if (o == null) continue;
+                                String name = o.optString("vod_name", "");
+                                if (!relevant(name, keyword)) continue;
+                                addCandidate(merged, name,
+                                        o.optString("vod_pic", ""),
+                                        o.optString("vod_year", ""),
+                                        remarksOf(o),
+                                        s.name);
+                                taken++;
+                            }
+                            sortCandidates(merged);
+                            snapshot = new ArrayList<Candidate>(merged);
+                        }
+                        if (cb != null) cb.onProgress(snapshot);
+                    } catch (Exception ignored) {
+                        // 单个站挂了不影响其他站
+                    } finally {
+                        latch.countDown();
+                    }
+                }
+            });
+        }
+
+        try {
+            latch.await(35, TimeUnit.SECONDS);
+        } catch (InterruptedException ignored) {
+        }
+        pool.shutdownNow();
+
+        synchronized (lock) {
+            sortCandidates(merged);
+            return new ArrayList<Candidate>(merged);
+        }
+    }
+
+    /**
+     * 把一条搜索结果并进候选池：同名（忽略括号内容与大小写）合并，只补空字段。
+     * 纯字符串逻辑，不碰网络与 JSON，单测直接覆盖。
+     */
+    static void addCandidate(List<Candidate> merged, String title, String pic,
+                             String year, String remarks, String sourceName) {
+        if (merged == null) return;
+        if (title == null || title.trim().length() == 0) return;
+        String key = clean(title).toLowerCase(java.util.Locale.US);
+        if (key.length() == 0) return;
+
+        for (int i = 0; i < merged.size(); i++) {
+            Candidate c = merged.get(i);
+            if (!clean(c.title).toLowerCase(java.util.Locale.US).equals(key)) continue;
+            // 同一个站重复给出同名条目只算一个源
+            if (sourceName != null && sourceName.length() > 0 && !c.sourceNames.contains(sourceName)) {
+                c.sourceNames.add(sourceName);
+            }
+            c.sources = Math.max(1, c.sourceNames.size());
+            if (isBlank(c.pic) && !isBlank(pic)) c.pic = pic.trim();
+            if (isBlank(c.year) && !isBlank(year)) c.year = year.trim();
+            if (isBlank(c.remarks) && !isBlank(remarks)) c.remarks = remarks.trim();
+            return;
+        }
+
+        Candidate c = new Candidate();
+        c.title = title.trim();
+        c.pic = pic == null ? "" : pic.trim();
+        c.year = year == null ? "" : year.trim();
+        c.remarks = remarks == null ? "" : remarks.trim();
+        if (sourceName != null && sourceName.length() > 0) c.sourceNames.add(sourceName);
+        c.sources = Math.max(1, c.sourceNames.size());
+        merged.add(c);
+    }
+
+    /** 源多的排前面；同为 1 个源时短的在前（「狂飙」排在「狂飙 全集解说」前面） */
+    static void sortCandidates(List<Candidate> list) {
+        if (list == null) return;
+        Collections.sort(list, new Comparator<Candidate>() {
+            @Override
+            public int compare(Candidate a, Candidate b) {
+                if (a.sources != b.sources) return b.sources - a.sources;
+                if (a.title.length() != b.title.length()) return a.title.length() - b.title.length();
+                return a.title.compareTo(b.title);
+            }
+        });
+    }
+
+    /** 名字是否跟关键词相关：互相包含即算，但排除解说/预告这类非正片 */
+    static boolean relevant(String name, String keyword) {
+        String n = clean(name).toLowerCase(java.util.Locale.US);
+        String k = clean(keyword).toLowerCase(java.util.Locale.US);
+        if (n.length() == 0 || k.length() == 0) return false;
+        if (!n.contains(k) && !k.contains(n)) return false;
+
+        String noise = ".*(解说|预告|花絮|片段|速看|混剪|彩蛋|预告片).*";
+        if (n.matches(noise) && !k.matches(noise)) return false;
+        return true;
+    }
+
+    private static String remarksOf(JSONObject o) {
+        String[] keys = {"vod_remarks", "vod_serial", "vod_pubdate"};
+        for (int i = 0; i < keys.length; i++) {
+            String v = o.optString(keys[i], "");
+            if (v != null && v.trim().length() > 0) return v.trim();
+        }
+        return "";
+    }
+
+    private static boolean isBlank(String s) {
+        return s == null || s.trim().length() == 0;
+    }
 }
