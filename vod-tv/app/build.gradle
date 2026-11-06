@@ -9,8 +9,8 @@ android {
         // 4.4(API 19)：TLS 1.2 原生可用、GridView 尺寸方法可用，不再需要 4.0 那些兼容绕路
         minSdkVersion 19
         targetSdkVersion 28
-        versionCode 15
-        versionName "1.4.5"
+        versionCode 16
+        versionName "1.4.6"
     }
 
     buildTypes {

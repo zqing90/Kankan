@@ -1,0 +1,10 @@
+<!-- 纯占位分隔：只提供宽度，不画任何颜色。
+     给 LinearLayout 的 showDividers="middle" 当间距用 —— 比给每个子项设 margin 干净：
+     子项 margin 会被算进 wrap_content 的总宽，整行居中时会往左偏半个间距。 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <size
+        android:width="@dimen/space_sm"
+        android:height="1dp" />
+    <solid android:color="@android:color/transparent" />
+</shape>

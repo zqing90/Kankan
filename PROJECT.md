@@ -1026,24 +1026,30 @@ python tools/check_ids.py     # java 强转类型 vs 布局标签，防止改结
 - `res/layout/activity_player.xml`：`seek_hud / seek_hud_action / seek_hud_time`
 - `res/values/strings.xml`：`seek_forward_n / seek_backward_n / seek_at_start / seek_at_end`
 
-### 19.5 按钮长什么样（1.4.5）
+### 19.5 按钮长什么样（1.4.6 起：六键同尺寸）
 
-1.4.4 交付后用户反馈「播放页没有看到快进快退的按钮」。其实两个键一直在控制栏里，
-但 **Material 的 `replay_10` / `forward_10` 在 24dp 尺寸下，圆里的「10」只有约 4dp 高**，
-实机上就是两个「旋转箭头」，被当成刷新图标。同时 1.4.4 的图标还有系统性偏移
-（见 §19.6），把「10」挤到左下角，更加看不见。
+演进：1.4.4 是 48dp 纯图标 →「看不出是快进快退」，1.4.5 临时加了中文标签 →
+标签让按钮 58×56dp 与其余 48dp 不齐，1.4.6 又回到纯图标，但**整行统一尺寸并把图标放大**。
 
-改法：
+当前形态（唯一标准，别再往标签方向改）：
 
-| 项 | 1.4.4 | 1.4.5 |
-|---|---|---|
-| 快退/快进 | 48dp 纯图标 | 58×56dp，**图标 26dp + 「快退/快进」标签** |
-| 图标居中 | 偏 (-3dp, +3dp) | 居中 |
-| 按钮行 | `layout_gravity=center_horizontal` | `fillViewport=true` + 子布局 `gravity=center` |
+| 项 | 值 |
+|---|---|
+| 六个键 | 全部 56×56dp，圆角 `radius_md`，图形 30dp（播放键 26dp） |
+| 间距 | 8dp，由容器 `p_buttons` 的 `showDividers="middle"` + `@drawable/divider_gap` 给 |
+| 播放键 | 尺寸形状与其余完全一致，只靠 **品牌蓝实底** 区分主次 |
+| 文字 | **无**。快退/快进只靠 `replay_10` / `forward_10` 里的数字 |
+| 焦点 | 全部走 `bg_icon` / `bg_play` 的 `state_focused` 2dp 描边 |
 
-按钮行那一条是给窄屏兜底：`layout_gravity="center_horizontal"` 在内容比视口宽时
-会得到**负的左边距**，两头对称截掉；换成 `fillViewport` 后，够宽就居中、不够宽就
-从左排并可横向滚动，永远不会把两端的按钮切掉。
+两个容易踩的点：
+
+1. **间距不要用子项 `layout_marginRight`。** 子项 margin 会计入 `wrap_content` 的总宽，
+   而末尾那个 margin 后面没有内容，整行居中时会往左偏半个间距（4dp）。
+   用 LinearLayout 的 `showDividers="middle"` 配一个只带 `size` 的透明 shape 当 divider，
+   宽度干净、首尾无多余留白。`showDividers` 是 API 11，minSdk 19 可用。
+2. **图标必须够大。** `replay_10` / `forward_10` 里那个「10」只占整张图的约 1/5 高，
+   24dp 时只有 4~5dp，等于看不见；30dp 时约 6dp，勉强可读。再小就必须考虑
+   自绘更粗的字形（届时另开图标，不要靠加文字解决，用户已明确不要文字）。
 
 ### 19.6 图标导出偏移（管线级 bug，别再犯）
 

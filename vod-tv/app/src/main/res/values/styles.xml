@@ -112,32 +112,20 @@
         <item name="android:layout_marginLeft">@dimen/space_sm</item>
     </style>
 
-    <!-- 播放页控制栏图标：48dp 命中区、24dp 图形，比文字按钮更快被认出来。
-         遥控器上「快退 10 秒」用 Material 的 replay_10，不写中文。 -->
+    <!-- 播放页控制栏图标：六个键同一尺寸（56dp 命中区、30dp 图形）。
+         快退/快进用的是 Material 的 replay_10 / forward_10，圈里的「10」只有整张图的
+         1/5 高，所以 24dp 时根本看不清（1.4.4 的反馈就是「看不到快进快退按钮」）。
+         统一放大到 56dp + 30dp 图形，让数字可读，不再额外加文字标签。
+         间距由容器 p_buttons 的 divider 统一给，这里不设 margin ——
+         子项 margin 会被算进 wrap_content 宽度，整行会往左偏半个间距。 -->
     <style name="PlayerIconBtn">
-        <item name="android:layout_width">48dp</item>
-        <item name="android:layout_height">48dp</item>
-        <item name="android:padding">12dp</item>
+        <item name="android:layout_width">56dp</item>
+        <item name="android:layout_height">56dp</item>
+        <item name="android:padding">13dp</item>
         <item name="android:scaleType">fitCenter</item>
         <item name="android:background">@drawable/bg_icon</item>
         <item name="android:focusable">true</item>
         <item name="android:alpha">0.9</item>
-        <item name="android:layout_marginRight">@dimen/space_sm</item>
-    </style>
-
-    <!-- 快退/快进：图标 + 一行中文标签。
-         Material 的 replay_10 / forward_10 在 24dp 尺寸下，圈里那个「10」只有约 4dp 高，
-         实机上就是两个「旋转箭头」，被当成刷新图标（1.4.4 的反馈就是这个）。
-         加两个汉字不用认图标也知道是干什么的，顺手把图标放到 26dp 让「10」也能看清。 -->
-    <style name="PlayerSeekBtn">
-        <item name="android:layout_width">58dp</item>
-        <item name="android:layout_height">56dp</item>
-        <item name="android:layout_marginRight">@dimen/space_sm</item>
-        <item name="android:orientation">vertical</item>
-        <item name="android:gravity">center</item>
-        <item name="android:background">@drawable/bg_icon</item>
-        <item name="android:focusable">true</item>
-        <item name="android:clickable">true</item>
     </style>
 
     <!-- 主行动按钮（详情页「继续观看」这类一屏只有一个的动作）。

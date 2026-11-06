@@ -160,10 +160,10 @@
                 android:text="@string/player_hint" />
         </LinearLayout>
 
-        <!-- ③ 按钮行：整组居中，播放键在这组里唯一有实底。
+        <!-- ③ 按钮行：六个键同尺寸同间距，播放键靠品牌蓝实底区分主次。
              fillViewport=true + 子布局 wrap_content：宽度够时居中，
-             不够时（窄屏加标签后可能超出）从左排、可横向滚动，
-             不会像 layout_gravity=center_horizontal 那样两头对称截掉。 -->
+             不够时从左排、可横向滚动，不会像 layout_gravity=center_horizontal
+             那样在超宽时算出负左边距、把两端的按钮对称截掉。 -->
         <HorizontalScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -175,8 +175,10 @@
                 android:id="@+id/p_buttons"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:divider="@drawable/divider_gap"
                 android:orientation="horizontal"
-                android:gravity="center">
+                android:gravity="center"
+                android:showDividers="middle">
 
                 <ImageView
                     android:id="@+id/p_prev"
@@ -184,64 +186,28 @@
                     android:src="@drawable/ic_ui_prev"
                     android:contentDescription="@string/prev_episode" />
 
-                <!-- 快退/快进带中文标签：Material 的 replay_10/forward_10 在 24dp 下
-                     里面那个「10」只有 4dp 高，实际屏幕上就是两个「旋转箭头」，
-                     用户根本认不出是快进快退（1.4.4 收到的反馈就是这个）。 -->
-                <LinearLayout
+                <ImageView
                     android:id="@+id/p_rew"
-                    style="@style/PlayerSeekBtn"
-                    android:contentDescription="@string/rewind_10">
+                    style="@style/PlayerIconBtn"
+                    android:src="@drawable/ic_ui_replay10"
+                    android:contentDescription="@string/rewind_10" />
 
-                    <ImageView
-                        android:layout_width="26dp"
-                        android:layout_height="26dp"
-                        android:scaleType="fitCenter"
-                        android:src="@drawable/ic_ui_replay10"
-                        android:importantForAccessibility="no" />
-
-                    <TextView
-                        style="@style/Text.Micro"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="1dp"
-                        android:text="@string/rewind_short"
-                        android:textColor="@color/text_secondary" />
-                </LinearLayout>
-
+                <!-- 播放键与两侧同尺寸，只靠品牌蓝实底区分主次 -->
                 <ImageView
                     android:id="@+id/p_play"
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
-                    android:layout_marginLeft="@dimen/space_sm"
-                    android:layout_marginRight="@dimen/space_sm"
-                    android:padding="16dp"
-                    android:scaleType="fitCenter"
+                    style="@style/PlayerIconBtn"
+                    android:padding="15dp"
+                    android:alpha="1"
                     android:background="@drawable/bg_play"
                     android:src="@drawable/ic_ui_pause"
                     android:contentDescription="@string/pause"
-                    android:focusable="true"
                     android:nextFocusRight="@id/p_ff" />
 
-                <LinearLayout
+                <ImageView
                     android:id="@+id/p_ff"
-                    style="@style/PlayerSeekBtn"
-                    android:contentDescription="@string/forward_10">
-
-                    <ImageView
-                        android:layout_width="26dp"
-                        android:layout_height="26dp"
-                        android:scaleType="fitCenter"
-                        android:src="@drawable/ic_ui_forward10"
-                        android:importantForAccessibility="no" />
-
-                    <TextView
-                        style="@style/Text.Micro"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="1dp"
-                        android:text="@string/forward_short"
-                        android:textColor="@color/text_secondary" />
-                </LinearLayout>
+                    style="@style/PlayerIconBtn"
+                    android:src="@drawable/ic_ui_forward10"
+                    android:contentDescription="@string/forward_10" />
 
                 <ImageView
                     android:id="@+id/p_next"
