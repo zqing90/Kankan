@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  观看记录页。顶栏结构与其他二级页完全一致：左上返回、标题、右侧页面级动作。
+  规范见 PROJECT.md §15 / §18。
+-->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- 顶栏：返回 + 标题 + 条数 + 清空 -->
+    <LinearLayout
+        android:id="@+id/topbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingLeft="@dimen/topbar_pad_h"
+        android:paddingRight="@dimen/topbar_pad_h"
+        android:paddingTop="@dimen/space_xl"
+        android:paddingBottom="@dimen/space_xs">
+
+        <include
+            android:id="@+id/btn_back"
+            layout="@layout/part_back" />
+
+        <TextView
+            style="@style/Text.Title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/space_lg"
+            android:text="@string/history" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" />
+
+        <TextView
+            android:id="@+id/tv_count"
+            style="@style/Text.Micro"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="@dimen/space_md" />
+
+        <LinearLayout
+            android:id="@+id/btn_clear"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:focusable="true"
+            android:background="@drawable/bg_icon"
+            android:paddingLeft="@dimen/space_md"
+            android:paddingRight="@dimen/space_lg"
+            android:paddingTop="@dimen/space_sm"
+            android:paddingBottom="@dimen/space_sm">
+
+            <ImageView
+                android:layout_width="17dp"
+                android:layout_height="17dp"
+                android:src="@drawable/ic_ui_delete"
+                android:contentDescription="@null" />
+
+            <TextView
+                style="@style/Text.Caption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/space_xs"
+                android:text="@string/history_clear" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/hint"
+        style="@style/Text.Micro"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/topbar"
+        android:paddingLeft="@dimen/content_pad_h"
+        android:paddingTop="2dp"
+        android:paddingBottom="@dimen/space_sm"
+        android:text="@string/history_hint" />
+
+    <GridView
+        android:id="@+id/rgrid"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/hint"
+        android:layout_alignParentBottom="true"
+        android:numColumns="3"
+        android:horizontalSpacing="@dimen/card_gap_h"
+        android:verticalSpacing="@dimen/space_md"
+        android:paddingLeft="@dimen/topbar_pad_h"
+        android:paddingRight="@dimen/topbar_pad_h"
+        android:paddingTop="@dimen/space_xs"
+        android:paddingBottom="@dimen/space_xxl"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:listSelector="@android:color/transparent"
+        android:scrollbars="none" />
+
+    <!-- 空态：主文案 + 副文案 -->
+    <LinearLayout
+        android:id="@+id/empty"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/empty_title"
+            style="@style/Text.Body"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/history_empty_title"
+            android:textStyle="bold" />
+
+        <TextView
+            style="@style/Text.Caption"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_sm"
+            android:text="@string/history_empty_sub" />
+    </LinearLayout>
+
+    <!--
+      续播准备遮罩：点记录后要落地解析一次 m3u8（没缓存时还要重新检索 14 个站），
+      期间必须有明确反馈，否则用户会以为「点了没反应」。见 PROJECT.md §17。
+    -->
+    <LinearLayout
+        android:id="@+id/busy_panel"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#CC000000"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:clickable="true"
+        android:visibility="gone"
+        tools:ignore="KeyboardInaccessibleWidget">
+
+        <ProgressBar
+            android:layout_width="36dp"
+            android:layout_height="36dp" />
+
+        <TextView
+            android:id="@+id/busy_text"
+            style="@style/Text.Body"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_lg"
+            android:gravity="center" />
+    </LinearLayout>
+</RelativeLayout>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  播放/暂停键的底：品牌蓝实底。
+  形状与 bg_icon 一致（同为圆角矩形），整行六个键尺寸、形状完全相同，
+  只靠「唯一实底 + 蓝」区分主次，不再一个大圆一个小方块。
+-->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_focused="true">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/brand" />
+            <corners android:radius="@dimen/radius_md" />
+            <stroke android:width="@dimen/focus_stroke" android:color="@color/text_primary" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#D92B5CFF" />
+            <corners android:radius="@dimen/radius_md" />
+        </shape>
+    </item>
+</selector>

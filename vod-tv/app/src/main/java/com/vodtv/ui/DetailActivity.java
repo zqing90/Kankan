@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.vodtv.R;
 import com.vodtv.data.HistoryStore;
@@ -45,11 +46,25 @@ public class DetailActivity extends Activity {
     private List<PlayResolver.PlayLine> currentLines = new java.util.ArrayList<PlayResolver.PlayLine>();
     private boolean inEpisodes = false;
 
+    /** 集数达到这个数才按组折叠；短剧保持平铺，折叠反而多一步操作 */
+    private static final int EP_GROUP_THRESHOLD = 50;
+    private static final int EP_GROUP_SIZE = 10;
+    /** 当前选集页展示的线路；组头开合只重建列表，不动它 */
+    private PlayResolver.PlayLine epLineShown;
+    /** 选集页的折叠组号集合，每次 showEpisodes 重新初始化 */
+    private final java.util.HashSet<Integer> collapsedEpGroups = new java.util.HashSet<Integer>();
+
     private TextView btnResume;
-    private TextView btnBack;
+    private View btnBack;
+    private TextView btnBackLabel;
     private HistoryStore.Entry resumeEntry;
     private PlayResolver.PlayLine resumeLine;
     private PlayResolver.Ep resumeEp;
+    /**
+     * 从观看记录 / 首页「继续看」进来时置 true：检索完成后直接续播，不用再按一次 OK。
+     * 只消费一次——之后用户手动重测或换源，不该又被自动跳进播放页。
+     */
+    private boolean autoResumePending;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +76,7 @@ public class DetailActivity extends Activity {
         title = getIntent().getStringExtra("title");
         info = MovieInfo.fromIntent(getIntent());
         if (info.title.length() == 0) info.title = title;
+        autoResumePending = getIntent().getBooleanExtra("autoResume", false);
         linesBox = (LinearLayout) findViewById(R.id.lines);
         scroll = (ScrollView) findViewById(R.id.scroll);
         linesTitle = (TextView) findViewById(R.id.lines_title);
@@ -68,7 +84,8 @@ public class DetailActivity extends Activity {
 
         bindInfo();
 
-        btnBack = (TextView) findViewById(R.id.btn_back);
+        btnBack = findViewById(R.id.btn_back);
+        btnBackLabel = (TextView) findViewById(R.id.back_label);
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -200,7 +217,7 @@ public class DetailActivity extends Activity {
 
     private void renderLines(List<PlayResolver.PlayLine> list) {
         inEpisodes = false;
-        if (btnBack != null) btnBack.setText("← 返回");
+        if (btnBackLabel != null) btnBackLabel.setText(R.string.back);
         currentLines = list;
         linesBox.removeAllViews();
         scroll.scrollTo(0, 0);
@@ -251,7 +268,7 @@ public class DetailActivity extends Activity {
                     firstPlayable = row;
                 }
             } else {
-                name.setTextColor(getResources().getColor(R.color.text_dim));
+                name.setTextColor(getResources().getColor(R.color.text_tertiary));
                 spec.setText(l.error == null ? "不可用" : l.error);
                 stat.setText("");
                 row.setFocusable(false);
@@ -281,16 +298,32 @@ public class DetailActivity extends Activity {
 
         updateResume(h);
 
-        // 从首页「继续观看」点进来时，焦点直接停在「继续看」上，按一下 OK 就接着播；
-        // 普通进入仍落在推荐源上。
-        boolean wantResume = getIntent().getBooleanExtra("autoResume", false)
-                && btnResume.getVisibility() == View.VISIBLE;
-        final View target = wantResume ? btnResume : firstPlayable;
-        if (target != null) {
-            target.post(new Runnable() {
+        // 从记录页 / 首页「继续看」点进来：检索一完成就直接续播。
+        // 以前这里只是把焦点放在「继续看」上，用户还得再按一次 OK
+        //（加上要等检索十几秒）—— 感受就是「点了没反应、没法继续播放」。
+        boolean wantResume = autoResumePending && btnResume.getVisibility() == View.VISIBLE;
+        if (wantResume) {
+            autoResumePending = false;
+            btnResume.post(new Runnable() {
                 @Override
                 public void run() {
-                    target.requestFocus();
+                    continuePlay();
+                }
+            });
+            return;
+        }
+        // 从记录点进来、却没找到能续播的线路：必须说一句，不能静默停在片源列表
+        if (autoResumePending) {
+            Toast.makeText(this, R.string.resume_not_found, Toast.LENGTH_LONG).show();
+        }
+        autoResumePending = false;
+
+        final View first = firstPlayable;
+        if (first != null) {
+            first.post(new Runnable() {
+                @Override
+                public void run() {
+                    first.requestFocus();
                 }
             });
         }
@@ -330,10 +363,19 @@ public class DetailActivity extends Activity {
         }
         if (resumeLine == null) return;
 
-        StringBuilder txt = new StringBuilder("继续看 ");
-        if (h.ep != null && h.ep.length() > 0) txt.append(h.ep).append("  ");
-        txt.append(h.posText());
-        if (h.dur > 0) txt.append(" / ").append(h.durText());
+        StringBuilder txt = new StringBuilder();
+        // 看完的记录还在，但位置贴到片尾，续播会从头开始 —— 文案跟着改成「重看」，
+        // 不要再说「继续看 45:00 / 45:00」把用户骗到片尾
+        if (h.isFinished()) {
+            txt.append(getString(R.string.history_replay));
+        } else {
+            txt.append("继续看 ");
+        }
+        if (h.ep != null && h.ep.length() > 0) txt.append(" ").append(h.ep);
+        if (!h.isFinished()) {
+            txt.append("  ").append(h.posText());
+            if (h.dur > 0) txt.append(" / ").append(h.durText());
+        }
         btnResume.setText(txt.toString());
         btnResume.setVisibility(View.VISIBLE);
     }
@@ -395,7 +437,38 @@ public class DetailActivity extends Activity {
 
     private void showEpisodes(final PlayResolver.PlayLine l) {
         inEpisodes = true;
-        if (btnBack != null) btnBack.setText("← 片源列表");
+        if (btnBackLabel != null) btnBackLabel.setText("片源列表");
+        epLineShown = l;
+        collapsedEpGroups.clear();
+
+        // 默认只展开「上次看到」的那一组（没有记录就开第一组），其余全收起
+        if (l.eps.size() >= EP_GROUP_THRESHOLD) {
+            HistoryStore.Entry h = HistoryStore.get(title);
+            int lastIdx = -1;
+            if (h != null && l.sourceId != null && l.sourceId.equals(h.sourceId)) {
+                for (int i = 0; i < l.eps.size(); i++) {
+                    if (h.ep != null && h.ep.equals(l.eps.get(i).label)) {
+                        lastIdx = i;
+                        break;
+                    }
+                }
+            }
+            int openGroup = lastIdx >= 0 ? lastIdx / EP_GROUP_SIZE : 0;
+            for (int g = 0; g <= (l.eps.size() - 1) / EP_GROUP_SIZE; g++) {
+                if (g != openGroup) collapsedEpGroups.add(g);
+            }
+        }
+
+        renderEpisodes(-1);
+    }
+
+    /**
+     * 重建选集列表（返回片源列表那一行 + 组头 + 集数行）。
+     * 集数达到阈值时按 10 集一组插入可点开合的组头；toggleGroup >= 0 表示
+     * 刚点了第 toggleGroup 组的组头，重建后把焦点还给那个组头。
+     */
+    private void renderEpisodes(final int toggleGroup) {
+        final PlayResolver.PlayLine l = epLineShown;
         linesBox.removeAllViews();
         linesTitle.setText("选集 · " + l.sourceName + "（共 " + l.eps.size() + " 集）");
         scroll.scrollTo(0, 0);
@@ -415,40 +488,83 @@ public class DetailActivity extends Activity {
         });
         linesBox.addView(back, rowParams());
 
+        final boolean grouping = l.eps.size() >= EP_GROUP_THRESHOLD;
         View firstEp = null;
         View lastWatch = null;
+        View headerToFocus = null;
         final String lastPosText = (h != null && lastEp != null) ? h.posText() : "";
-        for (int i = 0; i < l.eps.size(); i++) {
-            final PlayResolver.Ep ep = l.eps.get(i);
-            final View row = LayoutInflater.from(this).inflate(R.layout.item_line, linesBox, false);
-            final TextView name = (TextView) row.findViewById(R.id.line_name);
-            final TextView spec = (TextView) row.findViewById(R.id.line_spec);
-            final TextView badge = (TextView) row.findViewById(R.id.line_badge);
 
-            name.setText(ep.label);
-            // 探针已解析过的那一集打个标，说明这条是确认能播的
-            if (ep.label != null && ep.label.equals(l.label)) {
-                badge.setVisibility(View.VISIBLE);
-                badge.setText("已验证");
-            }
-            boolean isLast = lastEp != null && lastEp.equals(ep.label);
-            spec.setText(isLast ? "上次看到 " + lastPosText : "");
-            if (isLast) lastWatch = row;
+        int i = 0;
+        int g = 0;
+        while (i < l.eps.size()) {
+            final int group = g;
+            final int start = i;
+            final int end = Math.min(i + EP_GROUP_SIZE, l.eps.size());
+            final boolean expanded = !grouping || !collapsedEpGroups.contains(group);
 
-            row.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    spec.setText("解析中…");
-                    resolveAndPlay(l, ep, spec);
+            if (grouping) {
+                View head = LayoutInflater.from(this).inflate(R.layout.item_line, linesBox, false);
+                ((TextView) head.findViewById(R.id.line_name)).setText(
+                        (expanded ? "▾ " : "▸ ") + "第 " + (start + 1) + " - " + end + " 集");
+                ((TextView) head.findViewById(R.id.line_spec)).setText("");
+                ((TextView) head.findViewById(R.id.line_badge)).setVisibility(View.GONE);
+                ((TextView) head.findViewById(R.id.line_stat)).setText("");
+                head.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (collapsedEpGroups.contains(group)) {
+                            collapsedEpGroups.remove(group);
+                        } else {
+                            collapsedEpGroups.add(group);
+                        }
+                        renderEpisodes(group);
+                    }
+                });
+                linesBox.addView(head, rowParams());
+                if (group == toggleGroup) headerToFocus = head;
+                if (!expanded) {
+                    g++;
+                    i = end;
+                    continue;
                 }
-            });
+            }
 
-            linesBox.addView(row, rowParams());
-            if (firstEp == null) firstEp = row;
+            for (; i < end; i++) {
+                final PlayResolver.Ep ep = l.eps.get(i);
+                final View row = LayoutInflater.from(this).inflate(R.layout.item_line, linesBox, false);
+                final TextView name = (TextView) row.findViewById(R.id.line_name);
+                final TextView spec = (TextView) row.findViewById(R.id.line_spec);
+                final TextView badge = (TextView) row.findViewById(R.id.line_badge);
+
+                // 上次看到的那集文字前打勾，和组头一起标出「你在哪」
+                name.setText(isLastWatch(lastEp, ep.label) ? "✓ " + ep.label : ep.label);
+                // 探针已解析过的那一集打个标，说明这条是确认能播的
+                if (ep.label != null && ep.label.equals(l.label)) {
+                    badge.setVisibility(View.VISIBLE);
+                    badge.setText("已验证");
+                }
+                boolean isLast = isLastWatch(lastEp, ep.label);
+                spec.setText(isLast ? "上次看到 " + lastPosText : "");
+                if (isLast) lastWatch = row;
+
+                row.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        spec.setText("解析中…");
+                        resolveAndPlay(l, ep, spec);
+                    }
+                });
+
+                linesBox.addView(row, rowParams());
+                if (firstEp == null) firstEp = row;
+            }
+            g++;
         }
 
-        // 有上次记录就直接把焦点放在那一集上，按 OK 就接着看
-        final View target = lastWatch != null ? lastWatch : firstEp;
+        // 有上次记录就直接把焦点放在那一集上，按 OK 就接着看；
+        // 刚点了组头就把焦点还给组头，不然重建后焦点会跳走
+        View target = toggleGroup >= 0 ? headerToFocus
+                : (lastWatch != null ? lastWatch : firstEp);
         if (target != null) {
             final View f = target;
             f.post(new Runnable() {
@@ -458,6 +574,10 @@ public class DetailActivity extends Activity {
                 }
             });
         }
+    }
+
+    private static boolean isLastWatch(String lastEp, String epLabel) {
+        return lastEp != null && lastEp.equals(epLabel);
     }
 
     private void resolveAndPlay(final PlayResolver.PlayLine l,
@@ -490,7 +610,21 @@ public class DetailActivity extends Activity {
      * 集数只传 label 和原始 url，真正的 m3u8 解析放到播放页切集时再做（慢，得在子线程）。
      */
     private void play(PlayResolver.PlayLine l, PlayResolver.Ep ep, String media) {
-        Intent i = new Intent(DetailActivity.this, PlayerActivity.class);
+        launchPlayer(this, l, ep, media, info);
+    }
+
+    /**
+     * 跳播放页。观看记录页的「继续播放」也走这里，避免两处各打一份 Intent 参数。
+     *
+     * 除了当前这一集的地址，还把**整条线路的全部集数**带过去 —— 播放页要靠它做
+     * 「上一集 / 下一集 / 选集」，否则用户在播放页里想换集只能退出来重选。
+     * 集数只传 label 和原始 url，真正的 m3u8 解析放到播放页切集时再做（慢，得在子线程）。
+     */
+    public static void launchPlayer(Activity from, PlayResolver.PlayLine l, PlayResolver.Ep ep,
+                                    String media, MovieInfo info) {
+        if (from == null || l == null || media == null || media.length() == 0) return;
+
+        Intent i = new Intent(from, PlayerActivity.class);
         i.putExtra("url", media);
         i.putExtra("source", l.sourceName);
         i.putExtra("sourceId", l.sourceId);
@@ -510,12 +644,14 @@ public class DetailActivity extends Activity {
         }
 
         // 整份影片信息一起带过去，播放页退出时写进历史，首页才能显示海报
-        info.toIntent(i);
-        startActivity(i);
+        MovieInfo m = info != null ? info : new MovieInfo();
+        if (m.title == null || m.title.length() == 0) m.title = l.label;
+        m.toIntent(i);
+        from.startActivity(i);
     }
 
     /** 先按引用找（正常路径都是同一个对象），找不到再按集名兜底 */
-    private int indexOf(List<PlayResolver.Ep> eps, PlayResolver.Ep ep) {
+    private static int indexOf(List<PlayResolver.Ep> eps, PlayResolver.Ep ep) {
         if (ep == null) return 0;
         for (int i = 0; i < eps.size(); i++) {
             if (eps.get(i) == ep) return i;

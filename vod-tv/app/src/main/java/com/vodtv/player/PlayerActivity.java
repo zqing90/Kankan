@@ -3,11 +3,15 @@ package com.vodtv.player;
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.SystemClock;
 import android.text.TextUtils;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.WindowManager;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -36,13 +40,16 @@ import java.util.Locale;
  *
  * 遥控器键位（观看态）：
  *   OK / 播放暂停键  播放/暂停
- *   ← →            快退/快进 10 秒
+ *   ← →            快退/快进 10 秒，按住连续跳（每 350ms 一跳）
  *   ↑              呼出控制栏并把焦点交给按钮
  *   ↓              收起控制栏
  *   返回           退出
  *
  * 焦点在控制栏按钮上时，方向键由系统做焦点移动，按返回或 ↓ 退回观看态。
- * 手机：点画面切换控制栏，控制栏按钮本身可触摸点击。
+ * 手机：轻点画面切换控制栏；按住左半屏连续快退、右半屏连续快进，松手即停。
+ *
+ * 长按连续跳的实现见「长按快进/快退」一节：目标位置自己累加，不依赖
+ * getCurrentPosition() 回读（seekTo 之后它有一帧还是旧值，越按越慢甚至倒退）。
  */
 public class PlayerActivity extends Activity implements Player.Listener {
 
@@ -56,11 +63,11 @@ public class PlayerActivity extends Activity implements Player.Listener {
     private TextView timeText;
     private TextView pTitle;
     private TextView pSource;
-    private TextView btnBack;
-    private TextView btnPrev;
-    private TextView btnNext;
-    private TextView btnPlay;
-    private TextView btnEps;
+    private View btnBack;
+    private View btnPrev;
+    private View btnNext;
+    private ImageView btnPlay;
+    private View btnEps;
     private TextView epTitle;
 
     private boolean controlsShowing = false;
@@ -89,6 +96,65 @@ public class PlayerActivity extends Activity implements Player.Listener {
         @Override
         public void run() {
             if (!ended) msg.setVisibility(View.GONE);
+        }
+    };
+
+    /* ---------- 长按快进/快退 ---------- */
+
+    /** 一跳 10 秒，与单击 ←/→ 和 +10s 按钮语义一致 */
+    private static final long SEEK_STEP_MS = 10000L;
+    /** 按住后第一次加速前的等待：再短会让「轻按」变成跳两下 */
+    private static final long SEEK_HOLD_DELAY = 480L;
+    /** 之后每 350ms 再跳一跳（约 28 倍速），比拖进度条好控，也不会卡成幻灯片 */
+    private static final long SEEK_REPEAT_INTERVAL = 350L;
+    /** 按住期间系统会持续发 repeat 的 DOWN；万一 UP 丢了，靠这个心跳兜底，不至无限快进 */
+    private static final long SEEK_KEY_TIMEOUT = 3000L;
+
+    private View seekHud;
+    private TextView seekHudAction;
+    private TextView seekHudTime;
+
+    /** 0 空闲 / -1 快退 / +1 快进 */
+    private int seekDir = 0;
+    /** 连跳的目标位置。自己累加，不回读 getCurrentPosition */
+    private long seekTargetMs = 0;
+    /** 本次长按的起点，用来算「一共跳了多少」 */
+    private long seekFromMs = 0;
+    /** 这次是遥控器按住的（需要心跳兜底）还是手指按住的 */
+    private boolean seekByKey = false;
+    private long seekKeyBeat = 0;
+
+    private final Runnable seekRepeat = new Runnable() {
+        @Override
+        public void run() {
+            if (seekDir == 0) return;
+            if (seekByKey && SystemClock.uptimeMillis() - seekKeyBeat > SEEK_KEY_TIMEOUT) {
+                stopSeek();     // UP 丢了，别一直往前冲
+                return;
+            }
+            if (stepSeek()) handler.postDelayed(this, SEEK_REPEAT_INTERVAL);
+        }
+    };
+
+    private final Runnable hideSeekHud = new Runnable() {
+        @Override
+        public void run() {
+            if (seekDir == 0 && seekHud != null) seekHud.setVisibility(View.GONE);
+        }
+    };
+
+    /* 手机长按画面：左半屏快退、右半屏快进 */
+    private int touchSeekDir = 0;
+    private float touchDownX = 0;
+    private float touchDownY = 0;
+    /** 长按是否已经触发（决定松手时是「停止快进」还是「切换控制栏」） */
+    private boolean touchHolding = false;
+    private final Runnable touchHold = new Runnable() {
+        @Override
+        public void run() {
+            if (touchSeekDir == 0) return;
+            touchHolding = true;
+            startSeek(touchSeekDir, false);
         }
     };
 
@@ -126,14 +192,17 @@ public class PlayerActivity extends Activity implements Player.Listener {
         timeText = (TextView) findViewById(R.id.p_time);
         pTitle = (TextView) findViewById(R.id.p_title);
         pSource = (TextView) findViewById(R.id.p_source);
-        btnBack = (TextView) findViewById(R.id.p_back);
-        btnPrev = (TextView) findViewById(R.id.p_prev);
-        btnNext = (TextView) findViewById(R.id.p_next);
-        btnPlay = (TextView) findViewById(R.id.p_play);
-        btnEps = (TextView) findViewById(R.id.p_eps);
+        btnBack = findViewById(R.id.p_back);
+        btnPrev = findViewById(R.id.p_prev);
+        btnNext = findViewById(R.id.p_next);
+        btnPlay = findViewById(R.id.p_play);
+        btnEps = findViewById(R.id.p_eps);
         epPanel = (LinearLayout) findViewById(R.id.ep_panel);
         epBox = (LinearLayout) findViewById(R.id.ep_box);
         epTitle = (TextView) findViewById(R.id.ep_title);
+        seekHud = findViewById(R.id.seek_hud);
+        seekHudAction = (TextView) findViewById(R.id.seek_hud_action);
+        seekHudTime = (TextView) findViewById(R.id.seek_hud_time);
 
         url = getIntent().getStringExtra("url");
         title = getIntent().getStringExtra("title");
@@ -214,18 +283,78 @@ public class PlayerActivity extends Activity implements Player.Listener {
             }
         });
 
-        // 手机上点画面切换控制栏
-        findViewById(R.id.touch_layer).setOnClickListener(new View.OnClickListener() {
+        // 手机上：轻点画面切换控制栏；按住左半屏连续快退、右半屏连续快进。
+        // 整层自己吃下所有事件（返回 true），只在「没触发长按」的松手时调 performClick，
+        // 否则长按松手会顺带再切换一次控制栏。performClick 而不是直接调方法，
+        // 是为了让无障碍服务也能拿到这次点击。
+        final View touchLayer = findViewById(R.id.touch_layer);
+        final int slop = ViewConfiguration.get(this).getScaledTouchSlop();
+        final int holdMs = ViewConfiguration.getLongPressTimeout();
+        touchLayer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (epPanel.getVisibility() == View.VISIBLE) return;
-                if (controlsShowing && !inControls) {
-                    showControls(false);
-                } else {
-                    showControls(true);
-                }
+                toggleControlsByTap();
             }
         });
+        touchLayer.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent e) {
+                switch (e.getActionMasked()) {
+                    case MotionEvent.ACTION_DOWN:
+                        if (epPanel.getVisibility() == View.VISIBLE) return false;
+                        touchDownX = e.getX();
+                        touchDownY = e.getY();
+                        touchHolding = false;
+                        touchSeekDir = e.getX() < v.getWidth() / 2f ? -1 : 1;
+                        handler.postDelayed(touchHold, holdMs);
+                        return true;
+
+                    case MotionEvent.ACTION_MOVE:
+                        // 手指挪开就是在划，不是按住
+                        if (!touchHolding
+                                && (Math.abs(e.getX() - touchDownX) > slop
+                                || Math.abs(e.getY() - touchDownY) > slop)) {
+                            handler.removeCallbacks(touchHold);
+                            touchSeekDir = 0;
+                        }
+                        return true;
+
+                    case MotionEvent.ACTION_UP:
+                        handler.removeCallbacks(touchHold);
+                        if (touchHolding) {
+                            // 长按结束：停在当前这一跳，不再顺带切换控制栏
+                            touchHolding = false;
+                            touchSeekDir = 0;
+                            stopSeek();
+                            return true;
+                        }
+                        touchSeekDir = 0;
+                        // 走 performClick 而不是直接调方法：无障碍服务要的是这次「点击」本身
+                        v.performClick();
+                        return true;
+
+                    case MotionEvent.ACTION_CANCEL:
+                        handler.removeCallbacks(touchHold);
+                        if (touchHolding) {
+                            touchHolding = false;
+                            stopSeek();
+                        }
+                        touchSeekDir = 0;
+                        return true;
+                }
+                return false;
+            }
+        });
+    }
+
+    /** 手机上轻点画面的原有行为：控制栏在就收起，不在就呼出 */
+    private void toggleControlsByTap() {
+        if (epPanel.getVisibility() == View.VISIBLE) return;
+        if (controlsShowing && !inControls) {
+            showControls(false);
+        } else {
+            showControls(true);
+        }
     }
 
     private void updateHeader() {
@@ -290,17 +419,101 @@ public class PlayerActivity extends Activity implements Player.Listener {
     private void updatePlayButton() {
         if (btnPlay == null) return;
         boolean playing = player != null && player.getPlayWhenReady();
-        btnPlay.setText(playing ? "暂停" : "播放");
+        btnPlay.setImageResource(playing ? R.drawable.ic_ui_pause : R.drawable.ic_ui_play);
     }
 
+    /** 单击一跳（按钮 / 遥控器按一下），顺带给浮层反馈 */
     private void seekBy(long deltaMs) {
         if (player == null) return;
-        long pos = player.getCurrentPosition() + deltaMs;
+        long from = Math.max(0, player.getCurrentPosition());
+        long pos = from + deltaMs;
         long dur = player.getDuration();
         if (dur > 0 && pos > dur) pos = dur;
         if (pos < 0) pos = 0;
         player.seekTo(pos);
+        showSeekHud(deltaMs < 0 ? -1 : 1, pos - from, pos);
         showControls(true);
+    }
+
+    /* ---------- 长按快进/快退 ---------- */
+
+    /**
+     * 起步：立刻跳一次，之后由 {@link #seekRepeat} 按 350ms 的节奏继续跳。
+     * 单击只是「跳一次」，不会留下定时器；按住才会进入连跳。
+     */
+    private void startSeek(int dir, boolean byKey) {
+        if (player == null || dir == 0) return;
+        if (seekDir == dir && seekByKey == byKey) {
+            // 系统重复发 DOWN：只刷新心跳，别再起步一次
+            seekKeyBeat = SystemClock.uptimeMillis();
+            return;
+        }
+        if (seekDir != 0) stopSeek();
+
+        // 遥控器按一下顺手把控制栏呼出来（进度条每 500ms 自己会更新，能看到跳了多少）
+        if (byKey) showControls(true);
+
+        long from = Math.max(0, player.getCurrentPosition());
+        long dur = player.getDuration();
+        // 已经在头/尾，按住也没有可跳的空间
+        if ((dir < 0 && from <= 0) || (dir > 0 && dur > 0 && from >= dur - 1000)) {
+            showSeekHud(dir, 0, from);
+            return;
+        }
+
+        seekDir = dir;
+        seekByKey = byKey;
+        seekKeyBeat = SystemClock.uptimeMillis();
+        seekFromMs = from;
+        seekTargetMs = from;
+        stepSeek();
+        if (seekDir != 0) handler.postDelayed(seekRepeat, SEEK_HOLD_DELAY);
+    }
+
+    /** 沿当前方向再跳一步；返回 false 表示已经顶到头，循环该停了 */
+    private boolean stepSeek() {
+        if (player == null || seekDir == 0) return false;
+        long dur = player.getDuration();
+        long target = seekTargetMs + seekDir * SEEK_STEP_MS;
+        if (dur > 0 && target > dur) target = dur;
+        if (target < 0) target = 0;
+        if (target == seekTargetMs) {
+            showSeekHud(seekDir, seekTargetMs - seekFromMs, seekTargetMs);
+            stopSeek();
+            return false;
+        }
+        seekTargetMs = target;
+        player.seekTo(target);
+        showSeekHud(seekDir, target - seekFromMs, target);
+        return true;
+    }
+
+    /** 松手 / 到底 / 离开页面：停在当前这一跳，浮层过一会儿自己收 */
+    private void stopSeek() {
+        seekDir = 0;
+        seekByKey = false;
+        handler.removeCallbacks(seekRepeat);
+        handler.removeCallbacks(hideSeekHud);
+        handler.postDelayed(hideSeekHud, 700);
+    }
+
+    private void showSeekHud(int dir, long deltaMs, long targetMs) {
+        if (seekHud == null) return;
+        long abs = Math.abs(deltaMs);
+        if (abs < 1000) {
+            seekHudAction.setText(dir < 0 ? R.string.seek_at_start : R.string.seek_at_end);
+        } else {
+            int sec = (int) (abs / 1000);
+            seekHudAction.setText(dir < 0
+                    ? getString(R.string.seek_backward_n, sec)
+                    : getString(R.string.seek_forward_n, sec));
+        }
+        long dur = player == null ? 0 : player.getDuration();
+        seekHudTime.setText(dur > 0 ? fmt(targetMs) + " / " + fmt(dur) : fmt(targetMs));
+        seekHud.setVisibility(View.VISIBLE);
+        // 连跳期间每一步都刷新这个计时器，所以浮层会一直亮着
+        handler.removeCallbacks(hideSeekHud);
+        handler.postDelayed(hideSeekHud, 900);
     }
 
     /* ---------- 换集 ---------- */
@@ -347,6 +560,7 @@ public class PlayerActivity extends Activity implements Player.Listener {
         if (player == null) return;
         // 先把上一集的进度落盘，否则切走的那一集进度会丢
         saveProgress();
+        stopSeek();
 
         epIndex = idx;
         ep = label;
@@ -367,56 +581,25 @@ public class PlayerActivity extends Activity implements Player.Listener {
 
     /* ---------- 选集浮层 ---------- */
 
+    /** 集数达到这个数才按组折叠；短剧保持平铺，折叠反而多一步操作 */
+    private static final int EP_GROUP_THRESHOLD = 50;
+    private static final int EP_GROUP_SIZE = 10;
+    /** 浮层打开期间的折叠组号集合，每次 openEpisodes 重新初始化 */
+    private java.util.HashSet<Integer> collapsedEpGroups = new java.util.HashSet<Integer>();
+
     private void openEpisodes() {
         if (epLabels == null || epLabels.size() < 2) return;
 
-        epBox.removeAllViews();
+        collapsedEpGroups = new java.util.HashSet<Integer>();
         epTitle.setText("选集 · " + (sourceName == null ? "" : sourceName)
                 + "（共 " + epLabels.size() + " 集）");
 
-        int screenW = getResources().getDisplayMetrics().widthPixels;
-        final int cellW = dp(150);
-        final int cols = Math.max(3, (screenW - dp(90)) / cellW);
-
-        LinearLayout row = null;
-        for (int i = 0; i < epLabels.size(); i++) {
-            if (i % cols == 0) {
-                row = new LinearLayout(this);
-                row.setOrientation(LinearLayout.HORIZONTAL);
-                LinearLayout.LayoutParams rlp = new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT);
-                rlp.bottomMargin = dp(6);
-                epBox.addView(row, rlp);
+        // 默认只展开当前正在播的那一组，其余全收起；没在播态就开第一组
+        if (epLabels.size() >= EP_GROUP_THRESHOLD) {
+            int openGroup = epIndex >= 0 ? epIndex / EP_GROUP_SIZE : 0;
+            for (int g = 0; g <= (epLabels.size() - 1) / EP_GROUP_SIZE; g++) {
+                if (g != openGroup) collapsedEpGroups.add(g);
             }
-
-            final int idx = i;
-            TextView b = new TextView(this);
-            b.setText(epLabels.get(i));
-            b.setTextSize(13);
-            b.setTextColor(getResources().getColor(R.color.text_primary));
-            b.setPadding(dp(12), dp(9), dp(12), dp(9));
-            b.setBackgroundResource(R.drawable.bg_tab);
-            b.setFocusable(true);
-            b.setSingleLine(true);
-            b.setEllipsize(TextUtils.TruncateAt.END);
-            b.setGravity(android.view.Gravity.CENTER);
-            // 当前正在播的那一集标红，一眼能找到自己在哪
-            b.setSelected(i == epIndex);
-            b.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (idx == epIndex) {
-                        closeEpisodes();
-                    } else {
-                        switchEpisode(idx);
-                    }
-                }
-            });
-
-            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(cellW, LinearLayout.LayoutParams.WRAP_CONTENT);
-            lp.rightMargin = dp(6);
-            row.addView(b, lp);
         }
 
         epPanel.setVisibility(View.VISIBLE);
@@ -425,18 +608,128 @@ public class PlayerActivity extends Activity implements Player.Listener {
         if (f != null) f.clearFocus();
         handler.removeCallbacks(hideControls);
         // 焦点落在当前集上，省得用户在几十集里找
-        epPanel.post(new Runnable() {
-            @Override
-            public void run() {
-                int r = epIndex >= 0 ? epIndex / cols : 0;
-                int c = epIndex >= 0 ? epIndex % cols : 0;
-                if (r >= epBox.getChildCount()) return;
-                View rowView = epBox.getChildAt(r);
-                if (!(rowView instanceof LinearLayout)) return;
-                LinearLayout rl = (LinearLayout) rowView;
-                if (c < rl.getChildCount()) rl.getChildAt(c).requestFocus();
+        final View target = rebuildEpisodes(-1);
+        if (target != null) {
+            epPanel.post(new Runnable() {
+                @Override
+                public void run() {
+                    target.requestFocus();
+                }
+            });
+        }
+    }
+
+    /**
+     * 重建浮层里的集数格。
+     * 集数达到阈值时按 10 集一组插入可点开合的组头；toggleGroup >= 0 表示
+     * 刚点了第 toggleGroup 组的组头，重建后把焦点还给那个组头。
+     *
+     * @return 建议获得焦点的 View（初次打开 = 当前集格子，切换组 = 被点的组头），没有则 null
+     */
+    private View rebuildEpisodes(final int toggleGroup) {
+        epBox.removeAllViews();
+
+        int screenW = getResources().getDisplayMetrics().widthPixels;
+        final int cellW = dp(150);
+        final int cols = Math.max(3, (screenW - dp(90)) / cellW);
+        final int n = epLabels.size();
+        final boolean grouping = n >= EP_GROUP_THRESHOLD;
+
+        View currentChip = null;
+        View firstChip = null;
+        View headerToFocus = null;
+
+        int i = 0;
+        int g = 0;
+        while (i < n) {
+            final int group = g;
+            final int start = i;
+            final int end = Math.min(i + EP_GROUP_SIZE, n);
+            final boolean expanded = !grouping || !collapsedEpGroups.contains(group);
+
+            if (grouping) {
+                TextView h = new TextView(this);
+                h.setText((expanded ? "▾ " : "▸ ")
+                        + "第 " + (start + 1) + " - " + end + " 集");
+                h.setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX,
+                        getResources().getDimensionPixelSize(R.dimen.text_caption));
+                h.setTextColor(getResources().getColor(R.color.text_secondary));
+                h.setPadding(dp(12), dp(9), dp(12), dp(9));
+                h.setBackgroundResource(R.drawable.bg_chip);
+                h.setFocusable(true);
+                h.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (collapsedEpGroups.contains(group)) {
+                            collapsedEpGroups.remove(group);
+                        } else {
+                            collapsedEpGroups.add(group);
+                        }
+                        View t = rebuildEpisodes(group);
+                        if (t != null) t.requestFocus();
+                    }
+                });
+                LinearLayout.LayoutParams hlp = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT);
+                hlp.bottomMargin = dp(6);
+                epBox.addView(h, hlp);
+                if (group == toggleGroup) headerToFocus = h;
+                if (!expanded) {
+                    g++;
+                    i = end;
+                    continue;
+                }
             }
-        });
+
+            LinearLayout row = null;
+            for (; i < end; i++) {
+                if (i % cols == 0 || row == null) {
+                    row = new LinearLayout(this);
+                    row.setOrientation(LinearLayout.HORIZONTAL);
+                    LinearLayout.LayoutParams rlp = new LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.MATCH_PARENT,
+                            LinearLayout.LayoutParams.WRAP_CONTENT);
+                    rlp.bottomMargin = dp(6);
+                    epBox.addView(row, rlp);
+                }
+
+                final int idx = i;
+                TextView b = new TextView(this);
+                // 当前正在播的那一集：品牌蓝实底（bg_chip 的 selected 态）+ 文字前打勾，一眼能找到自己在哪
+                b.setText((i == epIndex ? "✓ " : "") + epLabels.get(i));
+                b.setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX,
+                        getResources().getDimensionPixelSize(R.dimen.text_caption));
+                b.setTextColor(getResources().getColor(R.color.text_primary));
+                b.setPadding(dp(12), dp(9), dp(12), dp(9));
+                b.setBackgroundResource(R.drawable.bg_chip);
+                b.setFocusable(true);
+                b.setSingleLine(true);
+                b.setEllipsize(TextUtils.TruncateAt.END);
+                b.setGravity(android.view.Gravity.CENTER);
+                b.setSelected(i == epIndex);
+                b.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (idx == epIndex) {
+                            closeEpisodes();
+                        } else {
+                            switchEpisode(idx);
+                        }
+                    }
+                });
+
+                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(cellW, LinearLayout.LayoutParams.WRAP_CONTENT);
+                lp.rightMargin = dp(6);
+                row.addView(b, lp);
+                if (firstChip == null) firstChip = b;
+                if (i == epIndex) currentChip = b;
+            }
+            g++;
+        }
+
+        if (toggleGroup >= 0) return headerToFocus;
+        return currentChip != null ? currentChip : firstChip;
     }
 
     private void closeEpisodes() {
@@ -498,7 +791,7 @@ public class PlayerActivity extends Activity implements Player.Listener {
         btnNext.setVisibility(multi ? View.VISIBLE : View.GONE);
     }
 
-    private void setEnabled(TextView v, boolean on) {
+    private void setEnabled(View v, boolean on) {
         v.setEnabled(on);
         v.setAlpha(on ? 1f : 0.32f);
         // 不可用的按钮不能再接焦点，否则遥控器会停在死按钮上
@@ -566,12 +859,14 @@ public class PlayerActivity extends Activity implements Player.Listener {
 
             case KeyEvent.KEYCODE_DPAD_LEFT:
             case KeyEvent.KEYCODE_MEDIA_REWIND:
-                seekBy(-10000);
+                // 长按的重复 DOWN 节奏由系统定（先 500ms 再 50ms），跳 10 秒完全没法用，
+                // 所以只在第一次按下时起步，后续交给自己的 350ms 定时器
+                startSeek(-1, true);
                 return true;
 
             case KeyEvent.KEYCODE_DPAD_RIGHT:
             case KeyEvent.KEYCODE_MEDIA_FAST_FORWARD:
-                seekBy(10000);
+                startSeek(1, true);
                 return true;
 
             case KeyEvent.KEYCODE_DPAD_UP:
@@ -583,10 +878,27 @@ public class PlayerActivity extends Activity implements Player.Listener {
                 return true;
 
             case KeyEvent.KEYCODE_BACK:
+                stopSeek();
                 finish();
                 return true;
         }
         return super.onKeyDown(keyCode, event);
+    }
+
+    /** 松手即停：连跳只由按住维持，UP 一到立刻刹车 */
+    @Override
+    public boolean onKeyUp(int keyCode, KeyEvent event) {
+        if (seekDir != 0) {
+            switch (keyCode) {
+                case KeyEvent.KEYCODE_DPAD_LEFT:
+                case KeyEvent.KEYCODE_DPAD_RIGHT:
+                case KeyEvent.KEYCODE_MEDIA_REWIND:
+                case KeyEvent.KEYCODE_MEDIA_FAST_FORWARD:
+                    stopSeek();
+                    return true;
+            }
+        }
+        return super.onKeyUp(keyCode, event);
     }
 
     /* ---------- 进度记忆 ---------- */
@@ -608,6 +920,9 @@ public class PlayerActivity extends Activity implements Player.Listener {
     @Override
     public void onPlaybackStateChanged(int playbackState) {
         if (playbackState == Player.STATE_BUFFERING) {
+            // 连跳时每跳一次都会短暂 BUFFERING，这里不该闪「缓冲中…」，
+            // 否则屏幕上跟快进浮层叠成一团
+            if (seekDir != 0) return;
             msg.setVisibility(View.VISIBLE);
             msg.setText("缓冲中…");
         } else if (playbackState == Player.STATE_READY) {
@@ -627,6 +942,9 @@ public class PlayerActivity extends Activity implements Player.Listener {
             }
         } else if (playbackState == Player.STATE_ENDED) {
             ended = true;
+            // 播完立刻落盘：此时 pos 贴到片尾，HistoryStore 会把它记成「已看完」而不是删掉。
+            // 不能只等 onPause —— 用户看完直接按电源/回桌面，onPause 可能来不及走到这里。
+            saveProgress();
             boolean hasNext = epUrls != null && epIndex >= 0 && epIndex < epUrls.size() - 1;
             msg.setVisibility(View.VISIBLE);
             msg.setText(hasNext
@@ -645,6 +963,11 @@ public class PlayerActivity extends Activity implements Player.Listener {
     @Override
     protected void onPause() {
         super.onPause();
+        // 按着的时候被切走（来电 / Home / 熄屏），UP 可能永远不来，这里必须刹车
+        handler.removeCallbacks(touchHold);
+        touchHolding = false;
+        touchSeekDir = 0;
+        stopSeek();
         saveProgress();
         if (player != null) player.setPlayWhenReady(false);
         updatePlayButton();

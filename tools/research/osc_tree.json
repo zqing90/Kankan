@@ -1,0 +1,3368 @@
+{
+  "sha": "e8c12d2bf408feb129857e577803d918e613482f",
+  "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/e8c12d2bf408feb129857e577803d918e613482f",
+  "tree": [
+    {
+      "path": ".github",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "39915cbd974a41dc14f49c500f4918f79bfa1569",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/39915cbd974a41dc14f49c500f4918f79bfa1569"
+    },
+    {
+      "path": ".github/workflows",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "15c6a4bd7a8e448c0d784bd38b4c11e31cdb39d2",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/15c6a4bd7a8e448c0d784bd38b4c11e31cdb39d2"
+    },
+    {
+      "path": ".github/workflows/test.yml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9a87f11bd044596afdb347c6c65a58b199a8e0c5",
+      "size": 775,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/9a87f11bd044596afdb347c6c65a58b199a8e0c5"
+    },
+    {
+      "path": ".gitignore",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "61e8c9b66af0af2141141e7365c6ccda34b8ef16",
+      "size": 1499,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/61e8c9b66af0af2141141e7365c6ccda34b8ef16"
+    },
+    {
+      "path": ".idea",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "cf951c8237dd3586ecd75987d69be961a26f0a45",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/cf951c8237dd3586ecd75987d69be961a26f0a45"
+    },
+    {
+      "path": ".idea/.name",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "25d48a7c96bd1b0098d53815fe21e566380ac556",
+      "size": 5,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/25d48a7c96bd1b0098d53815fe21e566380ac556"
+    },
+    {
+      "path": ".idea/codeStyles",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "5382b1049adb45576431b0779026c9f1558822bf",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/5382b1049adb45576431b0779026c9f1558822bf"
+    },
+    {
+      "path": ".idea/codeStyles/Project.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "681f41ae2aee4749eb4ddda94f8c6a76c825c825",
+      "size": 3309,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/681f41ae2aee4749eb4ddda94f8c6a76c825c825"
+    },
+    {
+      "path": ".idea/compiler.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fb7f4a8a465d42b4a0390d464b83b99e8465bba7",
+      "size": 169,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/fb7f4a8a465d42b4a0390d464b83b99e8465bba7"
+    },
+    {
+      "path": ".idea/jarRepositories.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "047baf83430dd467beec73d8cd6714cdaf78bab7",
+      "size": 1947,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/047baf83430dd467beec73d8cd6714cdaf78bab7"
+    },
+    {
+      "path": ".idea/misc.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fbe5affca0cbbed658f6a5c7116b15b365f2cec7",
+      "size": 954,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/fbe5affca0cbbed658f6a5c7116b15b365f2cec7"
+    },
+    {
+      "path": "LICENSE",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0ad25db4bd1d86c452db3f9602ccdbe172438f52",
+      "size": 34523,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/0ad25db4bd1d86c452db3f9602ccdbe172438f52"
+    },
+    {
+      "path": "app",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "7c90fb5e731d868e7c66a3ae3d14c30c372e7aa3",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/7c90fb5e731d868e7c66a3ae3d14c30c372e7aa3"
+    },
+    {
+      "path": "app/build.gradle",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c8eca69732862d537dead6aadf8d3cfca0680fa1",
+      "size": 3154,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/c8eca69732862d537dead6aadf8d3cfca0680fa1"
+    },
+    {
+      "path": "app/libs",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "a6ca54b1ec8814ce52c9496fae5b90996c068aeb",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/a6ca54b1ec8814ce52c9496fae5b90996c068aeb"
+    },
+    {
+      "path": "app/libs/thunder.jar",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d5c06f797d2273f0438106ef511b467816b28697",
+      "size": 79211,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/d5c06f797d2273f0438106ef511b467816b28697"
+    },
+    {
+      "path": "app/proguard-rules.pro",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1902c50053fce5fa1145ee28be34deeddf9ae434",
+      "size": 6979,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/1902c50053fce5fa1145ee28be34deeddf9ae434"
+    },
+    {
+      "path": "app/schemas",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "ccd3ce9417b7b7ebd2ac910794b6ca562ffd0a80",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/ccd3ce9417b7b7ebd2ac910794b6ca562ffd0a80"
+    },
+    {
+      "path": "app/schemas/com.github.tvbox.osc.data.AppDataBase",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "8e46865850136e68f9219a8b76b3cad3d131190b",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/8e46865850136e68f9219a8b76b3cad3d131190b"
+    },
+    {
+      "path": "app/schemas/com.github.tvbox.osc.data.AppDataBase/1.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1c844a7aba80f7f325ff7e1aed9f4ccab4744f43",
+      "size": 3723,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/1c844a7aba80f7f325ff7e1aed9f4ccab4744f43"
+    },
+    {
+      "path": "app/schemas/com.github.tvbox.osc.data.AppDataBase/3.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f7ebf8c508e44e89cf2aceed0fc722e4faefb912",
+      "size": 6261,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/f7ebf8c508e44e89cf2aceed0fc722e4faefb912"
+    },
+    {
+      "path": "app/src",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "52d50c2cad5b6c77ea319a8875b099a0f3830124",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/52d50c2cad5b6c77ea319a8875b099a0f3830124"
+    },
+    {
+      "path": "app/src/main",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "62c22d7e086122a0dfb53cbd972c626eb0967f7a",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/62c22d7e086122a0dfb53cbd972c626eb0967f7a"
+    },
+    {
+      "path": "app/src/main/AndroidManifest.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "93a0e8191480d3e76b518968400bb80d77227efd",
+      "size": 4055,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/93a0e8191480d3e76b518968400bb80d77227efd"
+    },
+    {
+      "path": "app/src/main/assets",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "f4697e306e66d18a218fc5a7ef654c5d4032ae77",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/f4697e306e66d18a218fc5a7ef654c5d4032ae77"
+    },
+    {
+      "path": "app/src/main/assets/ua.db",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "53a2eac5915e94857e817284a078b1d4ede245ee",
+      "size": 672844,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/53a2eac5915e94857e817284a078b1d4ede245ee"
+    },
+    {
+      "path": "app/src/main/java",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "42171c99a95bde7fdb94cb59b538880adbc15bbe",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/42171c99a95bde7fdb94cb59b538880adbc15bbe"
+    },
+    {
+      "path": "app/src/main/java/com",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "1795bfb4a13a86341e373de769ae552338a66932",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/1795bfb4a13a86341e373de769ae552338a66932"
+    },
+    {
+      "path": "app/src/main/java/com/github",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "aecbdf0d126e615b4169884f8b396f5327de848e",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/aecbdf0d126e615b4169884f8b396f5327de848e"
+    },
+    {
+      "path": "app/src/main/java/com/github/catvod",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "8d8640f53a608cba36b7403fce4697d27f0cef38",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/8d8640f53a608cba36b7403fce4697d27f0cef38"
+    },
+    {
+      "path": "app/src/main/java/com/github/catvod/crawler",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "0021ce6c188ac1d71b61723894503f938f85bd6a",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/0021ce6c188ac1d71b61723894503f938f85bd6a"
+    },
+    {
+      "path": "app/src/main/java/com/github/catvod/crawler/JarLoader.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "097dbcee516414e6f7931e272c538767306112fd",
+      "size": 4304,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/097dbcee516414e6f7931e272c538767306112fd"
+    },
+    {
+      "path": "app/src/main/java/com/github/catvod/crawler/Spider.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e67abb6bafb751dc71dc0f4f71e074535ced2a86",
+      "size": 2116,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/e67abb6bafb751dc71dc0f4f71e074535ced2a86"
+    },
+    {
+      "path": "app/src/main/java/com/github/catvod/crawler/SpiderDebug.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "578667f0585cbb50c91930a0e54239054c479007",
+      "size": 459,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/578667f0585cbb50c91930a0e54239054c479007"
+    },
+    {
+      "path": "app/src/main/java/com/github/catvod/crawler/SpiderNull.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c9bd8c5936e76272f6fc997eff0f3a6adfb5f3b3",
+      "size": 79,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/c9bd8c5936e76272f6fc997eff0f3a6adfb5f3b3"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "dcbbef7450cb5cdf4cb05d0d365cfec1877435f1",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/dcbbef7450cb5cdf4cb05d0d365cfec1877435f1"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "9682ca8d8478ee746f67bc98bcbfc39c07b940d1",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/9682ca8d8478ee746f67bc98bcbfc39c07b940d1"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/api",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "58c4acf197963aaa31391d3beb9af85cf076c460",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/58c4acf197963aaa31391d3beb9af85cf076c460"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/api/ApiConfig.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "143e6180573bd1d1b16fd7876f6602990b831f94",
+      "size": 19363,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/143e6180573bd1d1b16fd7876f6602990b831f94"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/base",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "bb8fbd8278830e36d01eb7f25553c9eea24413da",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/bb8fbd8278830e36d01eb7f25553c9eea24413da"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/base/App.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6cbded39ea30909a3fc8234b37a63c61542348ce",
+      "size": 1767,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/6cbded39ea30909a3fc8234b37a63c61542348ce"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/base/BaseActivity.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "88bf660c5bd8c726503c8c7909035bfd770a8a8a",
+      "size": 5321,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/88bf660c5bd8c726503c8c7909035bfd770a8a8a"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/base/BaseLazyFragment.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "36752f268557b79e1e293368c993b7a93ef28598",
+      "size": 10365,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/36752f268557b79e1e293368c993b7a93ef28598"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/bean",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "5dc972d7757ef169a5a253d6db8031d81ffa13d0",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/5dc972d7757ef169a5a253d6db8031d81ffa13d0"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/bean/AbsJson.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "961face383a57344f3f3a26e88330ab257f9e685",
+      "size": 9869,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/961face383a57344f3f3a26e88330ab257f9e685"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/bean/AbsSortJson.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c51e1d636d87d7823e320621c218aa7352d28817",
+      "size": 1397,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/c51e1d636d87d7823e320621c218aa7352d28817"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/bean/AbsSortXml.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2a318a24d94e3c330fe3f1e850be04733d3eb5f9",
+      "size": 431,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/2a318a24d94e3c330fe3f1e850be04733d3eb5f9"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/bean/AbsXml.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ebcbbeae00329a8ce3135d9fcabf984103edf31c",
+      "size": 306,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/ebcbbeae00329a8ce3135d9fcabf984103edf31c"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/bean/IJKCode.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2673e1bb46a9cbdc378eee91c5e7c36cdc267cac",
+      "size": 891,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/2673e1bb46a9cbdc378eee91c5e7c36cdc267cac"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/bean/LiveChannelGroup.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "44b8ff773c135022248b7868f68c8933868e97ab",
+      "size": 1101,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/44b8ff773c135022248b7868f68c8933868e97ab"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/bean/LiveChannelItem.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "bb567305e56b305a5ffeb507752712867c5bac1c",
+      "size": 2257,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/bb567305e56b305a5ffeb507752712867c5bac1c"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/bean/LivePlayerManager.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1c4b23e44a89fee18666c4632d1964e5b594447d",
+      "size": 5221,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/1c4b23e44a89fee18666c4632d1964e5b594447d"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/bean/LiveSettingGroup.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b8b25d0efe2e02546ca1f4ea0c17fb3bca6d4bfd",
+      "size": 776,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/b8b25d0efe2e02546ca1f4ea0c17fb3bca6d4bfd"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/bean/LiveSettingItem.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "741134aa81cda0c33900741f0e6d4b48ff2480cc",
+      "size": 715,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/741134aa81cda0c33900741f0e6d4b48ff2480cc"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/bean/Movie.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6decd100af2c9e5db0bf761303fe3490d762d0aa",
+      "size": 3308,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/6decd100af2c9e5db0bf761303fe3490d762d0aa"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/bean/MovieSort.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c0f1abf9b5315c69d93d2a8f95a6106ff1e2e006",
+      "size": 1621,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/c0f1abf9b5315c69d93d2a8f95a6106ff1e2e006"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/bean/ParseBean.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5b76b0e149dd2bae7d35a3137588c88edcc1dc9b",
+      "size": 1419,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/5b76b0e149dd2bae7d35a3137588c88edcc1dc9b"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/bean/SourceBean.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8d9a8f5a2268e35f39a99d0269238bbd22126a0b",
+      "size": 1991,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/8d9a8f5a2268e35f39a99d0269238bbd22126a0b"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/bean/VodInfo.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e60a5fb5b968778a9c769cd048ae79b950aa6f45",
+      "size": 4500,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/e60a5fb5b968778a9c769cd048ae79b950aa6f45"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/cache",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "42f24eba8d5a54d804027d64c52a11c16d8e9498",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/42f24eba8d5a54d804027d64c52a11c16d8e9498"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/cache/Cache.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1ac686dcf40181ec3b160c97c0441bd975041069",
+      "size": 402,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/1ac686dcf40181ec3b160c97c0441bd975041069"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/cache/CacheDao.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a3699c7f24f2c8fdbd6637f84843766783a72237",
+      "size": 1399,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/a3699c7f24f2c8fdbd6637f84843766783a72237"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/cache/CacheManager.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9d869873d01d9d7886817d5376af5d58c171e8ce",
+      "size": 2567,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/9d869873d01d9d7886817d5376af5d58c171e8ce"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/cache/RoomDataManger.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ae6743e2f56c7bc0564ab30fdbd87d39ad4592c8",
+      "size": 4665,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/ae6743e2f56c7bc0564ab30fdbd87d39ad4592c8"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/cache/VodCollect.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "42434aa976a9ef69cb6757556453c7c1b65b957d",
+      "size": 712,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/42434aa976a9ef69cb6757556453c7c1b65b957d"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/cache/VodCollectDao.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "86b699a83dba156365e786ad54a6937501f60d0f",
+      "size": 870,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/86b699a83dba156365e786ad54a6937501f60d0f"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/cache/VodRecord.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "75a781d2ab8090347253e1f1cf050bca688a65d2",
+      "size": 691,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/75a781d2ab8090347253e1f1cf050bca688a65d2"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/cache/VodRecordDao.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9484b6ae4735dd6a5b6a957a929fe5547e68cb19",
+      "size": 710,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/9484b6ae4735dd6a5b6a957a929fe5547e68cb19"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/callback",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "c9e8e210f7f4c7898f23a3af38f5eeaa7250d787",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/c9e8e210f7f4c7898f23a3af38f5eeaa7250d787"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/callback/EmptyCallback.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d07e2c1b38ecb6bc5f435f4303cd039616512795",
+      "size": 328,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/d07e2c1b38ecb6bc5f435f4303cd039616512795"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/callback/LoadingCallback.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "61fbed8e6aa99e1d1523137f42d17ecf32dd804c",
+      "size": 332,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/61fbed8e6aa99e1d1523137f42d17ecf32dd804c"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/data",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "7328802facc2a2a5f1d989bb502227a6ad6e69b9",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/7328802facc2a2a5f1d989bb502227a6ad6e69b9"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/data/AppDataBase.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "da5e3fe9ad77bd1b6a02f2e39d2242f5a5959fec",
+      "size": 735,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/da5e3fe9ad77bd1b6a02f2e39d2242f5a5959fec"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/data/AppDataManager.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a5a85486f2c055d6ee9cb99a48a21576c9e04ee8",
+      "size": 5931,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/a5a85486f2c055d6ee9cb99a48a21576c9e04ee8"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/event",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "35ccebe44bfdbe4bcdfb505ea359e9d698498789",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/35ccebe44bfdbe4bcdfb505ea359e9d698498789"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/event/HistoryStateEvent.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9898c73290c634b92aaa9fc6b27a5b893fa2ce49",
+      "size": 271,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/9898c73290c634b92aaa9fc6b27a5b893fa2ce49"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/event/RefreshEvent.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "aa9be925e7a34342da89c92081c559356950f23f",
+      "size": 883,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/aa9be925e7a34342da89c92081c559356950f23f"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/event/ServerEvent.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4dcfa5764d90be3b28c2d22d73e1aeb68660cf3b",
+      "size": 488,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/4dcfa5764d90be3b28c2d22d73e1aeb68660cf3b"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/event/TopStateEvent.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "90cf1c66fb7b36885cadde093c6733bf8716788f",
+      "size": 263,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/90cf1c66fb7b36885cadde093c6733bf8716788f"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/picasso",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "f29201b23731c2bf0f99bc5f8cbc90898a223675",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/f29201b23731c2bf0f99bc5f8cbc90898a223675"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/picasso/RoundTransformation.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6293ed7545778bc90d9905be0ab2dcd3018f3e67",
+      "size": 21704,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/6293ed7545778bc90d9905be0ab2dcd3018f3e67"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/player",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "d2f14a435ab6d9d14a37762d39442fac1d1b3579",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/d2f14a435ab6d9d14a37762d39442fac1d1b3579"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/player/IjkMediaPlayer.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6d72390cba78aa185776c088410593128b96b748",
+      "size": 1851,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/6d72390cba78aa185776c088410593128b96b748"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/player/controller",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "46cf656f4dd80228629a1972d5626ec8d06a0bd1",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/46cf656f4dd80228629a1972d5626ec8d06a0bd1"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/player/controller/BaseController.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "342fea80adba8fc0cfa0169d857c77ef2dfae002",
+      "size": 15006,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/342fea80adba8fc0cfa0169d857c77ef2dfae002"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/player/controller/LiveController.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "745fff3d19536511db22c094657720174746ff05",
+      "size": 2460,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/745fff3d19536511db22c094657720174746ff05"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/player/controller/VodController.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fe22096db4adbc095f7b62b2c2984493e288b36f",
+      "size": 21163,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/fe22096db4adbc095f7b62b2c2984493e288b36f"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/player/render",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "a31309a1d79e2d92dee46e3ee7dd100df2bfa5ab",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/a31309a1d79e2d92dee46e3ee7dd100df2bfa5ab"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/player/render/SurfaceRenderView.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "684b28de3fd0474982bbfd79d0f4e7ad65d22c32",
+      "size": 2640,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/684b28de3fd0474982bbfd79d0f4e7ad65d22c32"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/player/render/SurfaceRenderViewFactory.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "37a82a0845c81a08ab1e861ff0d808cbad8026f2",
+      "size": 487,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/37a82a0845c81a08ab1e861ff0d808cbad8026f2"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/player/thirdparty",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "d5b4af77529fb73d6fb75bc6b51452f5cc571bbb",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/d5b4af77529fb73d6fb75bc6b51452f5cc571bbb"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/player/thirdparty/MXPlayer.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0132f083293676546b5d4eb9af41b032c5a274a6",
+      "size": 3786,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/0132f083293676546b5d4eb9af41b032c5a274a6"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/player/thirdparty/ReexPlayer.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7fca28b7c906077d4d89ae3fa3323bda3ec664dc",
+      "size": 3152,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/7fca28b7c906077d4d89ae3fa3323bda3ec664dc"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/receiver",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "4898a18b531aefc69d38c54a372636c21875e12d",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/4898a18b531aefc69d38c54a372636c21875e12d"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/receiver/CustomWebReceiver.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6c3a490ded9ec9d6d39918726f620618c59883a5",
+      "size": 1499,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/6c3a490ded9ec9d6d39918726f620618c59883a5"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/receiver/SearchReceiver.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b47477d9cf6ea5a852cec4b879858950e9f93b3a",
+      "size": 1335,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/b47477d9cf6ea5a852cec4b879858950e9f93b3a"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/server",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "a1e26815bb917cb96ae7220f76bdcdd365b99c7d",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/a1e26815bb917cb96ae7220f76bdcdd365b99c7d"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/server/ControlManager.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5337055cf1454986b0f81f17bebe83ac314a8c9c",
+      "size": 3088,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/5337055cf1454986b0f81f17bebe83ac314a8c9c"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/server/DataReceiver.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8e15dba9d08a261d37ef8fb717b7de732a8fe521",
+      "size": 282,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/8e15dba9d08a261d37ef8fb717b7de732a8fe521"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/server/InputRequestProcess.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "82d444d81806f4056c2f5eae8afe9b489b50ca8d",
+      "size": 2045,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/82d444d81806f4056c2f5eae8afe9b489b50ca8d"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/server/RawRequestProcess.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "de86e33f307f9e50708fbb6be5432ceead8af19c",
+      "size": 1531,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/de86e33f307f9e50708fbb6be5432ceead8af19c"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/server/RemoteServer.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "63065c08c901b72d3a6dc917e8201efd5fb271af",
+      "size": 18008,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/63065c08c901b72d3a6dc917e8201efd5fb271af"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/server/RequestProcess.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "953c34b855185f61647d2aa160cf1c4b64fb301b",
+      "size": 793,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/953c34b855185f61647d2aa160cf1c4b64fb301b"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/server/ShellUtils.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a7f5e4ec2a0a8e80a61a522eb2910209d32fd824",
+      "size": 6790,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/a7f5e4ec2a0a8e80a61a522eb2910209d32fd824"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/ui",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "3bda66df155e71a4f0a4bbc5c5e9dc78e94ee501",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/3bda66df155e71a4f0a4bbc5c5e9dc78e94ee501"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/ui/activity",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "bac0ebd5d1e39fa4ed9545c1266a3522aec04731",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/bac0ebd5d1e39fa4ed9545c1266a3522aec04731"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/ui/activity/CollectActivity.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "205fcd326bd406a9082bc5800931c29d65222bc6",
+      "size": 5587,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/205fcd326bd406a9082bc5800931c29d65222bc6"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/ui/activity/DetailActivity.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1820939c82853c05c499f50dbd3b99a085627527",
+      "size": 24951,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/1820939c82853c05c499f50dbd3b99a085627527"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/ui/activity/HistoryActivity.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c2578d3ca8b4752477c361a2087ad307cdbf1296",
+      "size": 6438,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/c2578d3ca8b4752477c361a2087ad307cdbf1296"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/ui/activity/HomeActivity.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "596de2be8c02763b2f2e30fcf048378bf7960a20",
+      "size": 21125,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/596de2be8c02763b2f2e30fcf048378bf7960a20"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/ui/activity/LivePlayActivity.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "48e03536210b67f8df9a3089476b21e01af34352",
+      "size": 45770,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/48e03536210b67f8df9a3089476b21e01af34352"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/ui/activity/PlayActivity.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2040af3d6c8b77aba743d122f4716613950cc278",
+      "size": 46265,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/2040af3d6c8b77aba743d122f4716613950cc278"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/ui/activity/PushActivity.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4c96302c63fe0a1c80a8d94584d14c4098941da9",
+      "size": 2514,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/4c96302c63fe0a1c80a8d94584d14c4098941da9"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/ui/activity/SearchActivity.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "91019c4ff4b11c86904047fb931a86f2fb9a3d54",
+      "size": 14840,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/91019c4ff4b11c86904047fb931a86f2fb9a3d54"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/ui/activity/SettingActivity.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8fe585f4bf8f92a3de7462d095be7753ed5401cf",
+      "size": 6816,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/8fe585f4bf8f92a3de7462d095be7753ed5401cf"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/ui/adapter",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "7037e23c1ac80f65839e6994fb707761e311a229",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/7037e23c1ac80f65839e6994fb707761e311a229"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/ui/adapter/ApiHistoryDialogAdapter.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3d986b8e3d2da8b8bdd4a10c705c09924c65d360",
+      "size": 3438,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/3d986b8e3d2da8b8bdd4a10c705c09924c65d360"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/ui/adapter/BackupAdapter.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cc080162e2fee4d562547c1ea62360efb9bc4a51",
+      "size": 565,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/cc080162e2fee4d562547c1ea62360efb9bc4a51"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/ui/adapter/CollectAdapter.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "33ccd51d6dafa64290f84ce6141e4edf428cc706",
+      "size": 1927,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/33ccd51d6dafa64290f84ce6141e4edf428cc706"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/ui/adapter/GridAdapter.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "317a9e9eee2408a43921d4b98eba1ece530caf2f",
+      "size": 3021,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/317a9e9eee2408a43921d4b98eba1ece530caf2f"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/ui/adapter/GridFilterKVAdapter.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ed9d8f5b8faf08d6f0ec2a94b75742b38d810a0d",
+      "size": 538,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/ed9d8f5b8faf08d6f0ec2a94b75742b38d810a0d"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/ui/adapter/HistoryAdapter.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "869dffec3e8e335deaa31c80315e8312374e916f",
+      "size": 3181,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/869dffec3e8e335deaa31c80315e8312374e916f"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/ui/adapter/HomeHotVodAdapter.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "68cffaddeff63cc884e1027bb02c2a8b8ca4601f",
+      "size": 2109,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/68cffaddeff63cc884e1027bb02c2a8b8ca4601f"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/ui/adapter/HomePageAdapter.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "835c369c50908aff2e6e9c2df19d25ff2e66a948",
+      "size": 1578,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/835c369c50908aff2e6e9c2df19d25ff2e66a948"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/ui/adapter/LiveChannelGroupAdapter.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c52f79c52ed11c8970c3cab6f903e41b0dd02d59",
+      "size": 2055,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/c52f79c52ed11c8970c3cab6f903e41b0dd02d59"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/ui/adapter/LiveChannelItemAdapter.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "122c4bdd59602f9b740578d48405a3d88f34ff50",
+      "size": 2459,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/122c4bdd59602f9b740578d48405a3d88f34ff50"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/ui/adapter/LiveSettingGroupAdapter.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "134df48e5c6ce2c36339321bc2487d52a5f0991b",
+      "size": 1991,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/134df48e5c6ce2c36339321bc2487d52a5f0991b"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/ui/adapter/LiveSettingItemAdapter.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8801c0d1a999ddcea5b761809bfae36aa5a75409",
+      "size": 2267,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/8801c0d1a999ddcea5b761809bfae36aa5a75409"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/ui/adapter/ParseAdapter.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4d41ab213d93ab29ccd001231c1f7c645598f320",
+      "size": 948,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/4d41ab213d93ab29ccd001231c1f7c645598f320"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/ui/adapter/PinyinAdapter.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "aeac271d71520bf9e8394f041fbc04b2035b1f38",
+      "size": 525,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/aeac271d71520bf9e8394f041fbc04b2035b1f38"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/ui/adapter/QuickSearchAdapter.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "77dd75e3dc12027b1fe2b5c547f5d7e6b8a84dc0",
+      "size": 2045,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/77dd75e3dc12027b1fe2b5c547f5d7e6b8a84dc0"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/ui/adapter/SearchAdapter.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "14b7e25deea1cfe894737bcb88bd14b97af9a9d4",
+      "size": 2521,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/14b7e25deea1cfe894737bcb88bd14b97af9a9d4"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/ui/adapter/SearchWordAdapter.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "720e9a92d1c3068a9e433619cf1cda2a2ee7ca6f",
+      "size": 598,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/720e9a92d1c3068a9e433619cf1cda2a2ee7ca6f"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/ui/adapter/SelectDialogAdapter.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2701953fcf7df80ef5c774126d522d83cc27fe21",
+      "size": 3026,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/2701953fcf7df80ef5c774126d522d83cc27fe21"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/ui/adapter/SeriesAdapter.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c7d0f95cb9ee7182340d3fe932b5e6c046f2fa6d",
+      "size": 962,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/c7d0f95cb9ee7182340d3fe932b5e6c046f2fa6d"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/ui/adapter/SeriesFlagAdapter.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d085400820bdf97240e74790d091474f04c84848",
+      "size": 1003,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/d085400820bdf97240e74790d091474f04c84848"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/ui/adapter/SettingMenuAdapter.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f28d83d23b04308b4b23ed9b59a7d7cf0187ba4f",
+      "size": 637,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/f28d83d23b04308b4b23ed9b59a7d7cf0187ba4f"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/ui/adapter/SettingPageAdapter.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b9ba5b114386c733b9533be4968b503bce80b8f2",
+      "size": 1500,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/b9ba5b114386c733b9533be4968b503bce80b8f2"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/ui/adapter/SortAdapter.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "10173bd10e456cd8fdae6060cb9b417cd5e47eaf",
+      "size": 646,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/10173bd10e456cd8fdae6060cb9b417cd5e47eaf"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/ui/dialog",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "e6fded65803b4c20c41374141986f8ea3121aa14",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/e6fded65803b4c20c41374141986f8ea3121aa14"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/ui/dialog/AboutDialog.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "df46f65e4c788a41accef2c93058ae816e39f87f",
+      "size": 371,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/df46f65e4c788a41accef2c93058ae816e39f87f"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/ui/dialog/ApiDialog.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2a00358dfc3766b4dc92656bc7facdddb22b6d41",
+      "size": 6153,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/2a00358dfc3766b4dc92656bc7facdddb22b6d41"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/ui/dialog/ApiHistoryDialog.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4c2dd509eaae1928219733ad00bea8fc1ee75318",
+      "size": 1494,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/4c2dd509eaae1928219733ad00bea8fc1ee75318"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/ui/dialog/BackupDialog.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "97403369eef7de0fa933d6620ae751c6b03cda97",
+      "size": 8688,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/97403369eef7de0fa933d6620ae751c6b03cda97"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/ui/dialog/BaseDialog.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f0c30ad554024b34b471f992fc92a44c08aa9b3d",
+      "size": 1457,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/f0c30ad554024b34b471f992fc92a44c08aa9b3d"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/ui/dialog/GridFilterDialog.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7fcc7ba799b7977ce9c555033ad5aed5ecf26ef5",
+      "size": 4190,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/7fcc7ba799b7977ce9c555033ad5aed5ecf26ef5"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/ui/dialog/LivePasswordDialog.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ac4fd97ffc6e9eb33da6ae8964a61e588f4cbab5",
+      "size": 1516,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/ac4fd97ffc6e9eb33da6ae8964a61e588f4cbab5"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/ui/dialog/QuickSearchDialog.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4704086800ccd6526861d8e63be6902898cd2a05",
+      "size": 3884,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/4704086800ccd6526861d8e63be6902898cd2a05"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/ui/dialog/RemoteDialog.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "af9a870c4e72bdb0fadeb2f5091b53420c36c190",
+      "size": 1195,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/af9a870c4e72bdb0fadeb2f5091b53420c36c190"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/ui/dialog/SelectDialog.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "219051acebd85c467249fcbf5b0db11bc0b62221",
+      "size": 1692,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/219051acebd85c467249fcbf5b0db11bc0b62221"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/ui/dialog/TipDialog.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "17185368759b691662e426ffb9f1fb9389e5033d",
+      "size": 1507,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/17185368759b691662e426ffb9f1fb9389e5033d"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/ui/dialog/XWalkInitDialog.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "418be35c89904a5efdf3cb1f07e9348915398464",
+      "size": 3652,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/418be35c89904a5efdf3cb1f07e9348915398464"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/ui/fragment",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "c214e6f5be295e29011a70a66f596482deaf638d",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/c214e6f5be295e29011a70a66f596482deaf638d"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/ui/fragment/GridFragment.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a86dd27b8ba67af26ec5a757eecc98aed6bf4e5a",
+      "size": 6300,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/a86dd27b8ba67af26ec5a757eecc98aed6bf4e5a"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/ui/fragment/ModelSettingFragment.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "713bd240cafbca422d6abfc3e0904665bc3bc6a7",
+      "size": 21668,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/713bd240cafbca422d6abfc3e0904665bc3bc6a7"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/ui/fragment/UserFragment.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "21546595c73734de55c066380d2ae4ebc30796b3",
+      "size": 10475,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/21546595c73734de55c066380d2ae4ebc30796b3"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/ui/tv",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "a7fd650abe2df4f90fac02a7e3ca9f4aeab353f5",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/a7fd650abe2df4f90fac02a7e3ca9f4aeab353f5"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/ui/tv/QRCodeGen.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "df6866a90cfdfb32bc75c1ccd3139ed14b640405",
+      "size": 1605,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/df6866a90cfdfb32bc75c1ccd3139ed14b640405"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/ui/tv/widget",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "302d0cf2d548af31445c8e34f2fbc9ff730b926b",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/302d0cf2d548af31445c8e34f2fbc9ff730b926b"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/ui/tv/widget/DefaultTransformer.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "75f840c7d8d90424a2e4e8f4348460321a6e923c",
+      "size": 316,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/75f840c7d8d90424a2e4e8f4348460321a6e923c"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/ui/tv/widget/FixedSpeedScroller.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8c82004ad2dfa212dd7b54121a9b62b93bdbe331",
+      "size": 1045,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/8c82004ad2dfa212dd7b54121a9b62b93bdbe331"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/ui/tv/widget/LoadMoreView.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b2c98d23f6081c2c83a261c366b0c98e407c9509",
+      "size": 586,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/b2c98d23f6081c2c83a261c366b0c98e407c9509"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/ui/tv/widget/MarqueeTextView.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "eb58404ebb7874aa12d15588ce6179b22139d4e1",
+      "size": 941,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/eb58404ebb7874aa12d15588ce6179b22139d4e1"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/ui/tv/widget/NoScrollViewPager.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a7c81b367ce740aa344484c370d9f0b18e169c00",
+      "size": 907,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/a7c81b367ce740aa344484c370d9f0b18e169c00"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/ui/tv/widget/SearchKeyboard.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "778db25aafef63ef5fda7032c3b1f846addfb8dd",
+      "size": 5166,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/778db25aafef63ef5fda7032c3b1f846addfb8dd"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/ui/tv/widget/ViewObj.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7c128d356b2641219e97c345958365704eba93e2",
+      "size": 1123,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/7c128d356b2641219e97c345958365704eba93e2"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/util",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "652b000ee6a1d37984bc04e015f95a4131ed5a38",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/652b000ee6a1d37984bc04e015f95a4131ed5a38"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/util/AdBlocker.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e224c9db3418ea90a4d61cb2fb474830ebbd8862",
+      "size": 761,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/e224c9db3418ea90a4d61cb2fb474830ebbd8862"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/util/AppManager.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "dd50d68ace3cbcd165ee30c1d922ce0c3f476723",
+      "size": 3354,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/dd50d68ace3cbcd165ee30c1d922ce0c3f476723"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/util/DefaultConfig.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "49dc691426d080e333e8103c518fc8863bb994ec",
+      "size": 5832,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/49dc691426d080e333e8103c518fc8863bb994ec"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/util/FastClickCheckUtil.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b29277739b33eecf2fc8f9ced64735bb647449a5",
+      "size": 816,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/b29277739b33eecf2fc8f9ced64735bb647449a5"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/util/FileUtils.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "267125249092dfa74eb2e6d40001299488f47e0a",
+      "size": 1916,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/267125249092dfa74eb2e6d40001299488f47e0a"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/util/HawkConfig.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a13a8d5856964beb178a47160b4d90771e898c34",
+      "size": 1552,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/a13a8d5856964beb178a47160b4d90771e898c34"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/util/LOG.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c904d3de66ada6b783cfb74e27a72e879cac44b5",
+      "size": 338,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/c904d3de66ada6b783cfb74e27a72e879cac44b5"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/util/MD5.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2e23c06b36ac801f1ca0175989914007d70b93a6",
+      "size": 5418,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/2e23c06b36ac801f1ca0175989914007d70b93a6"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/util/OkGoHelper.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d731254d15dd0e0f547aa4b3739838fe4ecb4a69",
+      "size": 6624,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/d731254d15dd0e0f547aa4b3739838fe4ecb4a69"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/util/PlayerHelper.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0f0624a7e8150e2ec1e56bf3d572a524c0d3bd82",
+      "size": 6780,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/0f0624a7e8150e2ec1e56bf3d572a524c0d3bd82"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/util/SSL",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "ff536a9c56e0d03c1c385070ceac7aa7e25ff484",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/ff536a9c56e0d03c1c385070ceac7aa7e25ff484"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/util/SSL/SSLSocketFactoryCompat.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "364bd1b2637450e6885e84fa1d3de5a0c200c297",
+      "size": 6816,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/364bd1b2637450e6885e84fa1d3de5a0c200c297"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/util/TLSSocketFactory.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1ffe41c88239183c9676298582a32d973ed2173c",
+      "size": 1908,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/1ffe41c88239183c9676298582a32d973ed2173c"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/util/UA.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8c550f7003ea9efa9fcbbb4f9826ebae204a5f41",
+      "size": 729803,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/8c550f7003ea9efa9fcbbb4f9826ebae204a5f41"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/util/XWalkUtils.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "885b82df1c4ea30576251a7ad38d54f2604561c0",
+      "size": 7086,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/885b82df1c4ea30576251a7ad38d54f2604561c0"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/util/thunder",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "fa4ba915d3e5b1cd53494fcc473124f15c2e50da",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/fa4ba915d3e5b1cd53494fcc473124f15c2e50da"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/util/thunder/Thunder.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "be0b88295a47bc2132a7746185c467f800c2adc8",
+      "size": 12759,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/be0b88295a47bc2132a7746185c467f800c2adc8"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/viewmodel",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "c0065cc9b8ae3a766d87df19bc4408f7f5353031",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/c0065cc9b8ae3a766d87df19bc4408f7f5353031"
+    },
+    {
+      "path": "app/src/main/java/com/github/tvbox/osc/viewmodel/SourceViewModel.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d59c8d53ece98cb43677f378146a6888df20d5e7",
+      "size": 35465,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/d59c8d53ece98cb43677f378146a6888df20d5e7"
+    },
+    {
+      "path": "app/src/main/java/okhttp3",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "143b7ca1a81e742f6d350e492e165bc0b51219b1",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/143b7ca1a81e742f6d350e492e165bc0b51219b1"
+    },
+    {
+      "path": "app/src/main/java/okhttp3/dnsoverhttps",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "748e5166821942859f967d639a9fc2782e622183",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/748e5166821942859f967d639a9fc2782e622183"
+    },
+    {
+      "path": "app/src/main/java/okhttp3/dnsoverhttps/BootstrapDns.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2cd474d30b401fe106599ae9c8bc4324010fc8f9",
+      "size": 1461,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/2cd474d30b401fe106599ae9c8bc4324010fc8f9"
+    },
+    {
+      "path": "app/src/main/java/okhttp3/dnsoverhttps/DnsOverHttps.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "65d8452ea0d6b47aeea60c33a6a9ee10362a7bde",
+      "size": 13259,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/65d8452ea0d6b47aeea60c33a6a9ee10362a7bde"
+    },
+    {
+      "path": "app/src/main/java/okhttp3/dnsoverhttps/DnsRecordCodec.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4c1cfc481e4a7b5f55d9668b59764a742c934b6d",
+      "size": 4173,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/4c1cfc481e4a7b5f55d9668b59764a742c934b6d"
+    },
+    {
+      "path": "app/src/main/res",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "8e4216f70838aeefdac97c131551af07d1ecef74",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/8e4216f70838aeefdac97c131551af07d1ecef74"
+    },
+    {
+      "path": "app/src/main/res/drawable-hdpi",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "e5675d175ee2a6bd1d9ed7a6daa462669a052dba",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/e5675d175ee2a6bd1d9ed7a6daa462669a052dba"
+    },
+    {
+      "path": "app/src/main/res/drawable-hdpi/app_icon.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f8cf0d9389fb45347f44f5f8a4110a23e19e7dc7",
+      "size": 11835,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/f8cf0d9389fb45347f44f5f8a4110a23e19e7dc7"
+    },
+    {
+      "path": "app/src/main/res/drawable-xhdpi",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "4d8d612c3f98ce267f8bf2a0d1c21f6a8e4a7ffb",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/4d8d612c3f98ce267f8bf2a0d1c21f6a8e4a7ffb"
+    },
+    {
+      "path": "app/src/main/res/drawable-xhdpi/app_icon.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "67749b4ecc3727283991a9111c9425f128ec58c1",
+      "size": 15839,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/67749b4ecc3727283991a9111c9425f128ec58c1"
+    },
+    {
+      "path": "app/src/main/res/drawable-xhdpi/vod_pause.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b0028ec0362169bc00567972bf0cb511016331a4",
+      "size": 1433,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/b0028ec0362169bc00567972bf0cb511016331a4"
+    },
+    {
+      "path": "app/src/main/res/drawable-xhdpi/vod_play.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9d7300980574cf96cd927b06205ef1cd0d7d7ffc",
+      "size": 1402,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/9d7300980574cf96cd927b06205ef1cd0d7d7ffc"
+    },
+    {
+      "path": "app/src/main/res/drawable-xxhdpi",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "f2325fd06658fa4776077472bbd8e51864348ef5",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/f2325fd06658fa4776077472bbd8e51864348ef5"
+    },
+    {
+      "path": "app/src/main/res/drawable-xxhdpi/app_icon.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "604ac3ecde0165ed3ca04878a3d9513a2068570d",
+      "size": 24750,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/604ac3ecde0165ed3ca04878a3d9513a2068570d"
+    },
+    {
+      "path": "app/src/main/res/drawable-xxxhdpi",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "82e271263138b953616a80e4e14dbee5d5212f15",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/82e271263138b953616a80e4e14dbee5d5212f15"
+    },
+    {
+      "path": "app/src/main/res/drawable-xxxhdpi/app_icon.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cd9445a614d1038adcb1c825e1e366756c75ac58",
+      "size": 34115,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/cd9445a614d1038adcb1c825e1e366756c75ac58"
+    },
+    {
+      "path": "app/src/main/res/drawable",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "c5bf1c85339d896d35c3a5901be1484d136606df",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/c5bf1c85339d896d35c3a5901be1484d136606df"
+    },
+    {
+      "path": "app/src/main/res/drawable/anim_loading.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7a8a5cc2f1a05eeefe3635e67133d6afb22f846e",
+      "size": 213,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/7a8a5cc2f1a05eeefe3635e67133d6afb22f846e"
+    },
+    {
+      "path": "app/src/main/res/drawable/app_banner.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "de456889f720da60d1f9fc4f4bebd0a1a37ebb96",
+      "size": 19457,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/de456889f720da60d1f9fc4f4bebd0a1a37ebb96"
+    },
+    {
+      "path": "app/src/main/res/drawable/app_bg.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2bcc24e21974f908f42cc9aa0feadcf92b2c2d85",
+      "size": 198620,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/2bcc24e21974f908f42cc9aa0feadcf92b2c2d85"
+    },
+    {
+      "path": "app/src/main/res/drawable/box_controller_top_bg.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "39c8c5832ccfd1ae460eb66c787f1db41e1cd091",
+      "size": 265,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/39c8c5832ccfd1ae460eb66c787f1db41e1cd091"
+    },
+    {
+      "path": "app/src/main/res/drawable/button_detail_collect.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cd144cd6c449742ceb508c4cd11fd932b4d9e9bc",
+      "size": 595,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/cd144cd6c449742ceb508c4cd11fd932b4d9e9bc"
+    },
+    {
+      "path": "app/src/main/res/drawable/button_detail_play.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "30cfd36e46b5fe614b91a56b9367f90f913523e5",
+      "size": 595,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/30cfd36e46b5fe614b91a56b9367f90f913523e5"
+    },
+    {
+      "path": "app/src/main/res/drawable/button_detail_quick_search.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "43c2f42a58d3b36cdf2904c10928feb4904b93e1",
+      "size": 595,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/43c2f42a58d3b36cdf2904c10928feb4904b93e1"
+    },
+    {
+      "path": "app/src/main/res/drawable/button_detail_sort.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "329aaef6338b31b16171cd86e73318b66d360e11",
+      "size": 599,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/329aaef6338b31b16171cd86e73318b66d360e11"
+    },
+    {
+      "path": "app/src/main/res/drawable/button_dialog_main.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "59b7fdfecba8fb04a2c8320bbdb08181c4ec766a",
+      "size": 515,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/59b7fdfecba8fb04a2c8320bbdb08181c4ec766a"
+    },
+    {
+      "path": "app/src/main/res/drawable/button_home_sort_focus.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "eb9c11006bdf744b9fdecb529cb18e62b6a04232",
+      "size": 504,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/eb9c11006bdf744b9fdecb529cb18e62b6a04232"
+    },
+    {
+      "path": "app/src/main/res/drawable/icon_back.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "eb44101b6f32dd014040a8cb1c78e5a744fdfd0f",
+      "size": 3156,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/eb44101b6f32dd014040a8cb1c78e5a744fdfd0f"
+    },
+    {
+      "path": "app/src/main/res/drawable/icon_collect.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "94b07af0f07ccfda8edd30d1bd4516ba829b9725",
+      "size": 839,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/94b07af0f07ccfda8edd30d1bd4516ba829b9725"
+    },
+    {
+      "path": "app/src/main/res/drawable/icon_delete.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0184a4029aafc68f482fcff99f3049c13e51f3cb",
+      "size": 1361,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/0184a4029aafc68f482fcff99f3049c13e51f3cb"
+    },
+    {
+      "path": "app/src/main/res/drawable/icon_empty.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8874236ad6026cada62a128be7b26f9c7bb40723",
+      "size": 3762,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/8874236ad6026cada62a128be7b26f9c7bb40723"
+    },
+    {
+      "path": "app/src/main/res/drawable/icon_error.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4799b428d9da7ad8e4c0f88a1227b50caef3d7b8",
+      "size": 971,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/4799b428d9da7ad8e4c0f88a1227b50caef3d7b8"
+    },
+    {
+      "path": "app/src/main/res/drawable/icon_filter.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8a77139f2735a37aa3a0ac37bd9ccc51f1270941",
+      "size": 567,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/8a77139f2735a37aa3a0ac37bd9ccc51f1270941"
+    },
+    {
+      "path": "app/src/main/res/drawable/icon_history.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "acf8b3924b6ab115466d33fa6878a65c91e91e71",
+      "size": 782,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/acf8b3924b6ab115466d33fa6878a65c91e91e71"
+    },
+    {
+      "path": "app/src/main/res/drawable/icon_img_placeholder.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "894aca337ea7743710cc0137dc82561aaf0c7914",
+      "size": 2478,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/894aca337ea7743710cc0137dc82561aaf0c7914"
+    },
+    {
+      "path": "app/src/main/res/drawable/icon_live.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "bcfe6915d5915381b34c8ce093d75ac3d3a9f698",
+      "size": 2703,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/bcfe6915d5915381b34c8ce093d75ac3d3a9f698"
+    },
+    {
+      "path": "app/src/main/res/drawable/icon_loading.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ffb19f52341b0e980c9c0a7d637c98f38492b932",
+      "size": 1375,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/ffb19f52341b0e980c9c0a7d637c98f38492b932"
+    },
+    {
+      "path": "app/src/main/res/drawable/icon_play.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ed7209f74c27b4a2a335614649892877cf72fad9",
+      "size": 7604,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/ed7209f74c27b4a2a335614649892877cf72fad9"
+    },
+    {
+      "path": "app/src/main/res/drawable/icon_pre.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a8c4fe8a3b3deb70aa2af875b6ec85e69bb6f676",
+      "size": 3137,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/a8c4fe8a3b3deb70aa2af875b6ec85e69bb6f676"
+    },
+    {
+      "path": "app/src/main/res/drawable/icon_push.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8eeff280c8fd69ec976528bd2fbba91f5528c1c7",
+      "size": 697,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/8eeff280c8fd69ec976528bd2fbba91f5528c1c7"
+    },
+    {
+      "path": "app/src/main/res/drawable/icon_search.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1a5612a379cea6c91f8cda278b1ccfe6f253a15b",
+      "size": 758,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/1a5612a379cea6c91f8cda278b1ccfe6f253a15b"
+    },
+    {
+      "path": "app/src/main/res/drawable/icon_setting.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "414d367baf9df8e4798a3a916e07f492266530d8",
+      "size": 1778,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/414d367baf9df8e4798a3a916e07f492266530d8"
+    },
+    {
+      "path": "app/src/main/res/drawable/icon_video.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1870d86805dbc1cb9d2ed114eb5989d767aa39a3",
+      "size": 8237,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/1870d86805dbc1cb9d2ed114eb5989d767aa39a3"
+    },
+    {
+      "path": "app/src/main/res/drawable/img_loading_placeholder.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "61e5915350aa0ca893818e5cec0e9abfbee25f29",
+      "size": 447,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/61e5915350aa0ca893818e5cec0e9abfbee25f29"
+    },
+    {
+      "path": "app/src/main/res/drawable/input_dialog_api_input.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cf1b33e8247b4e8e6f01bc1e3000aea3d704d817",
+      "size": 1113,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/cf1b33e8247b4e8e6f01bc1e3000aea3d704d817"
+    },
+    {
+      "path": "app/src/main/res/drawable/input_search.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2a994fb07e06a74b9105fc3901b41b864787a4ea",
+      "size": 237,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/2a994fb07e06a74b9105fc3901b41b864787a4ea"
+    },
+    {
+      "path": "app/src/main/res/drawable/shape_dialog_bg_main.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "29eb48f5abf5cee11e77deec17df3d6877dcd376",
+      "size": 209,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/29eb48f5abf5cee11e77deec17df3d6877dcd376"
+    },
+    {
+      "path": "app/src/main/res/drawable/shape_dialog_filter_bg.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "dcf2fe440fd6440983448c90c2266b46be80899e",
+      "size": 271,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/dcf2fe440fd6440983448c90c2266b46be80899e"
+    },
+    {
+      "path": "app/src/main/res/drawable/shape_live_channel_num.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0bb0f98205bdc115a7b4e2938a5565c599d36566",
+      "size": 204,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/0bb0f98205bdc115a7b4e2938a5565c599d36566"
+    },
+    {
+      "path": "app/src/main/res/drawable/shape_live_focus.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c26096c3f2805d1470fc563212a17cec15610ed6",
+      "size": 414,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/c26096c3f2805d1470fc563212a17cec15610ed6"
+    },
+    {
+      "path": "app/src/main/res/drawable/shape_play_bottom.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e9e881d9aeea0d54c52a956b159552af3f7ac262",
+      "size": 257,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/e9e881d9aeea0d54c52a956b159552af3f7ac262"
+    },
+    {
+      "path": "app/src/main/res/drawable/shape_play_mobile_center.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a07ae5763fb0b4fd46f5f2f54a911ca96b7a2e1d",
+      "size": 280,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/a07ae5763fb0b4fd46f5f2f54a911ca96b7a2e1d"
+    },
+    {
+      "path": "app/src/main/res/drawable/shape_player_control_vod_seek.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cd83bbdbaecd89e3096ae6127bd6fe249ceed6a0",
+      "size": 670,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/cd83bbdbaecd89e3096ae6127bd6fe249ceed6a0"
+    },
+    {
+      "path": "app/src/main/res/drawable/shape_player_control_vod_seek_thumb.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "061a3c324f2c6fca8b3b3deb6278b7ab364e8e6c",
+      "size": 635,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/061a3c324f2c6fca8b3b3deb6278b7ab364e8e6c"
+    },
+    {
+      "path": "app/src/main/res/drawable/shape_player_control_vod_seek_thumb_normal.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b34dcb35705539804052c88dfd4bc3f1333e8c8a",
+      "size": 278,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/b34dcb35705539804052c88dfd4bc3f1333e8c8a"
+    },
+    {
+      "path": "app/src/main/res/drawable/shape_player_control_vod_seek_thumb_press.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "89d2219361db809823e6545d27aa8a816bda550f",
+      "size": 278,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/89d2219361db809823e6545d27aa8a816bda550f"
+    },
+    {
+      "path": "app/src/main/res/drawable/shape_setting_model_focus.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "da94567536c273b542fd79c747a3a3c5d7fee512",
+      "size": 605,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/da94567536c273b542fd79c747a3a3c5d7fee512"
+    },
+    {
+      "path": "app/src/main/res/drawable/shape_setting_sort_focus.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fcd9e43ce94d30e1f395ba3bb3d5120283fead01",
+      "size": 481,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/fcd9e43ce94d30e1f395ba3bb3d5120283fead01"
+    },
+    {
+      "path": "app/src/main/res/drawable/shape_source_flag_focus.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3af498d156736ae65363c69e4d1aa8fe3c48b321",
+      "size": 582,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/3af498d156736ae65363c69e4d1aa8fe3c48b321"
+    },
+    {
+      "path": "app/src/main/res/drawable/shape_source_flag_line.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3f3841926b701329901569442620b22393242dda",
+      "size": 271,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/3f3841926b701329901569442620b22393242dda"
+    },
+    {
+      "path": "app/src/main/res/drawable/shape_source_focus.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "93693a0712d9a21d9da96fe3fbeaf14f4e1cad50",
+      "size": 583,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/93693a0712d9a21d9da96fe3fbeaf14f4e1cad50"
+    },
+    {
+      "path": "app/src/main/res/drawable/shape_source_series_focus.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3af498d156736ae65363c69e4d1aa8fe3c48b321",
+      "size": 582,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/3af498d156736ae65363c69e4d1aa8fe3c48b321"
+    },
+    {
+      "path": "app/src/main/res/drawable/shape_thumb_bottom_name.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c22b551ee435e91f27d32e243c98995e052c8f23",
+      "size": 279,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/c22b551ee435e91f27d32e243c98995e052c8f23"
+    },
+    {
+      "path": "app/src/main/res/drawable/shape_thumb_lang.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d187786bb6d18a96794a00456d2d48d8bc80c287",
+      "size": 201,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/d187786bb6d18a96794a00456d2d48d8bc80c287"
+    },
+    {
+      "path": "app/src/main/res/drawable/shape_thumb_note.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d8450e1115a52321f504b4cd0f067955d25c7bbc",
+      "size": 201,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/d8450e1115a52321f504b4cd0f067955d25c7bbc"
+    },
+    {
+      "path": "app/src/main/res/drawable/shape_thumb_year.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8d48929d43cebb2e42f1d84b91fd81dd326e5bcf",
+      "size": 201,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/8d48929d43cebb2e42f1d84b91fd81dd326e5bcf"
+    },
+    {
+      "path": "app/src/main/res/drawable/shape_user_focus.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0756a453e642449ef0c142f543ead56be7624b5f",
+      "size": 581,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/0756a453e642449ef0c142f543ead56be7624b5f"
+    },
+    {
+      "path": "app/src/main/res/layout",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "98ba3f8614d3143f0869b2440d6885543902e197",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/98ba3f8614d3143f0869b2440d6885543902e197"
+    },
+    {
+      "path": "app/src/main/res/layout/activity_collect.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "28490288816cac0e83b224d4e4d327fcd1135f99",
+      "size": 2971,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/28490288816cac0e83b224d4e4d327fcd1135f99"
+    },
+    {
+      "path": "app/src/main/res/layout/activity_detail.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3260d2d0625ac7e88dd06ed2dc03b6e6cd1c84c6",
+      "size": 11809,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/3260d2d0625ac7e88dd06ed2dc03b6e6cd1c84c6"
+    },
+    {
+      "path": "app/src/main/res/layout/activity_history.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "bfdbdc99bc3f032d57dedabeba8c2014a8c0659b",
+      "size": 2974,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/bfdbdc99bc3f032d57dedabeba8c2014a8c0659b"
+    },
+    {
+      "path": "app/src/main/res/layout/activity_home.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "87cfff9e8ba8ae12249b5ec2ca42140a340618f5",
+      "size": 3195,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/87cfff9e8ba8ae12249b5ec2ca42140a340618f5"
+    },
+    {
+      "path": "app/src/main/res/layout/activity_live_play.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "abe3a9312a0312d633eb940adbaa380bba5d5212",
+      "size": 5394,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/abe3a9312a0312d633eb940adbaa380bba5d5212"
+    },
+    {
+      "path": "app/src/main/res/layout/activity_play.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e72d1280e3af8b72ea9ca7cbf1df6c6b4c4ea42a",
+      "size": 1592,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/e72d1280e3af8b72ea9ca7cbf1df6c6b4c4ea42a"
+    },
+    {
+      "path": "app/src/main/res/layout/activity_push.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3ed4555413d82ed348117871ce88105b409531a6",
+      "size": 1839,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/3ed4555413d82ed348117871ce88105b409531a6"
+    },
+    {
+      "path": "app/src/main/res/layout/activity_search.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2ab89c554c91746ccb9a4b0e911da0b4d118742a",
+      "size": 5998,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/2ab89c554c91746ccb9a4b0e911da0b4d118742a"
+    },
+    {
+      "path": "app/src/main/res/layout/activity_setting.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d5b6e5a684eecb9c41e437828d440cf7746dc92e",
+      "size": 1101,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/d5b6e5a684eecb9c41e437828d440cf7746dc92e"
+    },
+    {
+      "path": "app/src/main/res/layout/box_vod_control_view.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "33c4d1e4ef5a220af0d5004f7518311c94ee90e0",
+      "size": 12023,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/33c4d1e4ef5a220af0d5004f7518311c94ee90e0"
+    },
+    {
+      "path": "app/src/main/res/layout/dialog_about.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9ee2c6c2184355849a907ffc84dce4b1800308c3",
+      "size": 949,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/9ee2c6c2184355849a907ffc84dce4b1800308c3"
+    },
+    {
+      "path": "app/src/main/res/layout/dialog_api.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3ece246e7b2493a9341d5722bf0133544da76f75",
+      "size": 5204,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/3ece246e7b2493a9341d5722bf0133544da76f75"
+    },
+    {
+      "path": "app/src/main/res/layout/dialog_api_history.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cdf231f692f3be6888761f8c1c64c76ddf98c513",
+      "size": 2371,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/cdf231f692f3be6888761f8c1c64c76ddf98c513"
+    },
+    {
+      "path": "app/src/main/res/layout/dialog_backup.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0c356438c2a393674c7133973954f26cbd9c4817",
+      "size": 4949,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/0c356438c2a393674c7133973954f26cbd9c4817"
+    },
+    {
+      "path": "app/src/main/res/layout/dialog_grid_filter.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a55e6ac743f1eec9f65349a64cf66e75def27354",
+      "size": 554,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/a55e6ac743f1eec9f65349a64cf66e75def27354"
+    },
+    {
+      "path": "app/src/main/res/layout/dialog_live_password.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "538abb6c3ea8e8ba2f66f5d6d69b3961ca030968",
+      "size": 1896,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/538abb6c3ea8e8ba2f66f5d6d69b3961ca030968"
+    },
+    {
+      "path": "app/src/main/res/layout/dialog_quick_search.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "342c2823c017e757292369e5cacfe59a8841b6db",
+      "size": 2022,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/342c2823c017e757292369e5cacfe59a8841b6db"
+    },
+    {
+      "path": "app/src/main/res/layout/dialog_remote.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b51c9fa403c3012474c2cd4b9cd3830e75537c29",
+      "size": 1331,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/b51c9fa403c3012474c2cd4b9cd3830e75537c29"
+    },
+    {
+      "path": "app/src/main/res/layout/dialog_select.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "919d148eabcc36c503c71cb3703d1029e139c3a9",
+      "size": 2371,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/919d148eabcc36c503c71cb3703d1029e139c3a9"
+    },
+    {
+      "path": "app/src/main/res/layout/dialog_tip.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "28bba1567fdfeeb8d6a599a1f5f259e1f91a94ca",
+      "size": 2604,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/28bba1567fdfeeb8d6a599a1f5f259e1f91a94ca"
+    },
+    {
+      "path": "app/src/main/res/layout/dialog_xwalk.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6286273a13ee24efb281e9b1b2f0553e937a5d55",
+      "size": 1571,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/6286273a13ee24efb281e9b1b2f0553e937a5d55"
+    },
+    {
+      "path": "app/src/main/res/layout/fragment_grid.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d6911b3b226784c6c4c0dcd7393f4a5d06523ca7",
+      "size": 957,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/d6911b3b226784c6c4c0dcd7393f4a5d06523ca7"
+    },
+    {
+      "path": "app/src/main/res/layout/fragment_model.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1c3516e03de3b30f5e33bab6995c5cd17e6cb511",
+      "size": 27035,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/1c3516e03de3b30f5e33bab6995c5cd17e6cb511"
+    },
+    {
+      "path": "app/src/main/res/layout/fragment_user.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f38f4f0562a9e5b2c45fa59fc18ed81cbaa37cc4",
+      "size": 10611,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/f38f4f0562a9e5b2c45fa59fc18ed81cbaa37cc4"
+    },
+    {
+      "path": "app/src/main/res/layout/item_dialog_api_history.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "225f8ffd5c252e20bd8658086d38fc621f5ac702",
+      "size": 1378,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/225f8ffd5c252e20bd8658086d38fc621f5ac702"
+    },
+    {
+      "path": "app/src/main/res/layout/item_dialog_backup.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "dd1f0ffd171ca8c4cca8fa4faa4921cc0093a67d",
+      "size": 1412,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/dd1f0ffd171ca8c4cca8fa4faa4921cc0093a67d"
+    },
+    {
+      "path": "app/src/main/res/layout/item_dialog_select.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2d8a327d2603c1f269527bcf4e31d316bcbf991b",
+      "size": 624,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/2d8a327d2603c1f269527bcf4e31d316bcbf991b"
+    },
+    {
+      "path": "app/src/main/res/layout/item_grid.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0f5defa301b8f35b4d1fbaac9446184008861148",
+      "size": 5224,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/0f5defa301b8f35b4d1fbaac9446184008861148"
+    },
+    {
+      "path": "app/src/main/res/layout/item_grid_filter.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "80a7a278eecb0e8bda947f3f4c765c51a898e881",
+      "size": 1310,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/80a7a278eecb0e8bda947f3f4c765c51a898e881"
+    },
+    {
+      "path": "app/src/main/res/layout/item_grid_filter_value.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "35afab05bf1d82b5beabf53f6c4ac8fb63efb335",
+      "size": 559,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/35afab05bf1d82b5beabf53f6c4ac8fb63efb335"
+    },
+    {
+      "path": "app/src/main/res/layout/item_home_sort.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6cf8e84f4d00a0569cdb526aa1102204c9c26062",
+      "size": 1177,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/6cf8e84f4d00a0569cdb526aa1102204c9c26062"
+    },
+    {
+      "path": "app/src/main/res/layout/item_keyboard.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2f34f3d6fc6341b1d08ccdafdfee66923b7e981a",
+      "size": 707,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/2f34f3d6fc6341b1d08ccdafdfee66923b7e981a"
+    },
+    {
+      "path": "app/src/main/res/layout/item_live.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f844682470ad58f1bb16ab6c6ecdc31e5d7b4ac1",
+      "size": 1309,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/f844682470ad58f1bb16ab6c6ecdc31e5d7b4ac1"
+    },
+    {
+      "path": "app/src/main/res/layout/item_live_channel.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5b11ff5fb025451ab239d5fadbc8b619d2a7868f",
+      "size": 1284,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/5b11ff5fb025451ab239d5fadbc8b619d2a7868f"
+    },
+    {
+      "path": "app/src/main/res/layout/item_live_channel_group.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a049e8c0508ad257b5432163001a4eb0de065787",
+      "size": 849,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/a049e8c0508ad257b5432163001a4eb0de065787"
+    },
+    {
+      "path": "app/src/main/res/layout/item_live_setting.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "eeeb2924c4c5b24ac575d89cb0584f5119b36d6c",
+      "size": 884,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/eeeb2924c4c5b24ac575d89cb0584f5119b36d6c"
+    },
+    {
+      "path": "app/src/main/res/layout/item_live_setting_group.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "95d01e16b0d80cdd6a1d8754901afbfa3875e0ae",
+      "size": 885,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/95d01e16b0d80cdd6a1d8754901afbfa3875e0ae"
+    },
+    {
+      "path": "app/src/main/res/layout/item_play_parse.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d51cc66d40fce7d141fec48c7c272d26ef224688",
+      "size": 509,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/d51cc66d40fce7d141fec48c7c272d26ef224688"
+    },
+    {
+      "path": "app/src/main/res/layout/item_quick_search_lite.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b259822c7f75694b951de02dd1b3170067786e6d",
+      "size": 668,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/b259822c7f75694b951de02dd1b3170067786e6d"
+    },
+    {
+      "path": "app/src/main/res/layout/item_search.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a16115d0846644966b88f8852b6f8874091977fd",
+      "size": 3313,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/a16115d0846644966b88f8852b6f8874091977fd"
+    },
+    {
+      "path": "app/src/main/res/layout/item_search_lite.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9e6ef28ca2b75ff02f8161861d4fb2867e46bf1a",
+      "size": 666,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/9e6ef28ca2b75ff02f8161861d4fb2867e46bf1a"
+    },
+    {
+      "path": "app/src/main/res/layout/item_search_word_hot.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cd23caa36ebf5df84e5de2a4a26cbca9c01b0e9b",
+      "size": 616,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/cd23caa36ebf5df84e5de2a4a26cbca9c01b0e9b"
+    },
+    {
+      "path": "app/src/main/res/layout/item_search_word_split.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fba13000638af279020500edea081562797df413",
+      "size": 560,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/fba13000638af279020500edea081562797df413"
+    },
+    {
+      "path": "app/src/main/res/layout/item_series.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7c728eae3707f59f1a825f30343483b161fb6f5a",
+      "size": 764,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/7c728eae3707f59f1a825f30343483b161fb6f5a"
+    },
+    {
+      "path": "app/src/main/res/layout/item_series_flag.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a64dd1a208b5bf14e195c2c3d281d1df25e5acfb",
+      "size": 1238,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/a64dd1a208b5bf14e195c2c3d281d1df25e5acfb"
+    },
+    {
+      "path": "app/src/main/res/layout/item_setting_menu.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5f6a4fbbb9632a57b26d25e251d4f8958ba281be",
+      "size": 718,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/5f6a4fbbb9632a57b26d25e251d4f8958ba281be"
+    },
+    {
+      "path": "app/src/main/res/layout/item_user_hot_vod.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cd5672bcb8fdb474d82f7b9d10226eb260e50d0c",
+      "size": 3481,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/cd5672bcb8fdb474d82f7b9d10226eb260e50d0c"
+    },
+    {
+      "path": "app/src/main/res/layout/item_view_load_more.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2822ce0f3e88ef43780c97c081aad376c8eff8fb",
+      "size": 2146,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/2822ce0f3e88ef43780c97c081aad376c8eff8fb"
+    },
+    {
+      "path": "app/src/main/res/layout/layout_keyborad.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9cb5347e4b8929c75a4c218c04d46a81d3225b96",
+      "size": 478,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/9cb5347e4b8929c75a4c218c04d46a81d3225b96"
+    },
+    {
+      "path": "app/src/main/res/layout/loadsir_empty_layout.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "035dcf6eb331bb4f8b0aca4f4a4e315a22205c53",
+      "size": 977,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/035dcf6eb331bb4f8b0aca4f4a4e315a22205c53"
+    },
+    {
+      "path": "app/src/main/res/layout/loadsir_loading_layout.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "886f95e42a6352f5dec69a4769bfc60ac6e5cf3b",
+      "size": 508,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/886f95e42a6352f5dec69a4769bfc60ac6e5cf3b"
+    },
+    {
+      "path": "app/src/main/res/layout/player_live_control_view.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "195af9fafddffd1d4a2b3c705957f36e05aed64e",
+      "size": 2877,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/195af9fafddffd1d4a2b3c705957f36e05aed64e"
+    },
+    {
+      "path": "app/src/main/res/layout/player_vod_control_view.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ace2fc6e8d6bf2b23034f4df4ba060972fb03dd6",
+      "size": 15509,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/ace2fc6e8d6bf2b23034f4df4ba060972fb03dd6"
+    },
+    {
+      "path": "app/src/main/res/raw",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "11b1a16ef0d114087c1778717c24333bc7fdad4e",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/11b1a16ef0d114087c1778717c24333bc7fdad4e"
+    },
+    {
+      "path": "app/src/main/res/raw/index.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a4b168ff6b1188b56b1be52f42ad5b4346349cf7",
+      "size": 15271,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/a4b168ff6b1188b56b1be52f42ad5b4346349cf7"
+    },
+    {
+      "path": "app/src/main/res/raw/jquery.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fc356ee42ba55abeda449c68b1ffb55a34b05c93",
+      "size": 84344,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/fc356ee42ba55abeda449c68b1ffb55a34b05c93"
+    },
+    {
+      "path": "app/src/main/res/raw/script.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "32e4879997e1fb5cdaede5b6ed53751a1a40bca5",
+      "size": 9358,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/32e4879997e1fb5cdaede5b6ed53751a1a40bca5"
+    },
+    {
+      "path": "app/src/main/res/raw/style.css",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1365228d0b135b95074b5a707c04deeb46e54cd4",
+      "size": 153043,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/1365228d0b135b95074b5a707c04deeb46e54cd4"
+    },
+    {
+      "path": "app/src/main/res/raw/ui.css",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c51d81c44070e8ce2dc701a63ccc3124578d54ce",
+      "size": 381,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/c51d81c44070e8ce2dc701a63ccc3124578d54ce"
+    },
+    {
+      "path": "app/src/main/res/values",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "3ef171218433ae075f2d9468517094f1022354bb",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/3ef171218433ae075f2d9468517094f1022354bb"
+    },
+    {
+      "path": "app/src/main/res/values/attrs.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9eef3b5dd104975da8cf1ce15318c6db34379718",
+      "size": 2264,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/9eef3b5dd104975da8cf1ce15318c6db34379718"
+    },
+    {
+      "path": "app/src/main/res/values/colors.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3afce681411ccfcd0aa78eb0723842d1b87cf1dc",
+      "size": 1329,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/3afce681411ccfcd0aa78eb0723842d1b87cf1dc"
+    },
+    {
+      "path": "app/src/main/res/values/dimens.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d90851f2f44cd6af9ab3ced794bfa7678c9489b7",
+      "size": 3191,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/d90851f2f44cd6af9ab3ced794bfa7678c9489b7"
+    },
+    {
+      "path": "app/src/main/res/values/strings.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ec34bb7a42c0f15a0168bb1e3727623a891d5c12",
+      "size": 67,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/ec34bb7a42c0f15a0168bb1e3727623a891d5c12"
+    },
+    {
+      "path": "app/src/main/res/values/styles.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1deb4e2c407ec8a4a8b8320f7edada10835ab0b6",
+      "size": 2207,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/1deb4e2c407ec8a4a8b8320f7edada10835ab0b6"
+    },
+    {
+      "path": "app/src/main/res/xml",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "e49152a323a4ee0862ad3a5e6d84014c47c1e44d",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/e49152a323a4ee0862ad3a5e6d84014c47c1e44d"
+    },
+    {
+      "path": "app/src/main/res/xml/file_paths.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c3281bf6690840f4d10759e212ef9ed1905b8d48",
+      "size": 590,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/c3281bf6690840f4d10759e212ef9ed1905b8d48"
+    },
+    {
+      "path": "app/src/main/res/xml/network_security_config.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "dca93c079e349fc5005ea8b3ea0947eb9bec9619",
+      "size": 144,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/dca93c079e349fc5005ea8b3ea0947eb9bec9619"
+    },
+    {
+      "path": "build.gradle",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b3e1572c12f5cd78deeedf6b488e60a41a290824",
+      "size": 868,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/b3e1572c12f5cd78deeedf6b488e60a41a290824"
+    },
+    {
+      "path": "gradle.properties",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "19dc3e601bcdb2bab595e155f3d0a14ae16e2f7c",
+      "size": 1084,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/19dc3e601bcdb2bab595e155f3d0a14ae16e2f7c"
+    },
+    {
+      "path": "gradle",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "3c9d6ea32e1ae40cbb9aa8dd06a6dc5a91a9bc3e",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/3c9d6ea32e1ae40cbb9aa8dd06a6dc5a91a9bc3e"
+    },
+    {
+      "path": "gradle/wrapper",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "04a60d5901ed7705966d3548e7e07efb4636b7db",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/04a60d5901ed7705966d3548e7e07efb4636b7db"
+    },
+    {
+      "path": "gradle/wrapper/gradle-wrapper.jar",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f6b961fd5a86aa5fbfe90f707c3138408be7c718",
+      "size": 54329,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/f6b961fd5a86aa5fbfe90f707c3138408be7c718"
+    },
+    {
+      "path": "gradle/wrapper/gradle-wrapper.properties",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "070478bcbc52bc4477910b4da16605dc16f9d920",
+      "size": 232,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/070478bcbc52bc4477910b4da16605dc16f9d920"
+    },
+    {
+      "path": "gradlew",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cccdd3d517fc5249beaefa600691cf150f2fa3e6",
+      "size": 5296,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/cccdd3d517fc5249beaefa600691cf150f2fa3e6"
+    },
+    {
+      "path": "gradlew.bat",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f9553162f122c71b34635112e717c3e733b5b212",
+      "size": 2176,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/f9553162f122c71b34635112e717c3e733b5b212"
+    },
+    {
+      "path": "player",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "3959d71580d48125fa2e5122cbff1d6014be4869",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/3959d71580d48125fa2e5122cbff1d6014be4869"
+    },
+    {
+      "path": "player/.gitignore",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "42afabfd2abebf31384ca7797186a27a4b7dbee8",
+      "size": 6,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/42afabfd2abebf31384ca7797186a27a4b7dbee8"
+    },
+    {
+      "path": "player/build.gradle",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "002af46ea022825a2ee01e464bf6aaee318c04fd",
+      "size": 1194,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/002af46ea022825a2ee01e464bf6aaee318c04fd"
+    },
+    {
+      "path": "player/proguard-rules.pro",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "481bb434814107eb79d7a30b676d344b0df2f8ce",
+      "size": 750,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/481bb434814107eb79d7a30b676d344b0df2f8ce"
+    },
+    {
+      "path": "player/src",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "0c80b7b63a1b9c9be9920a506da383235220e4f8",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/0c80b7b63a1b9c9be9920a506da383235220e4f8"
+    },
+    {
+      "path": "player/src/main",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "48a028e9e25f526a57d2aef899b6478a222fcf2d",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/48a028e9e25f526a57d2aef899b6478a222fcf2d"
+    },
+    {
+      "path": "player/src/main/AndroidManifest.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4a4947f36c85546da7c047d62b8d7831c1c2842f",
+      "size": 1583,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/4a4947f36c85546da7c047d62b8d7831c1c2842f"
+    },
+    {
+      "path": "player/src/main/java",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "b7f52ab45733cad75f5dddb39dafdddfe7f42a4e",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/b7f52ab45733cad75f5dddb39dafdddfe7f42a4e"
+    },
+    {
+      "path": "player/src/main/java/tv",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "fa20d5840e3cacc742ea86a7ece939f3ff12acd4",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/fa20d5840e3cacc742ea86a7ece939f3ff12acd4"
+    },
+    {
+      "path": "player/src/main/java/tv/danmaku",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "15693614d155060661e3afd75f2ce29fe0000a35",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/15693614d155060661e3afd75f2ce29fe0000a35"
+    },
+    {
+      "path": "player/src/main/java/tv/danmaku/ijk",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "d51583c0790ca79cacec8a780edbe172e84b81e7",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/d51583c0790ca79cacec8a780edbe172e84b81e7"
+    },
+    {
+      "path": "player/src/main/java/tv/danmaku/ijk/media",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "3b7b3dee8fbe7116cda3d0d716c30d6631680e26",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/3b7b3dee8fbe7116cda3d0d716c30d6631680e26"
+    },
+    {
+      "path": "player/src/main/java/tv/danmaku/ijk/media/player",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "8b8ceaec2f8fd749a3cb937ad0c59d4680853b31",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/8b8ceaec2f8fd749a3cb937ad0c59d4680853b31"
+    },
+    {
+      "path": "player/src/main/java/tv/danmaku/ijk/media/player/AbstractMediaPlayer.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0425b65eceba9790fd72b4fdc04ac4eacfdd62fe",
+      "size": 4281,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/0425b65eceba9790fd72b4fdc04ac4eacfdd62fe"
+    },
+    {
+      "path": "player/src/main/java/tv/danmaku/ijk/media/player/AndroidMediaPlayer.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a99cfb41a745969ef97b13b952657224ba36257b",
+      "size": 12777,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/a99cfb41a745969ef97b13b952657224ba36257b"
+    },
+    {
+      "path": "player/src/main/java/tv/danmaku/ijk/media/player/IMediaPlayer.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "da668efe3d2f1ea93b5b3e2e05af77227c18a84e",
+      "size": 6205,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/da668efe3d2f1ea93b5b3e2e05af77227c18a84e"
+    },
+    {
+      "path": "player/src/main/java/tv/danmaku/ijk/media/player/ISurfaceTextureHolder.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e1259f6d91b91b6d3b58a8b702ea969f9650f2c2",
+      "size": 946,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/e1259f6d91b91b6d3b58a8b702ea969f9650f2c2"
+    },
+    {
+      "path": "player/src/main/java/tv/danmaku/ijk/media/player/ISurfaceTextureHost.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6f465a14142d991d691f54fb0d4c37f47088d290",
+      "size": 834,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/6f465a14142d991d691f54fb0d4c37f47088d290"
+    },
+    {
+      "path": "player/src/main/java/tv/danmaku/ijk/media/player/IjkLibLoader.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7bb46240eeb6e3e82313a38ab9996e116beecf8c",
+      "size": 830,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/7bb46240eeb6e3e82313a38ab9996e116beecf8c"
+    },
+    {
+      "path": "player/src/main/java/tv/danmaku/ijk/media/player/IjkMediaCodecInfo.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3bec466e88cea6d37b4ffb07de32d194ed090f02",
+      "size": 10808,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/3bec466e88cea6d37b4ffb07de32d194ed090f02"
+    },
+    {
+      "path": "player/src/main/java/tv/danmaku/ijk/media/player/IjkMediaMeta.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d2ba5f6809452b215a07c64b7ff6c3d4658c075c",
+      "size": 16642,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/d2ba5f6809452b215a07c64b7ff6c3d4658c075c"
+    },
+    {
+      "path": "player/src/main/java/tv/danmaku/ijk/media/player/IjkMediaPlayer.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "94feba2310549d5a9de7d16a87a899956333c0a6",
+      "size": 48394,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/94feba2310549d5a9de7d16a87a899956333c0a6"
+    },
+    {
+      "path": "player/src/main/java/tv/danmaku/ijk/media/player/IjkTimedText.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0d11ae4bca1daea6053c08234219e3ddc52ee2fa",
+      "size": 1078,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/0d11ae4bca1daea6053c08234219e3ddc52ee2fa"
+    },
+    {
+      "path": "player/src/main/java/tv/danmaku/ijk/media/player/MediaInfo.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a572977004450a20d1dbc4e113d1cfe409836a37",
+      "size": 936,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/a572977004450a20d1dbc4e113d1cfe409836a37"
+    },
+    {
+      "path": "player/src/main/java/tv/danmaku/ijk/media/player/MediaPlayerProxy.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fe15c80b848b4e28d1b1e1b61e0bd1f25fe15bb0",
+      "size": 10492,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/fe15c80b848b4e28d1b1e1b61e0bd1f25fe15bb0"
+    },
+    {
+      "path": "player/src/main/java/tv/danmaku/ijk/media/player/TextureMediaPlayer.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "39926b18a5dcddb990ffb4d6e83ae64bce182359",
+      "size": 2847,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/39926b18a5dcddb990ffb4d6e83ae64bce182359"
+    },
+    {
+      "path": "player/src/main/java/tv/danmaku/ijk/media/player/annotations",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "9bb80a2ef43e211dc19d4c9d798e67c483839884",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/9bb80a2ef43e211dc19d4c9d798e67c483839884"
+    },
+    {
+      "path": "player/src/main/java/tv/danmaku/ijk/media/player/annotations/AccessedByNative.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d872251097f09c82d624d886c4f790504eb6879f",
+      "size": 1091,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/d872251097f09c82d624d886c4f790504eb6879f"
+    },
+    {
+      "path": "player/src/main/java/tv/danmaku/ijk/media/player/annotations/CalledByNative.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0d7912593aea7a4dc560188a055a745640d65f7d",
+      "size": 1202,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/0d7912593aea7a4dc560188a055a745640d65f7d"
+    },
+    {
+      "path": "player/src/main/java/tv/danmaku/ijk/media/player/demo",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "7e164a85c3bb92eecc89d7839120925e6ad4ea37",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/7e164a85c3bb92eecc89d7839120925e6ad4ea37"
+    },
+    {
+      "path": "player/src/main/java/tv/danmaku/ijk/media/player/demo/IjkDemoActivity.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3854de351e7a9ea00f9774bbbf6b4aa271897db8",
+      "size": 3161,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/3854de351e7a9ea00f9774bbbf6b4aa271897db8"
+    },
+    {
+      "path": "player/src/main/java/tv/danmaku/ijk/media/player/exceptions",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "222120ecbad921c39a4dbff32a37162e3508da66",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/222120ecbad921c39a4dbff32a37162e3508da66"
+    },
+    {
+      "path": "player/src/main/java/tv/danmaku/ijk/media/player/exceptions/IjkMediaException.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9662c650f78f740cbb11ab6002c77fb1336bdd2c",
+      "size": 834,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/9662c650f78f740cbb11ab6002c77fb1336bdd2c"
+    },
+    {
+      "path": "player/src/main/java/tv/danmaku/ijk/media/player/ffmpeg",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "fa04cb583a2688603acece5923378a2077dd4a4b",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/fa04cb583a2688603acece5923378a2077dd4a4b"
+    },
+    {
+      "path": "player/src/main/java/tv/danmaku/ijk/media/player/ffmpeg/FFmpegApi.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e13ba1b0bc84b728e41866019ba2533a9d6a10d9",
+      "size": 133,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/e13ba1b0bc84b728e41866019ba2533a9d6a10d9"
+    },
+    {
+      "path": "player/src/main/java/tv/danmaku/ijk/media/player/misc",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "06fb7acd2d6758ba651ffe08bfd5a2049ad77d46",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/06fb7acd2d6758ba651ffe08bfd5a2049ad77d46"
+    },
+    {
+      "path": "player/src/main/java/tv/danmaku/ijk/media/player/misc/AndroidMediaFormat.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "23928990cf7efc1169fd2554e0016fbe9a508857",
+      "size": 1841,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/23928990cf7efc1169fd2554e0016fbe9a508857"
+    },
+    {
+      "path": "player/src/main/java/tv/danmaku/ijk/media/player/misc/AndroidTrackInfo.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "75d7dbaea34d7cd79ae355a565d2af385ca84227",
+      "size": 3164,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/75d7dbaea34d7cd79ae355a565d2af385ca84227"
+    },
+    {
+      "path": "player/src/main/java/tv/danmaku/ijk/media/player/misc/IAndroidIO.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ac2bb8041ff54abe247d39270b09000bb921888d",
+      "size": 1005,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/ac2bb8041ff54abe247d39270b09000bb921888d"
+    },
+    {
+      "path": "player/src/main/java/tv/danmaku/ijk/media/player/misc/IMediaDataSource.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ae3a09be0d1a0fb43e327aae4ed880a2932e60ff",
+      "size": 964,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/ae3a09be0d1a0fb43e327aae4ed880a2932e60ff"
+    },
+    {
+      "path": "player/src/main/java/tv/danmaku/ijk/media/player/misc/IMediaFormat.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2d97cc6b89d0cd69e4c64b2fa94376bc434bc843",
+      "size": 932,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/2d97cc6b89d0cd69e4c64b2fa94376bc434bc843"
+    },
+    {
+      "path": "player/src/main/java/tv/danmaku/ijk/media/player/misc/ITrackInfo.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "24fe6a99004f0852dd07c684388c7ad24dfdfe2d",
+      "size": 1066,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/24fe6a99004f0852dd07c684388c7ad24dfdfe2d"
+    },
+    {
+      "path": "player/src/main/java/tv/danmaku/ijk/media/player/misc/IjkMediaFormat.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ded144c7a42723017822be11c51ef97b05fbbf01",
+      "size": 10341,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/ded144c7a42723017822be11c51ef97b05fbbf01"
+    },
+    {
+      "path": "player/src/main/java/tv/danmaku/ijk/media/player/misc/IjkTrackInfo.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f5755d96c81918e29553dcd3e32dad28b2fbd96a",
+      "size": 3096,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/f5755d96c81918e29553dcd3e32dad28b2fbd96a"
+    },
+    {
+      "path": "player/src/main/java/tv/danmaku/ijk/media/player/pragma",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "db853c171dd7668338a7db8242f4661ecb086d14",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/db853c171dd7668338a7db8242f4661ecb086d14"
+    },
+    {
+      "path": "player/src/main/java/tv/danmaku/ijk/media/player/pragma/DebugLog.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9c033f9c735e789e20458c5650eee760505d2daa",
+      "size": 3912,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/9c033f9c735e789e20458c5650eee760505d2daa"
+    },
+    {
+      "path": "player/src/main/java/tv/danmaku/ijk/media/player/pragma/Pragma.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ba29a209974893deb1827d454a4070a40bfc961e",
+      "size": 813,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/ba29a209974893deb1827d454a4070a40bfc961e"
+    },
+    {
+      "path": "player/src/main/java/tv/danmaku/ijk/media/player_armv7a",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "94dd0a8c5387c3bb4723bf89e686ecdbdd6b0001",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/94dd0a8c5387c3bb4723bf89e686ecdbdd6b0001"
+    },
+    {
+      "path": "player/src/main/java/tv/danmaku/ijk/media/player_armv7a/Pragma.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "798ba3f3ed1e9e1d77c48c802bbf4f14d79a3748",
+      "size": 721,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/798ba3f3ed1e9e1d77c48c802bbf4f14d79a3748"
+    },
+    {
+      "path": "player/src/main/java/xyz",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "33da13a2528ee48d9a6400123653f461f713784d",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/33da13a2528ee48d9a6400123653f461f713784d"
+    },
+    {
+      "path": "player/src/main/java/xyz/doikki",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "3479bab38be7d421ebe07ac5cbdaea47b6f57cd4",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/3479bab38be7d421ebe07ac5cbdaea47b6f57cd4"
+    },
+    {
+      "path": "player/src/main/java/xyz/doikki/videoplayer",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "76af0e4bf9fbc7e0dee34cd237d3ad057691554d",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/76af0e4bf9fbc7e0dee34cd237d3ad057691554d"
+    },
+    {
+      "path": "player/src/main/java/xyz/doikki/videoplayer/controller",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "671d6499160681aa79ce8df975a717978dcae79a",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/671d6499160681aa79ce8df975a717978dcae79a"
+    },
+    {
+      "path": "player/src/main/java/xyz/doikki/videoplayer/controller/BaseVideoController.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b3970c4a9e74f571f530b1838eef4779e5850d38",
+      "size": 21460,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/b3970c4a9e74f571f530b1838eef4779e5850d38"
+    },
+    {
+      "path": "player/src/main/java/xyz/doikki/videoplayer/controller/ControlWrapper.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e2b88c30d64db66a3252329ebd17af0c19b92641",
+      "size": 6085,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/e2b88c30d64db66a3252329ebd17af0c19b92641"
+    },
+    {
+      "path": "player/src/main/java/xyz/doikki/videoplayer/controller/GestureVideoController.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f47f182731166117bb00d535689221903116b126",
+      "size": 11312,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/f47f182731166117bb00d535689221903116b126"
+    },
+    {
+      "path": "player/src/main/java/xyz/doikki/videoplayer/controller/IControlComponent.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a2cc6fd358551c6bea47b4b2ea5708edfd4c2f4c",
+      "size": 2056,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/a2cc6fd358551c6bea47b4b2ea5708edfd4c2f4c"
+    },
+    {
+      "path": "player/src/main/java/xyz/doikki/videoplayer/controller/IGestureComponent.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "386ecd28ea53c7b36291c9cc08306d7a2763f818",
+      "size": 726,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/386ecd28ea53c7b36291c9cc08306d7a2763f818"
+    },
+    {
+      "path": "player/src/main/java/xyz/doikki/videoplayer/controller/IVideoController.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6489c28ef67bcb3d4f94339125dfbe67c44dbb2a",
+      "size": 935,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/6489c28ef67bcb3d4f94339125dfbe67c44dbb2a"
+    },
+    {
+      "path": "player/src/main/java/xyz/doikki/videoplayer/controller/MediaPlayerControl.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8d355fb8ab8f7b94dccc2392c23ae5d2721410ea",
+      "size": 841,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/8d355fb8ab8f7b94dccc2392c23ae5d2721410ea"
+    },
+    {
+      "path": "player/src/main/java/xyz/doikki/videoplayer/controller/OrientationHelper.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "312eed26edbbfa610fcbd24e4a53078d2a1e8910",
+      "size": 1069,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/312eed26edbbfa610fcbd24e4a53078d2a1e8910"
+    },
+    {
+      "path": "player/src/main/java/xyz/doikki/videoplayer/exo",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "e96b8c6e497a4b3fd4b07bc43a5390b43be74473",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/e96b8c6e497a4b3fd4b07bc43a5390b43be74473"
+    },
+    {
+      "path": "player/src/main/java/xyz/doikki/videoplayer/exo/ExoMediaPlayer.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f40a68812ad71de31b31a84ded2bd30475d6839f",
+      "size": 9144,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/f40a68812ad71de31b31a84ded2bd30475d6839f"
+    },
+    {
+      "path": "player/src/main/java/xyz/doikki/videoplayer/exo/ExoMediaPlayerFactory.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cb4f1688c5fd7d927526bd50b692e44a119197a2",
+      "size": 425,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/cb4f1688c5fd7d927526bd50b692e44a119197a2"
+    },
+    {
+      "path": "player/src/main/java/xyz/doikki/videoplayer/exo/ExoMediaSourceHelper.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a068c663ead6d9649e1cd2a8131d31d919a288e1",
+      "size": 6964,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/a068c663ead6d9649e1cd2a8131d31d919a288e1"
+    },
+    {
+      "path": "player/src/main/java/xyz/doikki/videoplayer/ijk",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "b9ff5feb016c96287c427088dfd9c5be3d9c0753",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/b9ff5feb016c96287c427088dfd9c5be3d9c0753"
+    },
+    {
+      "path": "player/src/main/java/xyz/doikki/videoplayer/ijk/IjkPlayer.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2dbeddf5d235dc91056248a692ac16b7568ab1ce",
+      "size": 7739,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/2dbeddf5d235dc91056248a692ac16b7568ab1ce"
+    },
+    {
+      "path": "player/src/main/java/xyz/doikki/videoplayer/ijk/IjkPlayerFactory.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "967daacbfad305861af0845c8b9cf9ebc73968fd",
+      "size": 395,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/967daacbfad305861af0845c8b9cf9ebc73968fd"
+    },
+    {
+      "path": "player/src/main/java/xyz/doikki/videoplayer/ijk/RawDataSourceProvider.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e3a742f6714cc80b747f5af28c6a35314cbf902e",
+      "size": 2444,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/e3a742f6714cc80b747f5af28c6a35314cbf902e"
+    },
+    {
+      "path": "player/src/main/java/xyz/doikki/videoplayer/player",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "94afa988509667899b0981921606c56d9f3d1983",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/94afa988509667899b0981921606c56d9f3d1983"
+    },
+    {
+      "path": "player/src/main/java/xyz/doikki/videoplayer/player/AbstractPlayer.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "dfc769aab5250c9c2e9cdea8a1aae33a1c7a8d32",
+      "size": 3395,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/dfc769aab5250c9c2e9cdea8a1aae33a1c7a8d32"
+    },
+    {
+      "path": "player/src/main/java/xyz/doikki/videoplayer/player/AndroidMediaPlayer.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "87a08536c70292df89e4fd5e51f5e1af56e17407",
+      "size": 7896,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/87a08536c70292df89e4fd5e51f5e1af56e17407"
+    },
+    {
+      "path": "player/src/main/java/xyz/doikki/videoplayer/player/AndroidMediaPlayerFactory.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "af9cb96ee21d6ef0f616036615e3b1ba359e2478",
+      "size": 544,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/af9cb96ee21d6ef0f616036615e3b1ba359e2478"
+    },
+    {
+      "path": "player/src/main/java/xyz/doikki/videoplayer/player/AudioFocusHelper.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "98d8f747889e1c262818ccc55e05223419786793",
+      "size": 3434,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/98d8f747889e1c262818ccc55e05223419786793"
+    },
+    {
+      "path": "player/src/main/java/xyz/doikki/videoplayer/player/PlayerFactory.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a93dca8b5f6c9da4d0b9b1fbb46f9d35cb92923e",
+      "size": 471,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/a93dca8b5f6c9da4d0b9b1fbb46f9d35cb92923e"
+    },
+    {
+      "path": "player/src/main/java/xyz/doikki/videoplayer/player/ProgressManager.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0521bb910aea61a2fd54a3635f80c22b4393bcdb",
+      "size": 566,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/0521bb910aea61a2fd54a3635f80c22b4393bcdb"
+    },
+    {
+      "path": "player/src/main/java/xyz/doikki/videoplayer/player/VideoView.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9f709c68f7bf0db7ff6ab9abe77ca262863262a2",
+      "size": 31835,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/9f709c68f7bf0db7ff6ab9abe77ca262863262a2"
+    },
+    {
+      "path": "player/src/main/java/xyz/doikki/videoplayer/player/VideoViewConfig.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1e80518476618f10963a51f49d0cfe3bfcee2287",
+      "size": 4302,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/1e80518476618f10963a51f49d0cfe3bfcee2287"
+    },
+    {
+      "path": "player/src/main/java/xyz/doikki/videoplayer/player/VideoViewManager.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d784f15e8fe80398e2748f1443756af26b892c7c",
+      "size": 3578,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/d784f15e8fe80398e2748f1443756af26b892c7c"
+    },
+    {
+      "path": "player/src/main/java/xyz/doikki/videoplayer/render",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "18141fd8c72b486548c959fdb1bce1a5e0620e9b",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/18141fd8c72b486548c959fdb1bce1a5e0620e9b"
+    },
+    {
+      "path": "player/src/main/java/xyz/doikki/videoplayer/render/IRenderView.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "aa024440284b3875b1f9b04626c790bc0c2d5e0f",
+      "size": 904,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/aa024440284b3875b1f9b04626c790bc0c2d5e0f"
+    },
+    {
+      "path": "player/src/main/java/xyz/doikki/videoplayer/render/MeasureHelper.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6ade8d1350a4c98b0b6bb96ec438ca1896faf495",
+      "size": 3009,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/6ade8d1350a4c98b0b6bb96ec438ca1896faf495"
+    },
+    {
+      "path": "player/src/main/java/xyz/doikki/videoplayer/render/RenderViewFactory.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "385d572e8760c9e0b6c04f4e1b0c183aafebcd75",
+      "size": 455,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/385d572e8760c9e0b6c04f4e1b0c183aafebcd75"
+    },
+    {
+      "path": "player/src/main/java/xyz/doikki/videoplayer/render/TextureRenderView.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2b8427a3fd6a6f21bac2ca6cdc0e5941b0a156ae",
+      "size": 2895,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/2b8427a3fd6a6f21bac2ca6cdc0e5941b0a156ae"
+    },
+    {
+      "path": "player/src/main/java/xyz/doikki/videoplayer/render/TextureRenderViewFactory.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f33a4b9648ef6802eeeb0f1d33ce79e133aa7d1a",
+      "size": 376,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/f33a4b9648ef6802eeeb0f1d33ce79e133aa7d1a"
+    },
+    {
+      "path": "player/src/main/java/xyz/doikki/videoplayer/util",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "7f4e5aca6391c955f3babe06e96f287417615f64",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/7f4e5aca6391c955f3babe06e96f287417615f64"
+    },
+    {
+      "path": "player/src/main/java/xyz/doikki/videoplayer/util/CutoutUtil.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fc8735be6d4905ea3dc2de94682e4472a5d6fbb0",
+      "size": 5049,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/fc8735be6d4905ea3dc2de94682e4472a5d6fbb0"
+    },
+    {
+      "path": "player/src/main/java/xyz/doikki/videoplayer/util/L.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "57c81566dae24c1774c1c0ec2895e54f626f6e8d",
+      "size": 878,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/57c81566dae24c1774c1c0ec2895e54f626f6e8d"
+    },
+    {
+      "path": "player/src/main/java/xyz/doikki/videoplayer/util/PlayerUtils.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c7f3cd51a6ca5d8fd24b79dbb303a530da9c8d18",
+      "size": 9872,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/c7f3cd51a6ca5d8fd24b79dbb303a530da9c8d18"
+    },
+    {
+      "path": "player/src/main/jniLibs",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "51f6c1eb8ed4743a70589250ec6b7d30b1233229",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/51f6c1eb8ed4743a70589250ec6b7d30b1233229"
+    },
+    {
+      "path": "player/src/main/jniLibs/armeabi-v7a",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "3d2c57606b822951fd70a0e2591d5e4c83afdcdb",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/3d2c57606b822951fd70a0e2591d5e4c83afdcdb"
+    },
+    {
+      "path": "player/src/main/jniLibs/armeabi-v7a/libplayer.so",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "42c95e897460ae492de3ea767f6068f07e4b9de6",
+      "size": 5194896,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/42c95e897460ae492de3ea767f6068f07e4b9de6"
+    },
+    {
+      "path": "player/src/main/jniLibs/armeabi-v7a/libxl_stat.so",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f3eaddf288cfb6f4fd54f136b7f4a1f9aa707e56",
+      "size": 501528,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/f3eaddf288cfb6f4fd54f136b7f4a1f9aa707e56"
+    },
+    {
+      "path": "player/src/main/jniLibs/armeabi-v7a/libxl_thunder_sdk.so",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "25dac438713956dc57194d203c35d43632f73a7e",
+      "size": 3680664,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/25dac438713956dc57194d203c35d43632f73a7e"
+    },
+    {
+      "path": "player/src/main/res",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "d4e7c3775e970432f821dfeea39fabc04b7fff29",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/d4e7c3775e970432f821dfeea39fabc04b7fff29"
+    },
+    {
+      "path": "player/src/main/res/layout",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "dfbaecdb9dd3e374cb5c46fba289e0cd54684137",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/dfbaecdb9dd3e374cb5c46fba289e0cd54684137"
+    },
+    {
+      "path": "player/src/main/res/layout/ijk_demo_activity.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "93ef631fc41c7ce8ef748bcd42393842a4c90efb",
+      "size": 644,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/93ef631fc41c7ce8ef748bcd42393842a4c90efb"
+    },
+    {
+      "path": "player/src/main/res/values",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "0b6a43ea1447377f937d11d6e76ccc42a5bfb701",
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/trees/0b6a43ea1447377f937d11d6e76ccc42a5bfb701"
+    },
+    {
+      "path": "player/src/main/res/values/attrs.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6612afd6b23a9086a7a842e30d3866a1052f5897",
+      "size": 670,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/6612afd6b23a9086a7a842e30d3866a1052f5897"
+    },
+    {
+      "path": "player/src/main/res/values/strings.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "df3314735d145e67c166bc687eb6e5362ea4aea6",
+      "size": 71,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/df3314735d145e67c166bc687eb6e5362ea4aea6"
+    },
+    {
+      "path": "settings.gradle",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "197eb2a2cc0b4f28ab2baa9cccda751156183a65",
+      "size": 59,
+      "url": "https://api.github.com/repos/q215613905/TVBoxOSC/git/blobs/197eb2a2cc0b4f28ab2baa9cccda751156183a65"
+    }
+  ],
+  "truncated": false
+}

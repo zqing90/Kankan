@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  设计 token：尺寸与字号（电视 / 平板，可用宽度 >= 520dp）
+  ─────────────────────────────────────────────────────────────
+  电视是「3 米观看距离 + 遥控器」：字号比手机档整体放大一级，
+  左右留 48dp overscan 安全区（Android TV 官方规范），否则边缘会被电视裁掉。
+  图标按钮放大到 48dp 触达区，遥控器焦点更容易命中。
+
+  ★ 为什么用 w520dp 而不是原来的 sw600dp：
+    很多国产电视把 1920x1080 报成 densityDpi=320，于是 smallestWidth 只有
+    1080/2 = 540dp，够不上 600 —— 整套电视档全部失效，退化成手机档（3 列大卡、
+    16sp 小字、16dp 边距）。用户 2026-11-07 反馈的「海报墙太大」就是这个。
+    540dp 正是这批电视的宽度，所以阈值取 520dp，留 20dp 余量。
+    手机竖屏（360~430dp）、横屏手机（<=960dp 但 shortEdge 小）不受影响：
+    列数在 HomeActivity.resolveColumns() 里还会按物理像素再校准一次。
+-->
+<resources>
+    <dimen name="topbar_pad_h">48dp</dimen>
+    <dimen name="content_pad_h">44dp</dimen>
+
+    <dimen name="text_hero">30sp</dimen>
+    <dimen name="text_title">22sp</dimen>
+    <dimen name="text_body">16sp</dimen>
+    <dimen name="text_caption">14sp</dimen>
+    <dimen name="text_micro">12sp</dimen>
+
+    <dimen name="app_title_size">26sp</dimen>
+    <dimen name="icon_btn_size">48dp</dimen>
+    <dimen name="card_gap_h">14dp</dimen>
+    <dimen name="card_gap_v">20dp</dimen>
+</resources>

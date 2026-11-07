@@ -18,13 +18,12 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.vodtv.CrashLog;
-import com.vodtv.R;
-import com.vodtv.data.HistoryStore;
+import com.vodtv.CrashLog;import com.vodtv.R;
 import com.vodtv.data.ImageLoader;
 import com.vodtv.data.Prefs;
 import com.vodtv.data.RankItem;
 import com.vodtv.data.RankRepository;
+import com.vodtv.widget.FocusKit;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -46,23 +45,81 @@ public class HomeActivity extends Activity {
     private GridView grid;
     private LinearLayout tabs;
     private TextView status;
-    private TextView empty;
-    private TextView btnRefresh;
-    private TextView btnSearch;
-
-    /* 继续观看横条 */
-    private LinearLayout historyBlock;
-    private LinearLayout historyRow;
-    private final List<View> historyCards = new ArrayList<View>();
+    private View empty;
+    private View btnRefresh;
+    private View btnSearch;
+    private View btnHistory;
+    private View btnSettings;
 
     private RankRepository.RankData data;
-    private String group = null;          // null = 全部
-    private String boardId = null;        // 当前分类下的子榜
     private PosterAdapter adapter;
     private boolean updating = false;
     private int posterHeight = 0;         // 按列宽动态算，避免不同分辨率下高度失控
+    /** 上一次真正持有焦点的卡片位置：从 tab 按 ↓ 回到海报墙时还停在原地，不弹回第一张 */
+    private int lastFocusedPos = 0;
+    /** 给 FocusKit 读「上次停在哪张」用，写成字段避免每次按键都 new 一个匿名类 */
+    private final FocusKit.Position lastPosRef = new FocusKit.Position() {
+        @Override
+        public int get() {
+            return lastFocusedPos;
+        }
+    };
 
-    private static final int GRID_COLS = 6;
+    /** tab 0：全部榜单合并去重后的列表（data 一变就重建） */
+    private List<RankItem> hotAll = new ArrayList<RankItem>();
+
+    /* ---------- 找一找（tab 2） ---------- */
+    private View findBar;
+    private LinearLayout findRow;
+    private String findTags = "";         // ""=全部，或 电影/电视剧/综艺/动画/纪录片
+    private String findYear = "all";      // all/cur/prev/older
+    private String findSort = "U";        // U=最热 S=高分 R=最新
+    private String findApplied = null;    // 当前结果对应的筛选组合 key
+    private boolean findLoading = false;
+    private boolean findHasMore = false;
+    /** 筛选组合 → 已加载的结果（含已翻的页），切回来不用重查 */
+    private final java.util.HashMap<String, FindResult> findCache = new java.util.HashMap<String, FindResult>();
+
+    /** 一组筛选条件下的已加载结果 */
+    private static class FindResult {
+        final List<RankItem> items = new ArrayList<RankItem>();
+        int nextStart = 0;
+        boolean hasMore = true;
+    }
+
+    private static final String[][] FIND_TYPES = {
+            {"", "全部"}, {"电影", "电影"}, {"电视剧", "电视剧"},
+            {"综艺", "综艺"}, {"动画", "动画"}, {"纪录片", "纪录片"},
+    };
+    private static final String[][] FIND_YEARS = {
+            {"all", "全部"}, {"cur", "今年"}, {"prev", "去年"}, {"older", "更早"},
+    };
+    private static final String[][] FIND_SORTS = {
+            {"U", "最热"}, {"S", "高分"}, {"R", "最新"},
+    };
+
+    /**
+     * 列数按**物理像素**算，不读 density、也不读 values 里的 grid_cols。
+     *
+     * 原因：电视面板的 densityDpi 各家乱报，同一个 1920x1080 面板有报 160 的、
+     * 也有报 320 的。报 320 时屏幕只有 540dp 宽，连 values-w520dp 的 7 列也会
+     * 被算成「每张 150dp」，而报 160 时又变成每张 274dp —— 看着完全不是同一个 App。
+     * 物理像素是唯一稳定的量：1920 宽就摆 7 张（每张约 250px），3 米外一行 7 个正好。
+     *
+     * 手机竖屏（1080x2340 这类）宽高比不满足下面任何一档，直接走 values/integers.xml。
+     */
+    private int resolveColumns(int widthPx, int heightPx) {
+        // 只有「横向大屏」才按像素加列数；竖屏手机哪怕 1440px 宽，宽 < 高，不受影响
+        boolean wide = widthPx > heightPx;
+        if (wide) {
+            if (widthPx >= 3200) return 11;   // 4K
+            if (widthPx >= 2560) return 9;    // 2K
+            if (widthPx >= 1920) return 7;    // 1080p
+            if (widthPx >= 1600) return 6;
+            if (widthPx >= 1280) return 5;    // 720p
+        }
+        return getResources().getInteger(R.integer.grid_cols);
+    }
 
     private final List<String[]> tabDefs = new ArrayList<String[]>();
     /** 和 tabDefs 一一对应的 TextView，用来控制焦点链和选中态 */
@@ -92,36 +149,47 @@ public class HomeActivity extends Activity {
 
         grid = (GridView) findViewById(R.id.grid);
         tabs = (LinearLayout) findViewById(R.id.tabs);
+        findBar = findViewById(R.id.find_bar);
+        findRow = (LinearLayout) findViewById(R.id.find_row);
         status = (TextView) findViewById(R.id.status);
-        empty = (TextView) findViewById(R.id.empty);
-        btnRefresh = (TextView) findViewById(R.id.btn_refresh);
-        btnSearch = (TextView) findViewById(R.id.btn_search);
-        historyBlock = (LinearLayout) findViewById(R.id.history_block);
-        historyRow = (LinearLayout) findViewById(R.id.history_row);
+        empty = findViewById(R.id.empty);
+        btnRefresh = findViewById(R.id.btn_refresh);
+        btnSearch = findViewById(R.id.btn_search);
+        btnHistory = findViewById(R.id.btn_history);
+        btnSettings = findViewById(R.id.btn_settings);
 
-        tabDefs.add(new String[]{"all", "全部"});
-        tabDefs.add(new String[]{RankRepository.GROUP_TV, "剧集"});
-        tabDefs.add(new String[]{RankRepository.GROUP_MOVIE, "电影"});
-        tabDefs.add(new String[]{RankRepository.GROUP_SHOW, "综艺"});
-        tabDefs.add(new String[]{RankRepository.GROUP_ANIME, "动画"});
-        tabDefs.add(new String[]{RankRepository.GROUP_DOC, "纪录片"});
+        tabDefs.add(new String[]{"hot", "豆瓣热榜"});
+        tabDefs.add(new String[]{"new", "新品速递"});
+        tabDefs.add(new String[]{"find", "找一找"});
 
         buildTabs();
+        buildFindBar();
+        // 四个顶栏图标都要有「看得见」的焦点态，否则遥控器选过去了也没反馈
+        FocusKit.iconFx(btnSearch);
+        FocusKit.iconFx(btnHistory);
+        FocusKit.iconFx(btnRefresh);
+        FocusKit.iconFx(btnSettings);
 
         adapter = new PosterAdapter();
+        // 列数必须在 setAdapter 之前定：GridView 在首次布局时才按 numColumns 摊格子，
+        // 之后改列数要重建适配器才生效。
+        android.util.DisplayMetrics dm = getResources().getDisplayMetrics();
+        grid.setNumColumns(resolveColumns(dm.widthPixels, dm.heightPixels));
         grid.setAdapter(adapter);
         grid.post(new Runnable() {
             @Override
             public void run() {
                 // getColumnWidth / getHorizontalSpacing 都是 API 16 的方法，4.0/4.1 上会 NoSuchMethodError，
-                // 所以列宽和间距都按布局里写死的值自己算（horizontalSpacing=14dp，见 activity_home.xml）
+                // 所以列宽和间距按布局里的 @dimen/card_gap_h 自己算
                 int cols = grid.getNumColumns();
                 int screenW = getResources().getDisplayMetrics().widthPixels;
+                int gap = getResources().getDimensionPixelSize(R.dimen.card_gap_h);
                 int usable = screenW - grid.getPaddingLeft() - grid.getPaddingRight()
-                        - dp(14) * (cols - 1);
+                        - gap * (cols - 1);
                 int colW = usable / cols;
                 if (colW > 0) {
-                    posterHeight = (int) (colW * 1.5f); // 2:3 海报
+                    // 卡片根布局左右各 2dp padding（给焦点描边留位置），海报宽要减掉这 4dp
+                    posterHeight = (int) ((colW - dp(4)) * 1.5f); // 2:3 海报
                     adapter.notifyDataSetChanged();
                 }
             }
@@ -132,6 +200,10 @@ public class HomeActivity extends Activity {
                 openDetailAt(position);
             }
         });
+
+        // 焦点必须落在「卡片」上，不能停在 GridView 容器上 —— 三道保险的实现在 FocusKit，
+        // 搜索页、观看记录页共用同一份（2026-11-07 三个页面在电视上症状完全一样）。
+        FocusKit.bindGrid(grid, lastPosRef);
 
         btnRefresh.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -145,7 +217,13 @@ public class HomeActivity extends Activity {
                 startActivity(new Intent(HomeActivity.this, SearchActivity.class));
             }
         });
-        findViewById(R.id.btn_settings).setOnClickListener(new View.OnClickListener() {
+        // 顶栏「记录」图标 → 观看记录页（首页不再放「继续观看」横条）
+        btnHistory.setOnClickListener(new View.OnClickListener() {            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(HomeActivity.this, HistoryActivity.class));
+            }
+        });
+        btnSettings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(HomeActivity.this, SettingsActivity.class));
@@ -154,7 +232,6 @@ public class HomeActivity extends Activity {
 
         loadCacheThenMaybeRefresh();
         selectTab(0);
-        renderHistory();
         showLastCrashIfAny();
     }
 
@@ -191,6 +268,7 @@ public class HomeActivity extends Activity {
 
     private void loadCacheThenMaybeRefresh() {
         data = RankRepository.loadCache(this);
+        rebuildHotAll();
         if (data != null && data.boards.size() > 0) {
             renderStatus();
             adapter.notifyDataSetChanged();
@@ -233,9 +311,10 @@ public class HomeActivity extends Activity {
                             if (manual) Toast.makeText(HomeActivity.this, "更新失败：" + error, Toast.LENGTH_LONG).show();
                         } else {
                             data = d;
+                            rebuildHotAll();
                             renderStatus();
                             adapter.notifyDataSetChanged();
-                            empty.setVisibility(d.total() > 0 ? View.GONE : View.VISIBLE);
+                            empty.setVisibility(currentItems().isEmpty() ? View.VISIBLE : View.GONE);
                             if (manual) Toast.makeText(HomeActivity.this, "已更新 " + d.total() + " 部", Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -245,6 +324,12 @@ public class HomeActivity extends Activity {
     }
 
     private void renderStatus() {
+        if (currentTab == 2) {
+            // 「找一找」不依赖主榜数据，data 为 null 也要能显示
+            status.setText("找一找 · " + describeFind() + " · " + currentItems().size()
+                    + " 部" + (findLoading ? " · 正在加载…" : ""));
+            return;
+        }
         if (data == null) return;
         String t = data.fetchedAt > 0
                 ? new SimpleDateFormat("MM-dd HH:mm", Locale.US).format(new Date(data.fetchedAt))
@@ -256,6 +341,238 @@ public class HomeActivity extends Activity {
     }
 
     /* ---------- 分类 ---------- */
+
+    /** data 一变就重建「豆瓣热榜(全部)」：17 个榜按序拼接、同片去重（保留第一次出现的榜位） */
+    private void rebuildHotAll() {
+        hotAll = new ArrayList<RankItem>();
+        if (data == null) return;
+        java.util.HashSet<String> seen = new java.util.HashSet<String>();
+        for (RankRepository.Board b : data.boards) {
+            if (RankRepository.GROUP_NEW.equals(b.group)) continue;   // 新品速递不混进热榜
+            for (RankItem it : b.items) {
+                if (it == null || it.title == null || it.title.length() == 0) continue;
+                String key = it.title.trim();
+                if (seen.add(key)) hotAll.add(it);
+            }
+        }
+    }
+
+    /* ---------- 找一找 ---------- */
+
+    private String findKey() {
+        return findTags + "|" + findYear + "|" + findSort;
+    }
+
+    private FindResult findState() {
+        FindResult st = findCache.get(findKey());
+        if (st == null) {
+            st = new FindResult();
+            findCache.put(findKey(), st);
+        }
+        return st;
+    }
+
+    /** 组装筛选条：类型 / 年份 / 排序各占一行，行间留 4dp 间距 */
+    private void buildFindBar() {
+        findRow.removeAllViews();
+        addChipGroup("类型", FIND_TYPES, findTags);
+        addChipGroup("年份", FIND_YEARS, findYear);
+        addChipGroup("排序", FIND_SORTS, findSort);
+    }
+
+    private void addChipGroup(String label, String[][] defs, String current) {
+        // 一个条件一行：行本身横向，标签 + 该组 chips 排在行内
+        LinearLayout row = new LinearLayout(this);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setGravity(android.view.Gravity.CENTER_VERTICAL);
+        LinearLayout.LayoutParams rowLp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        if (findRow.getChildCount() > 0) rowLp.topMargin = dp(4);
+        findRow.addView(row, rowLp);
+
+        TextView lb = new TextView(this);
+        lb.setText(label);
+        lb.setTextSize(12);
+        lb.setTextColor(getResources().getColor(R.color.text_tertiary));
+        lb.setPadding(dp(10), 0, dp(4), 0);
+        row.addView(lb);
+
+        for (final String[] def : defs) {
+            final boolean on = def[0].equals(current);
+            TextView c = new TextView(this);
+            c.setId(View.generateViewId());
+            c.setText(def[1]);
+            c.setTextSize(13);
+            c.setPadding(dp(14), dp(5), dp(14), dp(5));
+            c.setBackgroundResource(R.drawable.bg_tab);
+            c.setTextColor(getResources().getColor(on ? R.color.text_primary : R.color.text_secondary));
+            c.setSelected(on);
+            c.setFocusable(true);
+            c.setFocusableInTouchMode(true);
+            c.setTag("chip_" + label + "_" + def[0]);
+            // 与 tab 一致：焦点扫过去就生效（带防抖 + 结果缓存，扫一排不会连环打接口）
+            c.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View v, boolean has) {
+                    if (!has) return;
+                    setChipState(def[0], label);
+                    scheduleFindApply();
+                }
+            });
+            c.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    setChipState(def[0], label);
+                    applyFind(false);
+                }
+            });
+            c.setOnKeyListener(new View.OnKeyListener() {
+                @Override
+                public boolean onKey(View v, int keyCode, KeyEvent event) {
+                    if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_DPAD_DOWN) {
+                        // 末行（排序）的 ↓ 才进网格；上面的行走默认焦点搜索，落到下一行的 chip
+                        View row = (View) v.getParent();
+                        if (findRow.getChildAt(findRow.getChildCount() - 1) == row) {
+                            FocusKit.focusGrid(grid, lastPosRef);
+                            return true;
+                        }
+                        return false;
+                    }
+                    return false;
+                }
+            });
+            row.addView(c);
+        }
+    }
+
+    /** 视觉选中态：原地更新同组 chips，不重建视图——重建会把焦点一起销毁，遥控器就断链了 */
+    private void setChipState(String value, String groupLabel) {
+        if ("类型".equals(groupLabel)) findTags = value;
+        else if ("年份".equals(groupLabel)) findYear = value;
+        else if ("排序".equals(groupLabel)) findSort = value;
+
+        // find_row 下是三行 LinearLayout，chip 都在行里，两级遍历
+        for (int r = 0; r < findRow.getChildCount(); r++) {
+            View row = findRow.getChildAt(r);
+            if (!(row instanceof ViewGroup)) continue;
+            ViewGroup g = (ViewGroup) row;
+            for (int i = 0; i < g.getChildCount(); i++) {
+                View v = g.getChildAt(i);
+                Object tag = v.getTag();
+                if (!(v instanceof TextView) || tag == null) continue;
+                String t = String.valueOf(tag);
+                if (!t.startsWith("chip_" + groupLabel + "_")) continue;
+                String chipValue = t.substring(("chip_" + groupLabel + "_").length());
+                boolean on = chipValue.equals(value);
+                v.setSelected(on);
+                ((TextView) v).setTextColor(getResources().getColor(
+                        on ? R.color.text_primary : R.color.text_secondary));
+            }
+        }
+    }
+
+    /** 焦点扫过 chips 时防抖：停 300ms 才真正发请求 */
+    private final Runnable findPending = new Runnable() {
+        @Override
+        public void run() {
+            applyFind(false);
+        }
+    };
+
+    private void scheduleFindApply() {
+        grid.postDelayed(findPending, 300);
+    }
+
+    /** 按当前筛选查第一页。silent=true 时失败不弹 Toast（切 tab 自动触发的那次） */
+    private void applyFind(final boolean silent) {
+        grid.removeCallbacks(findPending);
+        final FindResult target = findState();   // 钉住发起时的筛选组：请求回来前用户可能又换了条件
+        findLoading = true;
+        renderStatus();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                List<RankItem> result;
+                try {
+                    result = RankRepository.find(findTags, findYear, findSort, 0);
+                } catch (Exception e) {
+                    result = null;
+                }
+                final List<RankItem> fResult = result;
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        findLoading = false;
+                        if (fResult == null) {
+                            if (!silent) Toast.makeText(HomeActivity.this, "搜索失败，请稍后再试", Toast.LENGTH_SHORT).show();
+                            renderStatus();
+                            return;
+                        }
+                        target.items.clear();
+                        target.items.addAll(fResult);
+                        target.nextStart = fResult.size();
+                        target.hasMore = fResult.size() >= 20;
+                        adapter.notifyDataSetChanged();
+                        grid.invalidateViews();
+                        empty.setVisibility(currentItems().isEmpty() ? View.VISIBLE : View.GONE);
+                        renderStatus();
+                    }
+                });
+            }
+        }, "find-search").start();
+    }
+
+    /** 滚到最后几行时追加下一页 */
+    private void loadMoreFind() {
+        final FindResult st = findState();
+        if (findLoading || !st.hasMore || st.nextStart == 0) return;
+        findLoading = true;
+        renderStatus();
+        final int start = st.nextStart;
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                List<RankItem> page;
+                try {
+                    // 用户可能停在旧筛选上，用发起时的 key 存回对应那组
+                    page = RankRepository.find(findTags, findYear, findSort, start);
+                } catch (Exception e) {
+                    page = null;
+                }
+                final List<RankItem> fPage = page;
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        findLoading = false;
+                        if (fPage != null && !fPage.isEmpty()) {
+                            java.util.HashSet<String> seen = new java.util.HashSet<String>();
+                            for (RankItem it : st.items) seen.add(it.title.trim());
+                            for (RankItem it : fPage) {
+                                if (seen.add(it.title.trim())) st.items.add(it);
+                            }
+                            st.nextStart = start + fPage.size();
+                            st.hasMore = fPage.size() >= 20;
+                        } else {
+                            st.hasMore = false;   // 没有更多了 / 失败就不再自动重试
+                        }
+                        adapter.notifyDataSetChanged();
+                        renderStatus();
+                    }
+                });
+            }
+        }, "find-more").start();
+    }
+
+    private String describeFind() {
+        String ty = "全部", yr = "全部", so = "最热";
+        for (String[] d : FIND_TYPES) if (d[0].equals(findTags)) ty = d[1];
+        for (String[] d : FIND_YEARS) if (d[0].equals(findYear)) yr = d[1];
+        for (String[] d : FIND_SORTS) if (d[0].equals(findSort)) so = d[1];
+        return ty + " · " + yr + " · " + so;
+    }
+
 
     private void buildTabs() {
         tabs.removeAllViews();
@@ -309,20 +626,45 @@ public class HomeActivity extends Activity {
         }
 
         // 显式把焦点链串起来，别指望 FocusFinder 自己猜（容器本身不可聚焦）
-        for (int i = 0; i < tabViews.size(); i++) {
+        bindTopbarFocus();
+        grid.setNextFocusUpId(tabViews.get(0).getId());
+    }
+
+    /**
+     * 顶栏一行的焦点闭环：
+     * <pre>
+     *   tab0 ←→ tab1 ←→ tab2（找一找） → 搜索 → 记录 → 更新 → 设置 → 回到 tab0
+     *   每个节点的 ↑ 都钉在自己身上（已经是最上面一行了）；↓ 一律回海报墙
+     * </pre>
+     *
+     * ★ 踩过的坑（2026-11-07 用户实测）：旧版为了让左右能在 tab 间环绕，
+     *   把最后一个 tab 的 nextFocusRight 设成了 tab0。结果整行被 tab 封成环，
+     *   遥控器按 → 只会在「豆瓣热榜 / 新品速递 / 找一找」里转圈，
+     *   右边那排搜索、记录、更新、设置**永远选不中**（它们只设了 nextFocusLeft，
+     *   而焦点移动只认「当前控件」的 nextFocusX，不认目标控件的）。
+     *   现在环绕改挂在两端：tab0 的 ← 去设置、设置的 → 回 tab0，
+     *   中间是单向直链，遥控器才能一路走到头。
+     */
+    private void bindTopbarFocus() {
+        final int n = tabViews.size();
+        if (n == 0) return;
+
+        final View[] icons = {btnSearch, btnHistory, btnRefresh, btnSettings};
+
+        for (int i = 0; i < n; i++) {
             TextView cur = tabViews.get(i);
-            int left = (i == 0) ? tabViews.size() - 1 : i - 1;
-            int right = (i == tabViews.size() - 1) ? 0 : i + 1;
-            cur.setNextFocusLeftId(tabViews.get(left).getId());
-            cur.setNextFocusRightId(tabViews.get(right).getId());
+            cur.setNextFocusLeftId(i == 0 ? btnSettings.getId() : tabViews.get(i - 1).getId());
+            cur.setNextFocusRightId(i == n - 1 ? btnSearch.getId() : tabViews.get(i + 1).getId());
             cur.setNextFocusDownId(R.id.grid);
+            cur.setNextFocusUpId(cur.getId());       // 顶行，再往上没有了：钉住自己，别让焦点乱跳
         }
-        if (!tabViews.isEmpty()) {
-            grid.setNextFocusUpId(tabViews.get(0).getId());
-            // 顶栏最左边现在是「搜索」，从最后一个 tab 往右走要能落到它上面
-            if (btnSearch != null) {
-                btnSearch.setNextFocusLeftId(tabViews.get(tabViews.size() - 1).getId());
-            }
+
+        for (int i = 0; i < icons.length; i++) {
+            View v = icons[i];
+            v.setNextFocusLeftId(i == 0 ? tabViews.get(n - 1).getId() : icons[i - 1].getId());
+            v.setNextFocusRightId(i == icons.length - 1 ? tabViews.get(0).getId() : icons[i + 1].getId());
+            v.setNextFocusUpId(v.getId());
+            v.setNextFocusDownId(R.id.grid);
         }
     }
 
@@ -337,45 +679,53 @@ public class HomeActivity extends Activity {
         }
 
         if (currentTab == idx) {
-            // 同一个分类再按一次也重绑一遍，避免界面偶发没跟上
+            // 同一个分类再按一次也重绑一遍，避免界面偶发没跟上；
+            // 顺手回到顶部，「再点一次当前 Tab 回顶」是通用交互
             adapter.notifyDataSetChanged();
             grid.invalidateViews();
+            scrollGridToTop();
             return;
         }
         currentTab = idx;
 
-        String g = tabDefs.get(idx)[0];
-        group = "all".equals(g) ? null : g;
-        boardId = null;
+        findBar.setVisibility(idx == 2 ? View.VISIBLE : View.GONE);
+        // 首次进「找一找」且这组条件还没查过，先按默认条件查一轮
+        if (idx == 2) {
+            FindResult st = findState();
+            if (st.items.isEmpty() && st.nextStart == 0 && !findLoading) applyFind(false);
+        }
 
-        // 从网格往上走时焦点回到当前 tab（有历史横条时先经过横条）
+        // 从网格往上走时焦点回到当前 tab
         updateFocusChain();
 
         adapter.notifyDataSetChanged();
         grid.invalidateViews();
         scrollGridToTop();
 
-        empty.setVisibility(data != null && currentItems().isEmpty() ? View.VISIBLE : View.GONE);
+        empty.setVisibility(currentItems().isEmpty() ? View.VISIBLE : View.GONE);
         renderStatus();
     }
 
     /**
      * 切分类后回到第一行。
      *
-     * 不能直接用 grid.setSelection(0)：AbsListView 的实现里，
-     * 触摸模式下它只把位置记进 mResurrectToPosition，不触发滚动——
-     * 手机上表现为「切了 Tab，列表还停在原来那一屏」。
-     * 所以触摸模式必须走 smoothScrollToPosition，且要 post 到下一帧让新数据先完成布局。
+     * 三个坑叠在一起，所以写法不能省：
+     * 1. {@code setSelection(0)} 在触摸模式只记住位置、不滚动（AbsListView 的既定行为）；
+     * 2. 数据刚 notify 过，layoutChildren 会走 handleDataChanged() 把上一个分类的
+     *    可见位置「恢复」回来——这就是「切了 Tab 还停在原来那一屏」的直接原因；
+     * 3. {@code setSelectionFromTop} 是 API 21 才有的（lint 会拦，minSdk 19 用不了）。
+     *
+     * 所以先用 setSelection(0) 把待恢复的位置清掉，再在下一帧用
+     * smoothScrollToPositionFromTop（API 11，内部 PositionScroller 会等布局完成再滚）
+     * 真正把第 0 项顶到顶部。
      */
     private void scrollGridToTop() {
+        grid.setSelection(0);
         grid.post(new Runnable() {
             @Override
             public void run() {
-                if (grid.isInTouchMode()) {
-                    grid.smoothScrollToPosition(0);
-                } else {
-                    grid.setSelection(0);
-                }
+                grid.setSelection(0);
+                grid.smoothScrollToPositionFromTop(0, 0);
             }
         });
     }
@@ -383,27 +733,13 @@ public class HomeActivity extends Activity {
     /* ---------- 列表 ---------- */
 
     private List<RankItem> currentItems() {
-        List<RankItem> out = new ArrayList<RankItem>();
-        if (data == null) return out;
-
-        if (group == null) {
-            // 全部：每个分组取主榜前 8，拼成一面墙
-            for (String g : data.groups()) {
-                List<RankRepository.Board> bs = data.boardsOf(g);
-                if (bs.isEmpty()) continue;
-                List<RankItem> items = bs.get(0).items;
-                out.addAll(items.subList(0, Math.min(8, items.size())));
-            }
-            return out;
+        if (currentTab == 2) return findState().items;
+        if (currentTab == 1) {
+            // 新品速递独立于主榜，可能还没拉到
+            RankRepository.Board b = data == null ? null : data.board(RankRepository.BOARD_NEW);
+            return b == null ? java.util.Collections.<RankItem>emptyList() : b.items;
         }
-
-        if (boardId != null) {
-            RankRepository.Board b = data.board(boardId);
-            if (b != null) return b.items;
-        }
-        List<RankRepository.Board> bs = data.boardsOf(group);
-        if (bs.isEmpty()) return out;
-        return bs.get(0).items;
+        return hotAll;
     }
 
     /** 带防重复的入口：条目自身的按键监听和 onClick 可能都会触发 */
@@ -413,118 +749,41 @@ public class HomeActivity extends Activity {
         openDetail(adapter.getItem(position));
     }
 
-    /* ---------- 继续观看 ---------- */
-
     /**
-     * 横条数据完全独立于榜单：榜单每天在变，历史片可能早就掉出去了，
-     * 所以每条记录里存了一份影片信息快照（见 HistoryStore.Entry.info）。
-     */
-    private void renderHistory() {
-        if (historyRow == null) return;
-        historyRow.removeAllViews();
-        historyCards.clear();
-
-        List<HistoryStore.Entry> list = HistoryStore.recent(10);
-        if (list.isEmpty()) {
-            historyBlock.setVisibility(View.GONE);
-            updateFocusChain();
-            return;
-        }
-
-        historyBlock.setVisibility(View.VISIBLE);
-        for (final HistoryStore.Entry e : list) {
-            View card = LayoutInflater.from(this).inflate(R.layout.item_history, historyRow, false);
-            bindHistoryCard(card, e);
-            // 先分配 id，下面串焦点链要用
-            card.setId(View.generateViewId());
-            card.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    openFromHistory(e);
-                }
-            });
-            // 卡片自身 focusable，OK 键会被它吃掉，所以按键也得在这里兜住
-            card.setOnKeyListener(new View.OnKeyListener() {
-                @Override
-                public boolean onKey(View v, int keyCode, KeyEvent event) {
-                    if (event.getAction() == KeyEvent.ACTION_UP && isConfirmKey(keyCode)) {
-                        openFromHistory(e);
-                        return true;
-                    }
-                    return false;
-                }
-            });
-
-            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT);
-            lp.rightMargin = dp(12);
-            historyRow.addView(card, lp);
-            historyCards.add(card);
-        }
-
-        updateFocusChain();
-    }
-
-    private void bindHistoryCard(View card, HistoryStore.Entry e) {
-        ImageLoader.load((ImageView) card.findViewById(R.id.poster), e.info.pic, 200);
-        ((TextView) card.findViewById(R.id.h_title)).setText(e.title);
-
-        StringBuilder sub = new StringBuilder();
-        if (e.ep != null && e.ep.length() > 0) sub.append(e.ep).append("  ·  ");
-        sub.append(e.posText());
-        if (e.dur > 0) sub.append(" / ").append(e.durText());
-        ((TextView) card.findViewById(R.id.h_sub)).setText(sub.toString());
-
-        int pct = Math.max(0, Math.min(100, e.percent()));
-        View done = card.findViewById(R.id.h_bar_done);
-        View rest = card.findViewById(R.id.h_bar_rest);
-        LinearLayout.LayoutParams a = (LinearLayout.LayoutParams) done.getLayoutParams();
-        LinearLayout.LayoutParams b = (LinearLayout.LayoutParams) rest.getLayoutParams();
-        a.weight = Math.max(1, pct);
-        b.weight = Math.max(1, 100 - pct);
-        done.setLayoutParams(a);
-        rest.setLayoutParams(b);
-        // 时长未知时没有百分比可算，与其画一条全灰的条，不如不画
-        done.setVisibility(e.dur > 0 ? View.VISIBLE : View.GONE);
-    }
-
-    /** 从历史卡进详情：带整份影片信息，并让详情页把焦点直接停在「继续看」上 */
-    private void openFromHistory(HistoryStore.Entry e) {
-        if (opening) return;
-        opening = true;
-        Intent i = new Intent(this, DetailActivity.class);
-        e.info.toIntent(i);
-        i.putExtra("title", e.title);
-        i.putExtra("autoResume", true);
-        startActivity(i);
-    }
-
-    /**
-     * 焦点链：tab ↓ 历史首卡 ↓ 海报墙，海报墙 ↑ 历史首卡 ↑ 当前 tab。
+     * 焦点链：tab ↓ 海报墙，海报墙 ↑ 当前 tab。
      * 全部显式指定，不依赖 FocusFinder 猜。
      */
     private void updateFocusChain() {
         int tabId = (currentTab >= 0 && currentTab < tabViews.size())
                 ? tabViews.get(currentTab).getId() : View.NO_ID;
-        boolean hasHistory = !historyCards.isEmpty();
 
-        if (hasHistory) {
-            for (int i = 0; i < historyCards.size(); i++) {
-                View c = historyCards.get(i);
-                if (tabId != View.NO_ID) c.setNextFocusUpId(tabId);
-                c.setNextFocusDownId(R.id.grid);
-                if (i > 0) c.setNextFocusLeftId(historyCards.get(i - 1).getId());
-                if (i < historyCards.size() - 1) c.setNextFocusRightId(historyCards.get(i + 1).getId());
-            }
-            grid.setNextFocusUpId(historyCards.get(0).getId());
-        } else if (tabId != View.NO_ID) {
+        if (tabId != View.NO_ID) {
             grid.setNextFocusUpId(tabId);
         }
 
-        int downId = hasHistory ? historyCards.get(0).getId() : R.id.grid;
-        for (TextView t : tabViews) t.setNextFocusDownId(downId);
-        if (btnSearch != null) btnSearch.setNextFocusDownId(downId);
+        // 找一找 tab：↓ 先落筛选条第一个 chip（chips 末行的 ↓ 在 onKey 里交给 grid）
+        int chipId = firstChipId();
+        for (int i = 0; i < tabViews.size(); i++) {
+            tabViews.get(i).setNextFocusDownId(
+                    (i == 2 && chipId != View.NO_ID) ? chipId : R.id.grid);
+        }
+        if (btnSearch != null) btnSearch.setNextFocusDownId(R.id.grid);
+    }
+
+    private int firstChipId() {
+        for (int r = 0; r < findRow.getChildCount(); r++) {
+            View rowV = findRow.getChildAt(r);
+            if (!(rowV instanceof ViewGroup)) continue;
+            ViewGroup g = (ViewGroup) rowV;
+            for (int i = 0; i < g.getChildCount(); i++) {
+                View v = g.getChildAt(i);
+                Object tag = v.getTag();
+                if (v.isFocusable() && tag != null && String.valueOf(tag).startsWith("chip_")) {
+                    return v.getId();
+                }
+            }
+        }
+        return View.NO_ID;
     }
 
     private void openDetail(RankItem it) {
@@ -577,6 +836,9 @@ public class HomeActivity extends Activity {
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
+            // 「找一找」滚到最后几行自动追加下一页（loadMoreFind 自己防重）
+            if (currentTab == 2 && position >= currentItems().size() - 4) loadMoreFind();
+
             View v = convertView;
             if (v == null) {
                 v = LayoutInflater.from(HomeActivity.this).inflate(R.layout.item_poster, parent, false);
@@ -591,8 +853,9 @@ public class HomeActivity extends Activity {
             if (it == null) return v;
 
             title.setText(it.title);
-            sub.setText(group == null
-                    ? RankRepository.groupLabel(it.group) + " · " + it.metaLine()
+            // 热榜是多个榜拼的，标注来源榜；新品/找一找本来就是单一列表
+            sub.setText(currentTab == 0
+                    ? it.boardLabel + " · " + it.metaLine()
                     : it.metaLine());
 
             if (it.rating > 0) {
@@ -602,16 +865,17 @@ public class HomeActivity extends Activity {
                 score.setVisibility(View.GONE);
             }
 
-            if (position < 3) {
+            // TOP 角标只给有排序意义的两个 tab；找一找是查询结果，没有名次
+            if (currentTab != 2 && position < 3) {
                 rank.setVisibility(View.VISIBLE);
-                rank.setText(String.valueOf(position + 1));
+                rank.setText("TOP " + (position + 1));
                 // 三个分支必须都是资源 ID —— 不能把 R.color.gold 和 0xFFC0C8D4 这种
                 // 颜色字面量混在一个三元表达式里，否则 getColor() 会当成资源 ID 去查表，
                 // 抛 Resources$NotFoundException（第 2、3 名会直接崩溃）。
                 int badgeRes = position == 0 ? R.color.gold
                         : position == 1 ? R.color.silver : R.color.bronze;
-                rank.setBackgroundColor(getResources().getColor(badgeRes));
-                rank.setTextColor(position == 0 ? 0xFF3A2A00 : 0xFF21252E);
+                // 底统一是 bg_pill 的半透明黑胶囊，只换字色，不再整块铺色
+                rank.setTextColor(getResources().getColor(badgeRes));
             } else {
                 rank.setVisibility(View.GONE);
             }
@@ -626,13 +890,19 @@ public class HomeActivity extends Activity {
                 }
             }
 
-            v.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            // 焦点反馈全站只有 FocusKit 一份实现（以前三个页面各抄一份，改一处忘两处）；
+            // 这里只是额外记下「焦点停在第几张」，从 tab 按 ↓ 回来不再弹回第一张。
+            FocusKit.cardFx(v, new Runnable() {
                 @Override
-                public void onFocusChange(View view, boolean has) {
-                    float s = has ? 1.07f : 1.0f;
-                    view.animate().scaleX(s).scaleY(s).setDuration(120).start();
+                public void run() {
+                    lastFocusedPos = position;
                 }
             });
+
+            // 第一行的卡片 ↑ 要回「当前分类 tab」。不显式绑的话 FocusFinder 会挑
+            // 位置最近的那个 tab（在「找一找」里按 ↑ 可能落回「豆瓣热榜」，内容被顺手切走）。
+            // 第二行以后必须放开，否则按 ↑ 会跳过上一行直接飞回顶栏。
+            v.setNextFocusUpId(position < grid.getNumColumns() ? grid.getNextFocusUpId() : View.NO_ID);
 
             // 关键：item_poster 的根布局是 focusable 的，这种情况下 AbsListView 认为
             // 「条目自己会处理按键」，grid.setOnItemClickListener 永远等不到 OK 键，
@@ -655,9 +925,7 @@ public class HomeActivity extends Activity {
                 }
             });
 
-            // 复用时要复位，否则滑出屏幕的卡片会保持放大状态
-            v.setScaleX(v.isFocused() ? 1.07f : 1.0f);
-            v.setScaleY(v.isFocused() ? 1.07f : 1.0f);
+            // 复用时的缩放复位已经由 FocusKit.cardFx 统一处理，不要再在这里抄一份
 
             return v;
         }

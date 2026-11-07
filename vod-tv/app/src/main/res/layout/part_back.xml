@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  统一的「返回」按钮（PROJECT.md §15）。
+  所有二级页都把这一份 include 在顶栏最左，不许再另写一份 ——
+  以前详情页在左上、设置页在右上，用户一眼就看出来不对。
+  Android TV 官方规范其实不建议屏幕返回键（遥控器返回键即可），
+  这里保留是因为手机没有实体返回键，属于「手机兼容补丁」，固定左上角一处。
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:focusable="true"
+    android:background="@drawable/bg_icon"
+    android:paddingLeft="@dimen/space_md"
+    android:paddingRight="@dimen/space_lg"
+    android:paddingTop="@dimen/space_sm"
+    android:paddingBottom="@dimen/space_sm">
+
+    <ImageView
+        android:layout_width="18dp"
+        android:layout_height="18dp"
+        android:src="@drawable/ic_ui_back"
+        android:contentDescription="@null" />
+
+    <TextView
+        android:id="@+id/back_label"
+        style="@style/Text.Caption"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/space_xs"
+        android:text="@string/back" />
+</LinearLayout>

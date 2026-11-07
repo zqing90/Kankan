@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 输入框底：比背景亮一档的实底 + 1dp 描边，聚焦时换成统一的 2dp 焦点蓝 -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_focused="true">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/surface_2" />
+            <corners android:radius="@dimen/radius_md" />
+            <stroke android:width="@dimen/focus_stroke" android:color="@color/focus" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@color/surface" />
+            <corners android:radius="@dimen/radius_md" />
+            <stroke android:width="1dp" android:color="@color/stroke" />
+        </shape>
+    </item>
+</selector>

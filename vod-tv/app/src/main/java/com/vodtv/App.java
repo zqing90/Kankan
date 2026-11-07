@@ -6,6 +6,7 @@ import com.vodtv.data.HistoryStore;
 import com.vodtv.data.PlayCache;
 import com.vodtv.data.ImageLoader;
 import com.vodtv.data.Prefs;
+import com.vodtv.data.SearchHistory;
 import com.vodtv.data.SourceStats;
 import com.vodtv.data.SourceStore;
 
@@ -44,6 +45,9 @@ public class App extends Application {
         SourceStats.init(this);
         HistoryStore.init(this);
         PlayCache.init(this);
+        // 漏了这一行会导致 SearchHistory.sp 为 null：add() 直接 return、list() 永远空，
+        // 搜索页的「最近搜索」整块永久隐藏（1.3.0 就是这个 bug）
+        SearchHistory.init(this);
         ImageLoader.init(this);
     }
 

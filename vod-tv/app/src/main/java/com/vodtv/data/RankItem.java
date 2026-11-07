@@ -26,6 +26,8 @@ public class RankItem {
     public List<String> genres = new ArrayList<String>();
     public double rating;
     public int ratingCount;
+    /** 搜索结果里由片源站补上来的条目：命中几个源。榜单条目为 0，不显示 */
+    public int sourceCount;
 
     public String metaLine() {
         StringBuilder sb = new StringBuilder();
@@ -33,6 +35,10 @@ public class RankItem {
         if (episodes != null && episodes.length() > 0) {
             if (sb.length() > 0) sb.append(" · ");
             sb.append(episodes);
+        }
+        if (sourceCount > 0) {
+            if (sb.length() > 0) sb.append(" · ");
+            sb.append(sourceCount).append(" 个源");
         }
         if (sb.length() == 0 && region != null) sb.append(region);
         return sb.toString();
@@ -113,6 +119,50 @@ public class RankItem {
         r.url = r.id.length() > 0
                 ? "https://movie.douban.com/subject/" + r.id + "/"
                 : it.optString("url", "");
+        return r;
+    }
+
+    /**
+     * 豆瓣 new_search_subjects（网页「按条件找片」接口）的条目：
+     * 字段只有 title/rate/cover/url/id/casts/directors，没有年份地区简介。
+     * 年份由查询条件带入（year_range），不是条目自带的。
+     */
+    public static RankItem parseSearch(JSONObject it, String board, String boardLabel,
+                                       String group, String year) {
+        RankItem r = new RankItem();
+        r.board = board;
+        r.boardLabel = boardLabel;
+        r.group = group;
+        r.title = it.optString("title", "");
+        r.year = year == null ? "" : year;
+
+        String cover = it.optString("cover", "");
+        r.pic = cover;
+        r.picLarge = cover;
+
+        r.id = it.optString("id", "");
+        if (r.id.length() == 0) r.id = extractId(it.optString("url", ""));
+        r.url = it.optString("url", "");
+        if (r.url.length() == 0 && r.id.length() > 0) {
+            r.url = "https://movie.douban.com/subject/" + r.id + "/";
+        }
+
+        String rate = it.optString("rate", "");
+        try {
+            r.rating = Double.parseDouble(rate);
+        } catch (Exception ignored) {
+            r.rating = 0;
+        }
+
+        org.json.JSONArray dirs = it.optJSONArray("directors");
+        if (dirs != null && dirs.length() > 0) r.director = dirs.optString(0, "");
+        org.json.JSONArray casts = it.optJSONArray("casts");
+        if (casts != null) {
+            for (int i = 0; i < casts.length() && r.actors.size() < 3; i++) {
+                String a = casts.optString(i, "");
+                if (a.length() > 0) r.actors.add(a);
+            }
+        }
         return r;
     }
 

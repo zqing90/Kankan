@@ -15,15 +15,25 @@ import java.util.Iterator;
  *
  * 续播判断放在 {@link #resumePos}：不足 30 秒、或离结尾不到 1 分钟，都从头开始，
  * 免得用户刚点开就被拖到片尾、或者被拖到片尾只剩字幕。
+ *
+ * **看完了不删记录**（2026-11-07 反馈「播完之后历史记录会消失」）：
+ * 贴到片尾的记录会连 pos 一起写成时长，{@link Entry#isFinished()} 为 true，
+ * 记录页显示「已看完」，点进去从头播。记录只有「用户手动删」和「超过 80 条淘汰」两种消失方式。
  */
 public class HistoryStore {
 
-    /** 低于这个位置不值得续播 */
-    private static final long MIN_POS = 30 * 1000L;
-    /** 距离结尾小于这个值就当作看完了 */
+    /**
+     * 低于这个位置就不写记录。
+     * 定 5 秒而不是 30 秒：用户点开看一眼就退出的情况很常见，
+     * 30 秒门槛会让「观看记录」看起来像坏了（2026-11-06 反馈「看不到播放记录」的直接原因）。
+     */
+    private static final long MIN_POS = 5 * 1000L;
+    /** 低于这个位置不续播：刚看 5 秒就跳回去没有意义，从头开始更符合直觉 */
+    private static final long MIN_RESUME = 30 * 1000L;
+    /** 距离结尾小于这个值就当作看完了（同时决定「已看完」与「从头播」） */
     private static final long TAIL = 60 * 1000L;
     /** 最多保留多少部片的记录 */
-    private static final int MAX_ENTRIES = 80;
+    public static final int MAX_ENTRIES = 80;
 
     public static class Entry {
         public String title;
@@ -43,8 +53,19 @@ public class HistoryStore {
             return dur > 0 ? fmt(dur) : "";
         }
 
+        /**
+         * 看完了：位置贴到片尾一分钟以内。
+         *
+         * 不单独存布尔字段，用 pos/dur 推出来——旧版本的记录（看完就被删，可能残留在
+         * 别人的机器上）不用迁移，dur 未知（0）时也不会误判成看完。
+         */
+        public boolean isFinished() {
+            return HistoryStore.isFinished(pos, dur);
+        }
+
         public int percent() {
             if (dur <= 0) return 0;
+            if (isFinished()) return 100;
             return (int) Math.min(100, pos * 100 / dur);
         }
     }
@@ -60,8 +81,10 @@ public class HistoryStore {
     /* ---------- 写 ---------- */
 
     /**
-     * 记一次进度。pos 太小或已经贴到结尾时，直接把这条记录删掉，
-     * 下次进来就从头上播。
+     * 记一次进度。
+     *
+     * 位置太小（点开几秒就退）不新建记录；已经到片尾则**保留记录并标记已看完**，
+     * 位置直接写成时长。记录只有两种消失方式：用户手动删、超过上限被淘汰。
      */
     public static void save(String title, String ep, String sourceId,
                             long pos, long dur, MovieInfo info) {
@@ -69,14 +92,14 @@ public class HistoryStore {
         try {
             JSONObject all = all();
 
-            boolean useless = pos < MIN_POS || (dur > 0 && pos > dur - TAIL);
-            if (useless) {
-                if (all.has(title)) {
-                    all.remove(title);
-                    commit(all);
-                }
-                return;
-            }
+            // 点开几秒就退出：不建新记录，也不动可能已经存在的旧记录。
+            // 以前这里会把旧记录一并删掉 —— 重看第 1 分钟就想退出，整条记录就没了。
+            if (pos < MIN_POS) return;
+
+            // 看到结尾：保留并按「已看完」落盘，不再删除（以前 remove 掉，
+            // 用户看到的就是「播完之后历史记录会消失」）
+            boolean finished = dur > 0 && pos >= dur - TAIL;
+            if (finished) pos = dur;
 
             // 已有记录里的影片信息不要被空值盖掉：有的播放入口只带片名
             MovieInfo merged = info == null ? new MovieInfo() : info;
@@ -124,10 +147,27 @@ public class HistoryStore {
     }
 
     /**
-     * 最近看过的片，按时间倒序。首页「继续观看」横条用。
-     * 只返回 pos 有效（能续播）的记录。
+     * 最近看过的**没看完**的片，按时间倒序。给「继续观看」类入口用。
+     * 刚看几秒的、以及已经看完的都不要——放到「继续观看」里点进去却从头播，反而奇怪。
+     * 完整的「看过」清单（含已看完）走 {@link #all(int)}。
      */
     public static java.util.List<Entry> recent(int limit) {
+        java.util.List<Entry> out = query(limit, MIN_RESUME);
+        java.util.Iterator<Entry> it = out.iterator();
+        while (it.hasNext()) {
+            if (it.next().isFinished()) it.remove();
+        }
+        return out;
+    }
+
+    /**
+     * 全部观看记录（含只看了几秒的），按时间倒序。观看记录页用。
+     */
+    public static java.util.List<Entry> all(int limit) {
+        return query(limit, MIN_POS);
+    }
+
+    private static java.util.List<Entry> query(int limit, long minPos) {
         java.util.List<Entry> out = new java.util.ArrayList<Entry>();
         try {
             JSONObject all = all();
@@ -138,7 +178,7 @@ public class HistoryStore {
                 JSONObject o = all.optJSONObject(k);
                 if (o == null) continue;
                 Entry e = read(k, o);
-                if (e.pos >= MIN_POS) tmp.add(e);
+                if (e.pos >= minPos) tmp.add(e);
             }
             java.util.Collections.sort(tmp, new java.util.Comparator<Entry>() {
                 @Override
@@ -168,15 +208,16 @@ public class HistoryStore {
 
     /**
      * 该不该续播、从哪开始。返回 0 表示从头播。
-     * 集名对不上（用户手动换了别的集）时也从头播，避免张冠李戴。
+     * 集名对不上（用户手动换了别的集）时也从头播，避免张冠李戴；
+     * 已看完的同样从头播（记录还在，只是不再往后拖）。
      */
     public static long resumePos(Entry e, String ep) {
         if (e == null) return 0;
         if (ep != null && ep.length() > 0 && e.ep != null && e.ep.length() > 0 && !ep.equals(e.ep)) {
             return 0;
         }
-        if (e.pos < MIN_POS) return 0;
-        if (e.dur > 0 && e.pos > e.dur - TAIL) return 0;
+        if (e.pos < MIN_RESUME) return 0;
+        if (e.isFinished()) return 0;
         return e.pos;
     }
 
@@ -191,7 +232,25 @@ public class HistoryStore {
         }
     }
 
+    /** 清空全部记录（观看记录页的「清空」） */
+    public static void clearAll() {
+        try {
+            commit(new JSONObject());
+        } catch (Exception ignored) {
+        }
+    }
+
     /* ---------- 内部 ---------- */
+
+    /**
+     * 位置是否算「看到结尾」。
+     *
+     * 抽成静态方法是为了能脱离 SharedPreferences 单测——这条判定直接决定
+     * 「记录会不会被当成看完」，写错就会让记录从列表里消失（1.4.6 之前就是直接删）。
+     */
+    public static boolean isFinished(long pos, long dur) {
+        return dur > 0 && pos >= dur - TAIL;
+    }
 
     private static JSONObject all() {
         String s = sp.getString("data", "{}");

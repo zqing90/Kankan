@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- 播放进度：品牌蓝 + 全圆角，两端都是圆的才像「进度」而不是「色块」 -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@android:id/background">
         <shape android:shape="rectangle">
-            <solid android:color="#33FFFFFF" />
-            <corners android:radius="2dp" />
+            <solid android:color="#3DFFFFFF" />
+            <corners android:radius="99dp" />
         </shape>
     </item>
     <item android:id="@android:id/progress">
         <clip>
             <shape android:shape="rectangle">
-                <solid android:color="@color/accent" />
-                <corners android:radius="2dp" />
+                <solid android:color="@color/brand" />
+                <corners android:radius="99dp" />
             </shape>
         </clip>
     </item>

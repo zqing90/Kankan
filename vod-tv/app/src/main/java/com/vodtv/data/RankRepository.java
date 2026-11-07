@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -22,6 +23,9 @@ import java.util.concurrent.TimeUnit;
  * 两条取数路径：
  *   1. 直连：直接打豆瓣 rexxar 的 17 个榜单（4 路并发，约 4 秒）
  *   2. 服务端：GET {server}/api/rank（一次请求，字段已归一化）
+ *
+ * 另有一路独立数据源「新品速递」：movie.douban.com/j/new_search_subjects
+ * （网页找片接口，要求 UA、不需要 Referer；rexxar 正好相反）。
  *
  * 缓存落盘到 files/rank.json，App 启动先读缓存秒开，再按需后台刷新。
  */
@@ -67,6 +71,9 @@ public class RankRepository {
     public static final String GROUP_SHOW = "show";
     public static final String GROUP_ANIME = "anime";
     public static final String GROUP_DOC = "doc";
+    /** 新品速递：不是 rexxar 榜单，走 new_search_subjects 接口 */
+    public static final String GROUP_NEW = "new";
+    public static final String BOARD_NEW = "new_releases";
 
     /** 与 Node 端 BOARDS 保持一致 */
     private static final String[][] BOARDS = {
@@ -98,6 +105,7 @@ public class RankRepository {
         if (GROUP_SHOW.equals(g)) return "综艺";
         if (GROUP_ANIME.equals(g)) return "动画";
         if (GROUP_DOC.equals(g)) return "纪录片";
+        if (GROUP_NEW.equals(g)) return "新片";
         return g;
     }
 
@@ -143,6 +151,12 @@ public class RankRepository {
 
     public static RankData refresh(Context ctx, Listener l) throws Exception {
         RankData d = Prefs.useServer() ? fetchFromServer(ctx, l) : fetchFromDouban(l);
+        // 新品速递与主榜数据源不同（new_search_subjects），单独拉；失败不影响主榜
+        try {
+            Board nb = fetchNewReleases(null);
+            if (nb != null && !nb.items.isEmpty()) d.boards.add(nb);
+        } catch (Exception ignored) {
+        }
         d.fetchedAt = System.currentTimeMillis();
         save(ctx, d);
         return d;
@@ -207,6 +221,89 @@ public class RankRepository {
                 if (r.title != null && r.title.length() > 0) b.items.add(r);
             }
         }
+        return b;
+    }
+
+    /* ---------- new_search_subjects（新品速递 / 找一找） ---------- */
+
+    private static final String SEARCH_URL = "https://movie.douban.com/j/new_search_subjects";
+
+    /** 拼查询 URL。tags/年份要 URL 编码，空格组合豆瓣不认（实测 0 结果），逗号组合可以 */
+    private static String searchUrl(String tags, String yearRange, String sort, int start) {
+        StringBuilder u = new StringBuilder(SEARCH_URL)
+                .append("?sort=").append(sort)
+                .append("&range=0,10")
+                .append("&playable=1")
+                .append("&start=").append(start);
+        try {
+            if (tags != null && tags.length() > 0) {
+                u.append("&tags=").append(java.net.URLEncoder.encode(tags, "UTF-8"));
+            }
+            if (yearRange != null && yearRange.length() > 0) {
+                u.append("&year_range=").append(java.net.URLEncoder.encode(yearRange, "UTF-8"));
+            }
+        } catch (Exception ignored) {
+        }
+        return u.toString();
+    }
+
+    /**
+     * 按条件查一批（每页固定 20 条）。yearKey 取值：
+     *   all   不限年份
+     *   cur   当年
+     *   prev  去年
+     *   older 更早（1900 ~ 前年）
+     */
+    public static List<RankItem> find(String tags, String yearKey, String sort, int start) throws Exception {
+        int year = Calendar.getInstance().get(Calendar.YEAR);
+        String y = String.valueOf(year);
+        String yearRange;
+        if ("all".equals(yearKey)) yearRange = null;
+        else if ("cur".equals(yearKey)) yearRange = y + "," + y;
+        else if ("prev".equals(yearKey)) yearRange = (year - 1) + "," + (year - 1);
+        else if ("older".equals(yearKey)) yearRange = "1900," + (year - 2);
+        else yearRange = null;
+
+        String body = Http.getText(searchUrl(tags, yearRange, sort, start),
+                Http.headers(Http.UA_DESKTOP, null), 15000);
+        JSONObject j = new JSONObject(body);
+        JSONArray arr = j.optJSONArray("data");
+        String yStr = "cur".equals(yearKey) ? String.valueOf(year)
+                : "prev".equals(yearKey) ? String.valueOf(year - 1) : "";
+        List<RankItem> out = new ArrayList<RankItem>();
+        if (arr != null) {
+            for (int i = 0; i < arr.length(); i++) {
+                JSONObject it = arr.optJSONObject(i);
+                if (it == null) continue;
+                RankItem r = RankItem.parseSearch(it, "find", "找一找", GROUP_NEW, yStr);
+                if (r.title != null && r.title.length() > 0) out.add(r);
+            }
+        }
+        return out;
+    }
+
+    /** 新品速递：当年可播新作，按热度，拉 3 页共 60 条 */
+    private static Board fetchNewReleases(Listener l) throws Exception {
+        int year = Calendar.getInstance().get(Calendar.YEAR);
+        String y = String.valueOf(year);
+        Board b = new Board();
+        b.id = BOARD_NEW;
+        b.label = "新品速递";
+        b.group = GROUP_NEW;
+        for (int start = 0; start < 60; start += 20) {
+            String body = Http.getText(searchUrl("", y + "," + y, "U", start),
+                    Http.headers(Http.UA_DESKTOP, null), 15000);
+            JSONArray arr = new JSONObject(body).optJSONArray("data");
+            if (arr == null) break;
+            for (int i = 0; i < arr.length(); i++) {
+                JSONObject it = arr.optJSONObject(i);
+                if (it == null) continue;
+                RankItem r = RankItem.parseSearch(it, BOARD_NEW, "新品速递", GROUP_NEW, y);
+                if (r.title != null && r.title.length() > 0) b.items.add(r);
+            }
+            if (arr.length() < 20) break;   // 最后一页不满 20 就不用再翻了
+        }
+        if (l != null) l.onProgress("新品速递 " + b.items.size() + " 部");
         return b;
     }
 

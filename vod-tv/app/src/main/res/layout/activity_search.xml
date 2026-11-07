@@ -1,86 +1,130 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  搜索页
+  ─────────────────────────────────────────────────────────────
+  顶栏结构与其它二级页完全一致：左上返回 → 中间输入 → 右侧动作图标。
+  结果用和首页同一套海报卡（item_poster），所以两页的卡片视觉天然一致。
+-->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/bg">
+    android:layout_height="match_parent">
 
-    <!-- 顶栏：返回 + 输入框 + 搜索 -->
+    <!-- 顶栏：左上返回 + 输入框 + 搜索图标 -->
     <LinearLayout
         android:id="@+id/topbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:paddingLeft="36dp"
-        android:paddingRight="36dp"
-        android:paddingTop="20dp"
-        android:paddingBottom="6dp">
+        android:paddingLeft="@dimen/topbar_pad_h"
+        android:paddingRight="@dimen/topbar_pad_h"
+        android:paddingTop="@dimen/space_xl"
+        android:paddingBottom="@dimen/space_sm">
 
-        <TextView
+        <include
             android:id="@+id/btn_back"
-            style="@style/TopButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="0dp"
-            android:text="← 返回" />
+            layout="@layout/part_back" />
 
         <EditText
             android:id="@+id/q"
+            style="@style/Text.Body"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:layout_marginLeft="14dp"
-            android:background="@drawable/bg_tab"
+            android:layout_marginLeft="@dimen/space_md"
+            android:background="@drawable/bg_input"
             android:hint="@string/search_hint"
             android:imeOptions="actionSearch"
             android:inputType="text"
             android:maxLines="1"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp"
-            android:paddingTop="10dp"
-            android:paddingBottom="10dp"
+            android:paddingLeft="@dimen/space_lg"
+            android:paddingRight="@dimen/space_lg"
+            android:paddingTop="@dimen/space_md"
+            android:paddingBottom="@dimen/space_md"
             android:singleLine="true"
-            android:textColor="@color/text_primary"
-            android:textColorHint="@color/text_dim"
-            android:textSize="15sp" />
+            android:textColorHint="@color/text_tertiary" />
 
-        <TextView
+        <ImageView
             android:id="@+id/btn_go"
-            style="@style/TopButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/search" />
+            style="@style/IconButton"
+            android:layout_marginLeft="@dimen/space_sm"
+            android:src="@drawable/ic_ui_search"
+            android:contentDescription="@string/search" />
     </LinearLayout>
 
-    <!-- 状态 / 兜底入口 -->
+    <!-- 最近搜索：只在还没输入关键词时显示 -->
+    <LinearLayout
+        android:id="@+id/history_panel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/topbar"
+        android:orientation="vertical"
+        android:paddingLeft="@dimen/content_pad_h"
+        android:paddingRight="@dimen/topbar_pad_h"
+        android:paddingTop="@dimen/space_sm"
+        android:paddingBottom="@dimen/space_sm"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                style="@style/Text.Caption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/search_history"
+                android:textColor="@color/text_primary"
+                android:textStyle="bold" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
+
+            <TextView
+                android:id="@+id/btn_history_clear"
+                style="@style/Text.Micro"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:focusable="true"
+                android:background="@drawable/bg_chip"
+                android:paddingLeft="@dimen/space_md"
+                android:paddingRight="@dimen/space_md"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp"
+                android:text="@string/history_clear" />
+        </LinearLayout>
+
+        <!-- 标签按行动态填：代码里每行最多放 6 个 -->
+        <LinearLayout
+            android:id="@+id/history_tags"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_sm"
+            android:orientation="vertical" />
+    </LinearLayout>
+
+    <!-- 状态行：搜索进度 / 结果条数 -->
     <LinearLayout
         android:id="@+id/status_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/topbar"
+        android:layout_below="@id/history_panel"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:paddingLeft="38dp"
-        android:paddingRight="38dp"
-        android:paddingBottom="10dp">
+        android:paddingLeft="@dimen/content_pad_h"
+        android:paddingRight="@dimen/topbar_pad_h"
+        android:paddingBottom="@dimen/space_md">
 
         <TextView
             android:id="@+id/status"
-            android:layout_width="0dp"
+            style="@style/Text.Micro"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="输入片名后按「搜索」，也可以直接按遥控器确认键"
-            android:textColor="@color/text_dim"
-            android:textSize="12sp" />
-
-        <!-- 本地榜单没有时才出现：去 14 个片源站搜 -->
-        <TextView
-            android:id="@+id/btn_online"
-            style="@style/TopButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="联网搜索片源"
-            android:visibility="gone" />
+            android:text="@string/search_hint_status" />
     </LinearLayout>
 
     <GridView
@@ -89,24 +133,42 @@
         android:layout_height="match_parent"
         android:layout_below="@id/status_bar"
         android:layout_alignParentBottom="true"
-        android:numColumns="6"
-        android:horizontalSpacing="14dp"
-        android:verticalSpacing="20dp"
-        android:paddingLeft="32dp"
-        android:paddingRight="32dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="32dp"
+        android:numColumns="@integer/grid_cols"
+        android:horizontalSpacing="@dimen/card_gap_h"
+        android:verticalSpacing="@dimen/card_gap_v"
+        android:paddingLeft="@dimen/content_pad_h"
+        android:paddingRight="@dimen/content_pad_h"
+        android:paddingTop="@dimen/space_sm"
+        android:paddingBottom="@dimen/space_xxl"
         android:clipChildren="false"
         android:clipToPadding="false"
         android:listSelector="@android:color/transparent"
         android:scrollbars="none" />
 
-    <TextView
+    <!-- 空态：主文案 + 副文案，给下一步动作的提示 -->
+    <LinearLayout
         android:id="@+id/empty"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:textColor="@color/text_secondary"
-        android:textSize="15sp"
-        android:visibility="gone" />
+        android:orientation="vertical"
+        android:gravity="center"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/empty_title"
+            style="@style/Text.Body"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/search_empty_title"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/empty_sub"
+            style="@style/Text.Caption"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_sm"
+            android:text="@string/search_empty_sub" />
+    </LinearLayout>
 </RelativeLayout>

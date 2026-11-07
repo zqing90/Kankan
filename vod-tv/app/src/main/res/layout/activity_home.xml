@@ -1,143 +1,164 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  首页
+  ─────────────────────────────────────────────────────────────
+  垂直顺序：品牌栏 → 状态行 → 海报墙
+  顶栏左右 48dp / 手机 20dp（@dimen/topbar_pad_h），是 Android TV overscan 安全区。
+  动作按钮全部是图标，顺序固定：搜索 / 记录 / 更新 / 设置。
+-->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/bg">
+    android:layout_height="match_parent">
 
-    <!-- 顶栏 -->
+    <!-- ============ 顶栏 ============ -->
     <LinearLayout
         android:id="@+id/topbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:paddingLeft="36dp"
-        android:paddingRight="36dp"
-        android:paddingTop="22dp"
-        android:paddingBottom="4dp">
+        android:paddingLeft="@dimen/topbar_pad_h"
+        android:paddingRight="@dimen/topbar_pad_h"
+        android:paddingTop="@dimen/space_xl"
+        android:paddingBottom="@dimen/space_xs">
+
+        <!-- 品牌标记 + App 名。标记与桌面上那个蓝底白三角图标同一套视觉，
+             让人一眼认出「点进来的是同一个 App」 -->
+        <ImageView
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:src="@drawable/ic_brand_mark"
+            android:layout_marginRight="@dimen/space_sm"
+            android:contentDescription="@null" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/app_name"
             android:textColor="@color/text_primary"
-            android:textSize="26sp"
+            android:textSize="@dimen/app_title_size"
             android:textStyle="bold"
-            android:layout_marginRight="28dp" />
+            android:layout_marginRight="@dimen/space_xl" />
 
-        <LinearLayout
-            android:id="@+id/tabs"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal" />
-
-        <View
-            android:layout_width="0dp"
-            android:layout_height="1dp"
-            android:layout_weight="1" />
-
-        <TextView
-            android:id="@+id/btn_search"
-            style="@style/TopButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/search" />
-
-        <TextView
-            android:id="@+id/btn_refresh"
-            style="@style/TopButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/refresh"
-            android:nextFocusDown="@id/grid" />
-
-        <TextView
-            android:id="@+id/btn_settings"
-            style="@style/TopButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/settings"
-            android:nextFocusDown="@id/grid" />
-    </LinearLayout>
-
-    <!-- 数据源 / 更新时间 -->
-    <TextView
-        android:id="@+id/status"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/topbar"
-        android:paddingLeft="38dp"
-        android:paddingTop="6dp"
-        android:paddingBottom="10dp"
-        android:text="@string/loading"
-        android:textColor="@color/text_dim"
-        android:textSize="12sp" />
-
-    <!-- 继续观看：无历史时整块 gone，GridView 会自动贴回 status 下方 -->
-    <LinearLayout
-        android:id="@+id/history_block"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/status"
-        android:orientation="vertical"
-        android:paddingTop="2dp"
-        android:paddingBottom="6dp"
-        android:visibility="gone">
-
-        <TextView
-            android:id="@+id/history_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingLeft="38dp"
-            android:paddingBottom="8dp"
-            android:text="继续观看"
-            android:textColor="@color/text_primary"
-            android:textSize="15sp"
-            android:textStyle="bold" />
-
+        <!-- 分类 tab 放进横向滚动并吃掉剩余宽度：
+             窄屏（手机）上 5 个 tab + 4 个图标按钮会溢出，图标被挤出屏幕就点不到了 -->
         <HorizontalScrollView
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:paddingLeft="32dp"
-            android:paddingRight="32dp"
-            android:clipToPadding="false"
-            android:scrollbars="none">
+            android:layout_weight="1"
+            android:scrollbars="none"
+            android:fillViewport="true"
+            android:descendantFocusability="afterDescendants">
 
             <LinearLayout
-                android:id="@+id/history_row"
+                android:id="@+id/tabs"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal" />
         </HorizontalScrollView>
+
+        <!-- 动作一律用图标（Material Rounded），顺序固定：搜索 / 记录 / 更新 / 设置 -->
+        <ImageView
+            android:id="@+id/btn_search"
+            style="@style/IconButton"
+            android:src="@drawable/ic_ui_search"
+            android:contentDescription="@string/search" />
+
+        <ImageView
+            android:id="@+id/btn_history"
+            style="@style/IconButton"
+            android:src="@drawable/ic_ui_history"
+            android:contentDescription="@string/history"
+            android:nextFocusDown="@id/grid" />
+
+        <ImageView
+            android:id="@+id/btn_refresh"
+            style="@style/IconButton"
+            android:src="@drawable/ic_ui_refresh"
+            android:contentDescription="@string/refresh"
+            android:nextFocusDown="@id/grid" />
+
+        <ImageView
+            android:id="@+id/btn_settings"
+            style="@style/IconButton"
+            android:src="@drawable/ic_ui_settings"
+            android:contentDescription="@string/settings"
+            android:nextFocusDown="@id/grid" />
+    </LinearLayout>
+
+    <!-- 数据源 / 更新时间。11sp 三级文字，不再抢视觉重心 -->
+    <TextView
+        android:id="@+id/status"
+        style="@style/Text.Micro"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/topbar"
+        android:paddingLeft="@dimen/content_pad_h"
+        android:paddingTop="@dimen/space_xs"
+        android:paddingBottom="@dimen/space_md"
+        android:text="@string/loading" />
+
+    <!-- 「找一找」筛选条：类型 / 年份 / 排序，每个条件独占一行，chips 由代码填。
+         只在第三个 tab 可见；gone 时 grid 贴回 status 下方。 -->
+    <LinearLayout
+        android:id="@+id/find_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/status"
+        android:orientation="vertical"
+        android:paddingLeft="@dimen/content_pad_h"
+        android:paddingRight="@dimen/content_pad_h"
+        android:paddingBottom="@dimen/space_xs"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:id="@+id/find_row"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
     </LinearLayout>
 
     <GridView
         android:id="@+id/grid"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/history_block"
+        android:layout_below="@id/find_bar"
         android:layout_alignParentBottom="true"
-        android:numColumns="6"
-        android:horizontalSpacing="14dp"
-        android:verticalSpacing="20dp"
-        android:paddingLeft="32dp"
-        android:paddingRight="32dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="32dp"
+        android:numColumns="@integer/grid_cols"
+        android:horizontalSpacing="@dimen/card_gap_h"
+        android:verticalSpacing="@dimen/card_gap_v"
+        android:paddingLeft="@dimen/content_pad_h"
+        android:paddingRight="@dimen/content_pad_h"
+        android:paddingTop="@dimen/space_sm"
+        android:paddingBottom="@dimen/space_xxl"
         android:clipChildren="false"
         android:clipToPadding="false"
         android:listSelector="@android:color/transparent"
         android:scrollbars="none"
         android:nextFocusUp="@id/tabs" />
 
-    <!-- 空态 -->
-    <TextView
+    <!-- 空态：主文案 + 副文案，不再是孤零零一行灰字 -->
+    <LinearLayout
         android:id="@+id/empty"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:text="@string/empty"
-        android:textColor="@color/text_secondary"
-        android:textSize="15sp"
-        android:visibility="gone" />
+        android:orientation="vertical"
+        android:gravity="center"
+        android:visibility="gone">
+
+        <TextView
+            style="@style/Text.Body"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/empty_title"
+            android:textStyle="bold" />
+
+        <TextView
+            style="@style/Text.Caption"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_sm"
+            android:text="@string/empty" />
+    </LinearLayout>
 </RelativeLayout>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  电视档兜底列数：7。
+  ★ 实际列数以 HomeActivity.resolveColumns() 按物理像素算出来的为准 ——
+    电视的 densityDpi 各家乱报（同一个 1080p 面板有报 1.0 / 1.5 / 2.0 的），
+    这个值只在拿不到宽度像素时兜底。
+-->
+<resources>
+    <integer name="grid_cols">7</integer>
+</resources>

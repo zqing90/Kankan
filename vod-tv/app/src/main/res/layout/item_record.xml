@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 首页「继续观看」横向卡片：左海报 + 右文字 + 底部进度条 -->
+<!-- 观看记录页的卡片：宽度由 GridView 列宽决定，高度固定 96dp（代码里 dp(96)） -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="250dp"
-    android:layout_height="92dp"
+    android:layout_width="match_parent"
+    android:layout_height="96dp"
     android:orientation="horizontal"
     android:focusable="true"
     android:background="@drawable/bg_card"
     android:padding="4dp">
 
-    <ImageView
+    <com.vodtv.widget.RoundImageView
         android:id="@+id/poster"
         android:layout_width="58dp"
-        android:layout_height="84dp"
+        android:layout_height="86dp"
         android:scaleType="centerCrop"
         android:background="@drawable/ph_poster"
         android:contentDescription="@null" />
@@ -20,32 +20,30 @@
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:layout_marginLeft="9dp"
-        android:layout_marginRight="6dp"
+        android:layout_marginLeft="@dimen/space_md"
+        android:layout_marginRight="@dimen/space_sm"
         android:orientation="vertical"
         android:gravity="center_vertical">
 
         <TextView
             android:id="@+id/h_title"
-            style="@style/CardTitle"
+            style="@style/Text.Body"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="14sp" />
+            android:layout_height="wrap_content" />
 
         <TextView
             android:id="@+id/h_sub"
-            style="@style/CardSub"
+            style="@style/Text.Micro"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:textSize="11sp" />
+            android:layout_marginTop="2dp" />
 
         <!-- 进度条：两段 weight 由代码按百分比设置 -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="3dp"
-            android:layout_marginTop="7dp"
-            android:layout_marginRight="4dp"
+            android:layout_marginTop="@dimen/space_sm"
+            android:layout_marginRight="@dimen/space_xs"
             android:orientation="horizontal">
 
             <View
@@ -53,14 +51,14 @@
                 android:layout_width="0dp"
                 android:layout_height="3dp"
                 android:layout_weight="0"
-                android:background="@color/accent" />
+                android:background="@drawable/bar_done" />
 
             <View
                 android:id="@+id/h_bar_rest"
                 android:layout_width="0dp"
                 android:layout_height="3dp"
                 android:layout_weight="100"
-                android:background="#33FFFFFF" />
+                android:background="@drawable/bar_rest" />
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>

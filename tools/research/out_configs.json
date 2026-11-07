@@ -1,0 +1,29 @@
+{
+ "total_sites": 72,
+ "cms": [
+  {
+   "key": "暴风",
+   "name": "暴风",
+   "api": "https://bfzyapi.com/api.php/provide/vod",
+   "type": 1,
+   "searchable": 1,
+   "src": "https://dxawi.github.io/0/0.json"
+  },
+  {
+   "key": "IK",
+   "name": "IK",
+   "api": "https://ikunzyapi.com/api.php/provide/vod/from/ikm3u8/",
+   "type": 1,
+   "searchable": 1,
+   "src": "https://dxawi.github.io/0/0.json"
+  },
+  {
+   "key": "haiwaikan",
+   "name": "海外看(墙外)",
+   "api": "https://haiwaikan.com/api.php/provide/vod",
+   "type": 1,
+   "searchable": 1,
+   "src": "https://dxawi.github.io/0/0.json"
+  }
+ ]
+}
