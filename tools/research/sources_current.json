@@ -1,0 +1,16 @@
+[
+ {"id":"bfzy","name":"暴风资源","host":"https://bfzyapi.com","path":"/api.php/provide/vod/"},
+ {"id":"liangzi","name":"量子资源","host":"https://cj.lziapi.com","path":"/api.php/provide/vod/"},
+ {"id":"feifan","name":"非凡资源","host":"https://cj.ffzyapi.com","path":"/api.php/provide/vod/"},
+ {"id":"guangsu","name":"光速资源","host":"https://api.guangsuapi.com","path":"/api.php/provide/vod/"},
+ {"id":"wujin","name":"无尽资源","host":"https://api.wujinapi.com","path":"/api.php/provide/vod/"},
+ {"id":"modu","name":"魔都资源","host":"https://caiji.moduapi.cc","path":"/api.php/provide/vod/"},
+ {"id":"piaoling","name":"飘零资源","host":"https://p2100.net","path":"/api.php/provide/vod/"},
+ {"id":"360zy","name":"360资源","host":"https://360zy5.com","path":"/api.php/provide/vod/"},
+ {"id":"jisu","name":"极速资源","host":"https://jszyapi.com","path":"/api.php/provide/vod/"},
+ {"id":"hongniu","name":"红牛资源","host":"https://www.hongniuzy2.com","path":"/api.php/provide/vod/"},
+ {"id":"xinlang","name":"新浪资源","host":"https://api.xinlangapi.com","path":"/xinlangapi.php/provide/vod/"},
+ {"id":"huya","name":"虎牙资源","host":"https://www.huyaapi.com","path":"/api.php/provide/vod/"},
+ {"id":"jinying","name":"金鹰资源","host":"https://jyzyapi.com","path":"/provide/vod/"},
+ {"id":"zuida","name":"最大资源","host":"https://api.zuidapi.com","path":"/api.php/provide/vod/"}
+]

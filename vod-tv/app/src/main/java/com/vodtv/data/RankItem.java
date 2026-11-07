@@ -122,6 +122,50 @@ public class RankItem {
         return r;
     }
 
+    /**
+     * 豆瓣 new_search_subjects（网页「按条件找片」接口）的条目：
+     * 字段只有 title/rate/cover/url/id/casts/directors，没有年份地区简介。
+     * 年份由查询条件带入（year_range），不是条目自带的。
+     */
+    public static RankItem parseSearch(JSONObject it, String board, String boardLabel,
+                                       String group, String year) {
+        RankItem r = new RankItem();
+        r.board = board;
+        r.boardLabel = boardLabel;
+        r.group = group;
+        r.title = it.optString("title", "");
+        r.year = year == null ? "" : year;
+
+        String cover = it.optString("cover", "");
+        r.pic = cover;
+        r.picLarge = cover;
+
+        r.id = it.optString("id", "");
+        if (r.id.length() == 0) r.id = extractId(it.optString("url", ""));
+        r.url = it.optString("url", "");
+        if (r.url.length() == 0 && r.id.length() > 0) {
+            r.url = "https://movie.douban.com/subject/" + r.id + "/";
+        }
+
+        String rate = it.optString("rate", "");
+        try {
+            r.rating = Double.parseDouble(rate);
+        } catch (Exception ignored) {
+            r.rating = 0;
+        }
+
+        org.json.JSONArray dirs = it.optJSONArray("directors");
+        if (dirs != null && dirs.length() > 0) r.director = dirs.optString(0, "");
+        org.json.JSONArray casts = it.optJSONArray("casts");
+        if (casts != null) {
+            for (int i = 0; i < casts.length() && r.actors.size() < 3; i++) {
+                String a = casts.optString(i, "");
+                if (a.length() > 0) r.actors.add(a);
+            }
+        }
+        return r;
+    }
+
     private static String extractId(String s) {
         if (s == null) return "";
         java.util.regex.Matcher m = java.util.regex.Pattern.compile("(\\d{5,})").matcher(s);

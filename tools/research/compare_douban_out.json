@@ -1,0 +1,92 @@
+[
+ {
+  "case": "A1 正常请求 count=60",
+  "status": 200,
+  "ms": 470,
+  "note": "items=50 首条字段=actions,actors,card_subtitle,comments,cover,date,description,directors,has_linewatch,id,in"
+ },
+ {
+  "case": "A2 count=100（看有没有上限）",
+  "status": 200,
+  "ms": 396,
+  "note": "items=50"
+ },
+ {
+  "case": "A3 start=60 深翻页",
+  "status": 200,
+  "ms": 346,
+  "note": "items=30 首3=['与王生活的男人', '穿普拉达的女王2', '呼啸山庄']"
+ },
+ {
+  "case": "A4 不带 Referer",
+  "status": 400,
+  "ms": 125,
+  "note": "items=0"
+ },
+ {
+  "case": "A5 封面字段",
+  "status": 200,
+  "ms": 470,
+  "note": "cover.url=https://img3.doubanio.com/view/photo/m_ratio_poster/public/p"
+ },
+ {
+  "case": "A5b 评分字段",
+  "status": 200,
+  "ms": 470,
+  "note": "rating.value=5.7"
+ },
+ {
+  "case": "B1 默认(当年)",
+  "status": 200,
+  "ms": 423,
+  "note": "items=20 字段=casts,cover,cover_x,cover_y,directors,id,rate,star,title,url"
+ },
+ {
+  "case": "B2 start=20",
+  "status": 200,
+  "ms": 385,
+  "note": "items=20"
+ },
+ {
+  "case": "B2 start=40",
+  "status": 200,
+  "ms": 363,
+  "note": "items=20"
+ },
+ {
+  "case": "B2 start=60",
+  "status": 200,
+  "ms": 372,
+  "note": "items=20"
+ },
+ {
+  "case": "B3 不限年份",
+  "status": 200,
+  "ms": 492,
+  "note": "items=20"
+ },
+ {
+  "case": "B4 tags=电视剧",
+  "status": -1,
+  "ms": 0,
+  "note": "items=0"
+ },
+ {
+  "case": "B5 sort=T（近期热度）",
+  "status": 200,
+  "ms": 395,
+  "note": "items=20 首3=['给阿嬷的情书', '挽救计划', '飞驰人生3']"
+ },
+ {
+  "case": "B6 无 UA",
+  "status": -1,
+  "ms": 1,
+  "note": "items=0"
+ },
+ {
+  "case": "B7 sort=S（高分优先）",
+  "status": 200,
+  "ms": 421,
+  "note": "items=20 [('人生七年10', '9.5'), ('给阿嬷的情书', '9.3'), ('相反的你和我', '9.1'), ('太平年', '8.8')]"
+ }
+]

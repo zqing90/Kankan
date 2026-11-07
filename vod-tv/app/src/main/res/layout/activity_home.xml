@@ -97,11 +97,33 @@
         android:paddingBottom="@dimen/space_md"
         android:text="@string/loading" />
 
+    <!-- 「找一找」筛选条：类型 / 年份 / 排序，chips 由代码填。
+         只在第三个 tab 可见；gone 时 grid 贴回 status 下方。 -->
+    <HorizontalScrollView
+        android:id="@+id/find_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/status"
+        android:paddingLeft="@dimen/content_pad_h"
+        android:paddingRight="@dimen/content_pad_h"
+        android:clipToPadding="false"
+        android:scrollbars="none"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:id="@+id/find_row"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingBottom="@dimen/space_xs" />
+    </HorizontalScrollView>
+
     <GridView
         android:id="@+id/grid"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/status"
+        android:layout_below="@id/find_bar"
         android:layout_alignParentBottom="true"
         android:numColumns="@integer/grid_cols"
         android:horizontalSpacing="@dimen/card_gap_h"

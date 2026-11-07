@@ -51,11 +51,42 @@ public class HomeActivity extends Activity {
     private View btnSettings;
 
     private RankRepository.RankData data;
-    private String group = null;          // null = 全部
-    private String boardId = null;        // 当前分类下的子榜
     private PosterAdapter adapter;
     private boolean updating = false;
     private int posterHeight = 0;         // 按列宽动态算，避免不同分辨率下高度失控
+
+    /** tab 0：全部榜单合并去重后的列表（data 一变就重建） */
+    private List<RankItem> hotAll = new ArrayList<RankItem>();
+
+    /* ---------- 找一找（tab 2） ---------- */
+    private View findBar;
+    private LinearLayout findRow;
+    private String findTags = "";         // ""=全部，或 电影/电视剧/综艺/动画/纪录片
+    private String findYear = "all";      // all/cur/prev/older
+    private String findSort = "U";        // U=最热 S=高分 R=最新
+    private String findApplied = null;    // 当前结果对应的筛选组合 key
+    private boolean findLoading = false;
+    private boolean findHasMore = false;
+    /** 筛选组合 → 已加载的结果（含已翻的页），切回来不用重查 */
+    private final java.util.HashMap<String, FindResult> findCache = new java.util.HashMap<String, FindResult>();
+
+    /** 一组筛选条件下的已加载结果 */
+    private static class FindResult {
+        final List<RankItem> items = new ArrayList<RankItem>();
+        int nextStart = 0;
+        boolean hasMore = true;
+    }
+
+    private static final String[][] FIND_TYPES = {
+            {"", "全部"}, {"电影", "电影"}, {"电视剧", "电视剧"},
+            {"综艺", "综艺"}, {"动画", "动画"}, {"纪录片", "纪录片"},
+    };
+    private static final String[][] FIND_YEARS = {
+            {"all", "全部"}, {"cur", "今年"}, {"prev", "去年"}, {"older", "更早"},
+    };
+    private static final String[][] FIND_SORTS = {
+            {"U", "最热"}, {"S", "高分"}, {"R", "最新"},
+    };
 
     private static final int GRID_COLS = 6;
 
@@ -87,6 +118,10 @@ public class HomeActivity extends Activity {
 
         grid = (GridView) findViewById(R.id.grid);
         tabs = (LinearLayout) findViewById(R.id.tabs);
+        findBar = findViewById(R.id.find_bar);
+        findRow = (LinearLayout) findViewById(R.id.find_row);
+        findBar = findViewById(R.id.find_bar);
+        findRow = (LinearLayout) findViewById(R.id.find_row);
         status = (TextView) findViewById(R.id.status);
         empty = findViewById(R.id.empty);
         btnRefresh = findViewById(R.id.btn_refresh);
@@ -94,14 +129,12 @@ public class HomeActivity extends Activity {
         btnHistory = findViewById(R.id.btn_history);
         btnSettings = findViewById(R.id.btn_settings);
 
-        tabDefs.add(new String[]{"all", "全部"});
-        tabDefs.add(new String[]{RankRepository.GROUP_TV, "剧集"});
-        tabDefs.add(new String[]{RankRepository.GROUP_MOVIE, "电影"});
-        tabDefs.add(new String[]{RankRepository.GROUP_SHOW, "综艺"});
-        tabDefs.add(new String[]{RankRepository.GROUP_ANIME, "动画"});
-        tabDefs.add(new String[]{RankRepository.GROUP_DOC, "纪录片"});
+        tabDefs.add(new String[]{"hot", "豆瓣热榜"});
+        tabDefs.add(new String[]{"new", "新品速递"});
+        tabDefs.add(new String[]{"find", "找一找"});
 
         buildTabs();
+        buildFindBar();
 
         adapter = new PosterAdapter();
         grid.setAdapter(adapter);
@@ -193,6 +226,7 @@ public class HomeActivity extends Activity {
 
     private void loadCacheThenMaybeRefresh() {
         data = RankRepository.loadCache(this);
+        rebuildHotAll();
         if (data != null && data.boards.size() > 0) {
             renderStatus();
             adapter.notifyDataSetChanged();
@@ -235,9 +269,10 @@ public class HomeActivity extends Activity {
                             if (manual) Toast.makeText(HomeActivity.this, "更新失败：" + error, Toast.LENGTH_LONG).show();
                         } else {
                             data = d;
+                            rebuildHotAll();
                             renderStatus();
                             adapter.notifyDataSetChanged();
-                            empty.setVisibility(d.total() > 0 ? View.GONE : View.VISIBLE);
+                            empty.setVisibility(currentItems().isEmpty() ? View.VISIBLE : View.GONE);
                             if (manual) Toast.makeText(HomeActivity.this, "已更新 " + d.total() + " 部", Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -247,6 +282,12 @@ public class HomeActivity extends Activity {
     }
 
     private void renderStatus() {
+        if (currentTab == 2) {
+            // 「找一找」不依赖主榜数据，data 为 null 也要能显示
+            status.setText("找一找 · " + describeFind() + " · " + currentItems().size()
+                    + " 部" + (findLoading ? " · 正在加载…" : ""));
+            return;
+        }
         if (data == null) return;
         String t = data.fetchedAt > 0
                 ? new SimpleDateFormat("MM-dd HH:mm", Locale.US).format(new Date(data.fetchedAt))
@@ -258,6 +299,230 @@ public class HomeActivity extends Activity {
     }
 
     /* ---------- 分类 ---------- */
+
+    /** data 一变就重建「豆瓣热榜(全部)」：17 个榜按序拼接、同片去重（保留第一次出现的榜位） */
+    private void rebuildHotAll() {
+        hotAll = new ArrayList<RankItem>();
+        if (data == null) return;
+        java.util.HashSet<String> seen = new java.util.HashSet<String>();
+        for (RankRepository.Board b : data.boards) {
+            if (RankRepository.GROUP_NEW.equals(b.group)) continue;   // 新品速递不混进热榜
+            for (RankItem it : b.items) {
+                if (it == null || it.title == null || it.title.length() == 0) continue;
+                String key = it.title.trim();
+                if (seen.add(key)) hotAll.add(it);
+            }
+        }
+    }
+
+    /* ---------- 找一找 ---------- */
+
+    private String findKey() {
+        return findTags + "|" + findYear + "|" + findSort;
+    }
+
+    private FindResult findState() {
+        FindResult st = findCache.get(findKey());
+        if (st == null) {
+            st = new FindResult();
+            findCache.put(findKey(), st);
+        }
+        return st;
+    }
+
+    /** 组装筛选条：类型 | 年份 | 排序，三组 chips，组间加竖线分隔 */
+    private void buildFindBar() {
+        findRow.removeAllViews();
+        addChipGroup("类型", FIND_TYPES, findTags);
+        addDivider();
+        addChipGroup("年份", FIND_YEARS, findYear);
+        addDivider();
+        addChipGroup("排序", FIND_SORTS, findSort);
+    }
+
+    private void addChipGroup(String label, String[][] defs, String current) {
+        TextView lb = new TextView(this);
+        lb.setText(label);
+        lb.setTextSize(12);
+        lb.setTextColor(getResources().getColor(R.color.text_tertiary));
+        lb.setPadding(dp(10), 0, dp(4), 0);
+        findRow.addView(lb);
+
+        for (final String[] def : defs) {
+            final boolean on = def[0].equals(current);
+            TextView c = new TextView(this);
+            c.setId(View.generateViewId());
+            c.setText(def[1]);
+            c.setTextSize(13);
+            c.setPadding(dp(14), dp(5), dp(14), dp(5));
+            c.setBackgroundResource(R.drawable.bg_tab);
+            c.setTextColor(getResources().getColor(on ? R.color.text_primary : R.color.text_secondary));
+            c.setSelected(on);
+            c.setFocusable(true);
+            c.setFocusableInTouchMode(true);
+            c.setTag("chip_" + label + "_" + def[0]);
+            // 与 tab 一致：焦点扫过去就生效（带防抖 + 结果缓存，扫一排不会连环打接口）
+            c.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View v, boolean has) {
+                    if (!has) return;
+                    setChipState(def[0], label);
+                    scheduleFindApply();
+                }
+            });
+            c.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    setChipState(def[0], label);
+                    applyFind(false);
+                }
+            });
+            c.setOnKeyListener(new View.OnKeyListener() {
+                @Override
+                public boolean onKey(View v, int keyCode, KeyEvent event) {
+                    if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_DPAD_DOWN) {
+                        grid.requestFocus();
+                        return true;
+                    }
+                    return false;
+                }
+            });
+            findRow.addView(c);
+        }
+    }
+
+    private void addDivider() {
+        View d = new View(this);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(dp(1), dp(16));
+        lp.leftMargin = dp(6);
+        lp.rightMargin = dp(6);
+        d.setLayoutParams(lp);
+        d.setBackgroundColor(0xFF2A2F3A);
+        findRow.addView(d);
+    }
+
+    /** 视觉选中态：原地更新同组 chips，不重建视图——重建会把焦点一起销毁，遥控器就断链了 */
+    private void setChipState(String value, String groupLabel) {
+        if ("类型".equals(groupLabel)) findTags = value;
+        else if ("年份".equals(groupLabel)) findYear = value;
+        else if ("排序".equals(groupLabel)) findSort = value;
+
+        for (int i = 0; i < findRow.getChildCount(); i++) {
+            View v = findRow.getChildAt(i);
+            Object tag = v.getTag();
+            if (!(v instanceof TextView) || tag == null) continue;
+            String t = String.valueOf(tag);
+            if (!t.startsWith("chip_" + groupLabel + "_")) continue;
+            String chipValue = t.substring(("chip_" + groupLabel + "_").length());
+            boolean on = chipValue.equals(value);
+            v.setSelected(on);
+            ((TextView) v).setTextColor(getResources().getColor(
+                    on ? R.color.text_primary : R.color.text_secondary));
+        }
+    }
+
+    /** 焦点扫过 chips 时防抖：停 300ms 才真正发请求 */
+    private final Runnable findPending = new Runnable() {
+        @Override
+        public void run() {
+            applyFind(false);
+        }
+    };
+
+    private void scheduleFindApply() {
+        grid.postDelayed(findPending, 300);
+    }
+
+    /** 按当前筛选查第一页。silent=true 时失败不弹 Toast（切 tab 自动触发的那次） */
+    private void applyFind(final boolean silent) {
+        grid.removeCallbacks(findPending);
+        final FindResult target = findState();   // 钉住发起时的筛选组：请求回来前用户可能又换了条件
+        findLoading = true;
+        renderStatus();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                List<RankItem> result;
+                try {
+                    result = RankRepository.find(findTags, findYear, findSort, 0);
+                } catch (Exception e) {
+                    result = null;
+                }
+                final List<RankItem> fResult = result;
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        findLoading = false;
+                        if (fResult == null) {
+                            if (!silent) Toast.makeText(HomeActivity.this, "搜索失败，请稍后再试", Toast.LENGTH_SHORT).show();
+                            renderStatus();
+                            return;
+                        }
+                        target.items.clear();
+                        target.items.addAll(fResult);
+                        target.nextStart = fResult.size();
+                        target.hasMore = fResult.size() >= 20;
+                        adapter.notifyDataSetChanged();
+                        grid.invalidateViews();
+                        empty.setVisibility(currentItems().isEmpty() ? View.VISIBLE : View.GONE);
+                        renderStatus();
+                    }
+                });
+            }
+        }, "find-search").start();
+    }
+
+    /** 滚到最后几行时追加下一页 */
+    private void loadMoreFind() {
+        final FindResult st = findState();
+        if (findLoading || !st.hasMore || st.nextStart == 0) return;
+        findLoading = true;
+        renderStatus();
+        final int start = st.nextStart;
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                List<RankItem> page;
+                try {
+                    // 用户可能停在旧筛选上，用发起时的 key 存回对应那组
+                    page = RankRepository.find(findTags, findYear, findSort, start);
+                } catch (Exception e) {
+                    page = null;
+                }
+                final List<RankItem> fPage = page;
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        findLoading = false;
+                        if (fPage != null && !fPage.isEmpty()) {
+                            java.util.HashSet<String> seen = new java.util.HashSet<String>();
+                            for (RankItem it : st.items) seen.add(it.title.trim());
+                            for (RankItem it : fPage) {
+                                if (seen.add(it.title.trim())) st.items.add(it);
+                            }
+                            st.nextStart = start + fPage.size();
+                            st.hasMore = fPage.size() >= 20;
+                        } else {
+                            st.hasMore = false;   // 没有更多了 / 失败就不再自动重试
+                        }
+                        adapter.notifyDataSetChanged();
+                        renderStatus();
+                    }
+                });
+            }
+        }, "find-more").start();
+    }
+
+    private String describeFind() {
+        String ty = "全部", yr = "全部", so = "最热";
+        for (String[] d : FIND_TYPES) if (d[0].equals(findTags)) ty = d[1];
+        for (String[] d : FIND_YEARS) if (d[0].equals(findYear)) yr = d[1];
+        for (String[] d : FIND_SORTS) if (d[0].equals(findSort)) so = d[1];
+        return ty + " · " + yr + " · " + so;
+    }
+
 
     private void buildTabs() {
         tabs.removeAllViews();
@@ -354,18 +619,21 @@ public class HomeActivity extends Activity {
         }
         currentTab = idx;
 
-        String g = tabDefs.get(idx)[0];
-        group = "all".equals(g) ? null : g;
-        boardId = null;
+        findBar.setVisibility(idx == 2 ? View.VISIBLE : View.GONE);
+        // 首次进「找一找」且这组条件还没查过，先按默认条件查一轮
+        if (idx == 2) {
+            FindResult st = findState();
+            if (st.items.isEmpty() && st.nextStart == 0 && !findLoading) applyFind(false);
+        }
 
-        // 从网格往上走时焦点回到当前 tab（有历史横条时先经过横条）
+        // 从网格往上走时焦点回到当前 tab
         updateFocusChain();
 
         adapter.notifyDataSetChanged();
         grid.invalidateViews();
         scrollGridToTop();
 
-        empty.setVisibility(data != null && currentItems().isEmpty() ? View.VISIBLE : View.GONE);
+        empty.setVisibility(currentItems().isEmpty() ? View.VISIBLE : View.GONE);
         renderStatus();
     }
 
@@ -396,27 +664,13 @@ public class HomeActivity extends Activity {
     /* ---------- 列表 ---------- */
 
     private List<RankItem> currentItems() {
-        List<RankItem> out = new ArrayList<RankItem>();
-        if (data == null) return out;
-
-        if (group == null) {
-            // 全部：每个分组取主榜前 8，拼成一面墙
-            for (String g : data.groups()) {
-                List<RankRepository.Board> bs = data.boardsOf(g);
-                if (bs.isEmpty()) continue;
-                List<RankItem> items = bs.get(0).items;
-                out.addAll(items.subList(0, Math.min(8, items.size())));
-            }
-            return out;
+        if (currentTab == 2) return findState().items;
+        if (currentTab == 1) {
+            // 新品速递独立于主榜，可能还没拉到
+            RankRepository.Board b = data == null ? null : data.board(RankRepository.BOARD_NEW);
+            return b == null ? java.util.Collections.<RankItem>emptyList() : b.items;
         }
-
-        if (boardId != null) {
-            RankRepository.Board b = data.board(boardId);
-            if (b != null) return b.items;
-        }
-        List<RankRepository.Board> bs = data.boardsOf(group);
-        if (bs.isEmpty()) return out;
-        return bs.get(0).items;
+        return hotAll;
     }
 
     /** 带防重复的入口：条目自身的按键监听和 onClick 可能都会触发 */
@@ -438,8 +692,24 @@ public class HomeActivity extends Activity {
             grid.setNextFocusUpId(tabId);
         }
 
-        for (TextView t : tabViews) t.setNextFocusDownId(R.id.grid);
+        // 找一找 tab：↓ 先落筛选条第一个 chip（chips 的 ↓ 在 onKey 里交给 grid）
+        int chipId = firstChipId();
+        for (int i = 0; i < tabViews.size(); i++) {
+            tabViews.get(i).setNextFocusDownId(
+                    (i == 2 && chipId != View.NO_ID) ? chipId : R.id.grid);
+        }
         if (btnSearch != null) btnSearch.setNextFocusDownId(R.id.grid);
+    }
+
+    private int firstChipId() {
+        for (int i = 0; i < findRow.getChildCount(); i++) {
+            View v = findRow.getChildAt(i);
+            Object tag = v.getTag();
+            if (v.isFocusable() && tag != null && String.valueOf(tag).startsWith("chip_")) {
+                return v.getId();
+            }
+        }
+        return View.NO_ID;
     }
 
     private void openDetail(RankItem it) {
@@ -492,6 +762,9 @@ public class HomeActivity extends Activity {
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
+            // 「找一找」滚到最后几行自动追加下一页（loadMoreFind 自己防重）
+            if (currentTab == 2 && position >= currentItems().size() - 4) loadMoreFind();
+
             View v = convertView;
             if (v == null) {
                 v = LayoutInflater.from(HomeActivity.this).inflate(R.layout.item_poster, parent, false);
@@ -506,8 +779,9 @@ public class HomeActivity extends Activity {
             if (it == null) return v;
 
             title.setText(it.title);
-            sub.setText(group == null
-                    ? RankRepository.groupLabel(it.group) + " · " + it.metaLine()
+            // 热榜是多个榜拼的，标注来源榜；新品/找一找本来就是单一列表
+            sub.setText(currentTab == 0
+                    ? it.boardLabel + " · " + it.metaLine()
                     : it.metaLine());
 
             if (it.rating > 0) {
@@ -517,7 +791,8 @@ public class HomeActivity extends Activity {
                 score.setVisibility(View.GONE);
             }
 
-            if (position < 3) {
+            // TOP 角标只给有排序意义的两个 tab；找一找是查询结果，没有名次
+            if (currentTab != 2 && position < 3) {
                 rank.setVisibility(View.VISIBLE);
                 rank.setText("TOP " + (position + 1));
                 // 三个分支必须都是资源 ID —— 不能把 R.color.gold 和 0xFFC0C8D4 这种
