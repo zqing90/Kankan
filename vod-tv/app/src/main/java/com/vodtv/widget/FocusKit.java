@@ -23,6 +23,10 @@ import android.widget.GridView;
  */
 public final class FocusKit {
 
+    /** 全站唯一的焦点放大倍率：2dp 描边 + 1.06 放大，见 AGENTS.md §4.1 视觉铁律 */
+    private static final float SCALE_FOCUS = 1.06f;
+    private static final long FX_MS = 120;
+
     /** 记住「上次焦点停在第几张」，从顶栏按 ↓ 回网格时还能回到原地，不弹回第一张 */
     public interface Position {
         int get();
@@ -67,6 +71,36 @@ public final class FocusKit {
     }
 
     /**
+     * 海报卡 / 记录卡 / 结果卡的焦点反馈：聚焦 1.06 放大，失焦还原。
+     *
+     * 这段以前在首页、搜索页、记录页各抄了一份（<b>三份一模一样的 lambda</b>），
+     * 改一处忘两处的风险太高，2026-11-07 收口到这里，全站卡片只许调这个方法。
+     */
+    public static void cardFx(View v) {
+        cardFx(v, null);
+    }
+
+    /**
+     * 带回调的版本：卡片拿到焦点时还要做别的事（例如记住自己第几个）就走这里。
+     *
+     * 进来先把缩放对齐到「当前是否聚焦」：GridView 会回收条目视图，
+     * 复用到的那张可能还留着上一次的 1.06，不对齐就会看到莫名放大的卡片。
+     */
+    public static void cardFx(View v, final Runnable onFocus) {
+        float init = v.isFocused() ? SCALE_FOCUS : 1f;
+        v.setScaleX(init);
+        v.setScaleY(init);
+        v.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean has) {
+                float s = has ? SCALE_FOCUS : 1f;
+                view.animate().scaleX(s).scaleY(s).setDuration(FX_MS).start();
+                if (has && onFocus != null) onFocus.run();
+            }
+        });
+    }
+
+    /**
      * 顶栏图标按钮的焦点反馈。
      *
      * IconButton 样式的 alpha 固定 0.72（让图标不抢标题重心），selector 里 focused
@@ -79,8 +113,8 @@ public final class FocusKit {
         v.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View view, boolean has) {
-                float s = has ? 1.06f : 1f;
-                view.animate().scaleX(s).scaleY(s).setDuration(120).start();
+                float s = has ? SCALE_FOCUS : 1f;
+                view.animate().scaleX(s).scaleY(s).setDuration(FX_MS).start();
                 view.setAlpha(has ? 1f : idle);
             }
         });

@@ -293,17 +293,9 @@ public class HistoryActivity extends Activity {
             rest.setLayoutParams(b);
             done.setVisibility(e.dur > 0 ? View.VISIBLE : View.GONE);
 
-            // 焦点反馈：与首页/搜索页的卡片同一套（1.06 放大），
+            // 焦点反馈：与首页/搜索页同一份实现（FocusKit.cardFx，1.06 放大）；
             // 只靠 bg_card 的 2dp 描边在 3 米外太弱，用户会说「看不出选中了」
-            v.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-                @Override
-                public void onFocusChange(View view, boolean has) {
-                    float s = has ? 1.06f : 1f;
-                    view.animate().scaleX(s).scaleY(s).setDuration(120).start();
-                }
-            });
-            v.setScaleX(v.isFocused() ? 1.06f : 1f);
-            v.setScaleY(v.isFocused() ? 1.06f : 1f);
+            FocusKit.cardFx(v);
 
             // 条目自身 focusable，GridView 的 itemClick 收不到 OK，必须挂到这里
             v.setOnClickListener(new View.OnClickListener() {

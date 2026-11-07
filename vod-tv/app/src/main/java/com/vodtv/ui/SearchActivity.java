@@ -558,13 +558,8 @@ public class SearchActivity extends Activity {
                 }
             }
 
-            v.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-                @Override
-                public void onFocusChange(View view, boolean has) {
-                    float s = has ? 1.06f : 1.0f;
-                    view.animate().scaleX(s).scaleY(s).setDuration(120).start();
-                }
-            });
+            // 焦点反馈统一走 FocusKit，别再各页面抄一份 1.06 的动画
+            FocusKit.cardFx(v);
 
             // 条目自身 focusable，GridView 的 itemClick 收不到 OK 键，监听必须挂在这里
             final int pos = position;
@@ -585,8 +580,7 @@ public class SearchActivity extends Activity {
                 }
             });
 
-            v.setScaleX(v.isFocused() ? 1.06f : 1.0f);
-            v.setScaleY(v.isFocused() ? 1.06f : 1.0f);
+            // 复用时的缩放复位已经由 FocusKit.cardFx 统一处理
             return v;
         }
     }

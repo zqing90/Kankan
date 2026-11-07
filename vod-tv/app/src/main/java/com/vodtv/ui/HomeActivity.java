@@ -890,13 +890,12 @@ public class HomeActivity extends Activity {
                 }
             }
 
-            v.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            // 焦点反馈全站只有 FocusKit 一份实现（以前三个页面各抄一份，改一处忘两处）；
+            // 这里只是额外记下「焦点停在第几张」，从 tab 按 ↓ 回来不再弹回第一张。
+            FocusKit.cardFx(v, new Runnable() {
                 @Override
-                public void onFocusChange(View view, boolean has) {
-                    float s = has ? 1.06f : 1.0f;
-                    view.animate().scaleX(s).scaleY(s).setDuration(120).start();
-                    // 记住焦点停在哪张，从 tab 按 ↓ 回来时还在原地
-                    if (has) lastFocusedPos = position;
+                public void run() {
+                    lastFocusedPos = position;
                 }
             });
 
@@ -926,9 +925,7 @@ public class HomeActivity extends Activity {
                 }
             });
 
-            // 复用时要复位，否则滑出屏幕的卡片会保持放大状态
-            v.setScaleX(v.isFocused() ? 1.06f : 1.0f);
-            v.setScaleY(v.isFocused() ? 1.06f : 1.0f);
+            // 复用时的缩放复位已经由 FocusKit.cardFx 统一处理，不要再在这里抄一份
 
             return v;
         }
