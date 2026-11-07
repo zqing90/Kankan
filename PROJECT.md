@@ -3,53 +3,9 @@
 > 这份文档写给「接手这个项目的 AI」或未来的自己。目标是：只读这一个文件，就能知道项目是什么、代码在哪、为什么这么写、哪些坑已经踩过、下一步该做什么。
 > 生成时间：2026-11-06 ｜ 最后更新：2026-11-07（1.4.8） ｜ 全部内容为本地可运行代码，无外部私有依赖。
 
----
-
-## 铁律 · APK 产出后必须分发（每次构建都做，不问）
-
-> 用户 2026-11-06 明确要求，属**长期规则**，后续每次构建 APK 都要自动执行，不要逐次确认。
-
-每生成一个新的 APK（`assembleDebug` / `assembleRelease` 成功之后），**必须**立即：
-
-1. 把产物复制到 `vod-tv/dist/Kankan-<versionName>-debug.apk`（项目内留档）
-2. 再把同一份 APK 复制到 **`E:\share\`**（对外分发目录，文件名保持一致）
-3. 复制后校验两份文件 MD5 一致，并在回复中报出：文件名、大小、MD5、E 盘落点
-
-一条命令搞定（Git Bash）：
-
-```bash
-cd /d/code/kankan/vod-tv
-./gradlew assembleDebug
-cp app/build/outputs/apk/debug/app-debug.apk dist/Kankan-1.4.0-debug.apk
-cp dist/Kankan-1.4.0-debug.apk /e/share/
-md5sum dist/Kankan-1.4.0-debug.apk /e/share/Kankan-1.4.0-debug.apk
-```
-
-规则细则：
-
-- **不要覆盖不同版本的同名文件而丢掉历史**：`E:\share\` 里若已存在**同名但内容不同**的 APK，先把旧的改名留档（追加构建日期，如 `Kankan-1.2.0-debug-20261106-2130.apk`）再放新的。
-- 版本号没变但代码变了，属于「同名不同内容」，按上一条处理。
-- `E:\share\` 不存在时先 `mkdir -p /e/share`，不要报错退出。
-- 构建失败 / APK 没生成时，**不要**去复制上一次的旧包充数，如实说明失败。
-- 复制完不要自作主张安装、上传、发链接，等用户指示。
-
----
-
-## 铁律 · 先提交 dev，用户验收后才合 main
-
-> 用户 2026-11-06 明确要求，属**长期规则**。仓库为纯本地 git（无远程）。
-
-- **所有改动只提交到 `dev`**；`main` 是稳定基线，只放用户真机验收过的版本。
-- 不许直接往 `main` 提交，不许 `push` / `reset --hard` / `push -f`。
-- 交付话术固定：「已提交到 dev（commit `xxxxxxx`），等你验收」。用户说合并后才执行：
-  `git checkout main && git merge --no-ff dev`，合完立刻 `git checkout dev` 切回。
-- 用户说「有问题」就不合并，在 dev 上追加修复提交（不 amend 已交付的提交）。
-
-## 铁律 · 按改动范围选测试，不跑无关测试
-
-> 用户 2026-11-06 要求：「根据 git 的提交内容来测试，没涉及的改动就不跑对应测试」。
-
-判定依据只看 `git status --short` / `git diff --name-only dev`，映射表见 **§14.2**。回复中必须写明「改了哪类文件 → 因此跑了哪些检查 → 结果」。
+> **工作规则不在本文件**（2026-11-07 起）：APK 分发、dev/main 分支策略、按改动选测试、图标管线等
+> 硬性规则统一在 `AGENTS.md`（每次会话自动注入），规则沉淀见 `.workbuddy/memory/MEMORY.md`。
+> 本文件只讲项目本身：架构、数据流、外部接口、踩坑清单、版本演进。
 
 ---
 
@@ -524,7 +480,7 @@ echo "sdk.dir=D:\\Android\\Sdk" > local.properties
 ./gradlew assembleDebug
 # 产物：app/build/outputs/apk/debug/app-debug.apk
 # 留档：dist/Kankan-1.4.0-debug.apk
-# 分发：E:\share\Kankan-1.4.0-debug.apk   ← 见顶部「铁律 · APK 产出后必须分发」
+# 分发：E:\share\Kankan-1.4.0-debug.apk   ← 见 AGENTS.md §1（APK 分发铁律）
 ```
 
 环境（本机已装好，可直接构建）：
@@ -636,63 +592,11 @@ node src/cli.js play <站id> <片名>
 
 ---
 
-## 14. Git 工作流与测试策略
+## 14. Git 仓库事实（工作规则见 AGENTS.md 与 .workbuddy/memory/MEMORY.md）
 
-### 14.1 分支与提交
-
-```
-main   ●────────────●───────────────●   ← 只放用户真机验收过的版本（merge --no-ff）
-        \          /               /
-dev      ●──●──●──●───●──●──●─────●     ← 所有改动都落这里
-```
-
-| 项 | 约定 |
-|---|---|
-| 仓库位置 | `D:/code/kankan/.git`，**纯本地，无 remote** |
-| 提交身份 | 仓库局部配置 `kankan-dev <kankan@localhost>`（未写全局，不影响其他项目） |
-| 长期分支 | `main`（稳定基线）、`dev`（开发） |
-| 当前工作分支 | `dev` |
-| 提交粒度 | 一个可交付的改动集 = 一次提交；构建/测试通过后才提交 |
-| 提交信息 | `<type>: <一句话>`，type ∈ `feat` / `fix` / `refactor` / `docs` / `chore` / `test`；正文写清「改了什么、为什么、验证了什么」 |
-| 合并 | 用户验收通过 → `git checkout main && git merge --no-ff dev` → 立刻切回 `dev` |
-| 禁止 | 直接提交 main、amend 已交付提交、`reset --hard`、`push -f`（无远程） |
-
-新需求开工前先确认分支：
-
-```bash
-git -C D:/code/kankan branch --show-current   # 必须是 dev
-git -C D:/code/kankan status --short          # 工作区有脏文件先弄清来源
-```
-
-### 14.2 改动 → 测试映射（核心：不跑无关测试）
-
-| 改动的文件 | 必跑 | 明确不跑 |
-|---|---|---|
-| `PlayResolver.java`、`SourceStats.java`（纯逻辑，有单测） | `testDebugUnitTest` → `assembleDebug` → `lintDebug` | — |
-| 其他 `*.java`、`res/**`、`AndroidManifest.xml` | `assembleDebug` → `lintDebug` | `testDebugUnitTest` |
-| `*.gradle`、`settings.gradle`、`gradle.properties`、`lint.xml`、`gradle/wrapper/**` | `clean assembleDebug` → `testDebugUnitTest` → `lintDebug` | — |
-| `app/src/test/**` | `testDebugUnitTest` | `assembleDebug`、`lintDebug` |
-| 仅 `*.md`、`.gitignore`、`.gitattributes`、`.workbuddy/**` | **不跑任何构建** | 全部 |
-| `vod-collector/**/*.js` | `node --check <改动文件>` | Gradle 全套 |
-| `vod-collector/web/*.html`、`config/*.json` | 静态语法检查；必要时 `node src/cli.js health`（会联网） | Gradle 全套 |
-
-跨类改动取并集。纯文档改动跑 Gradle 属于镀金，**明确禁止**。
-
-### 14.3 交付话术（固定格式）
-
-> 改动：`xxx.java`、`yyy.xml`（→ 命中「其他 java/res」行）
-> 检查：`assembleDebug` 通过（37s）、`lintDebug` 0 error；未跑单测（本次未碰解析逻辑）
-> 提交：`dev` @ `a1b2c3d` ｜ APK 已同步 `E:/share/`（MD5 校验一致）
-> 待你验收后我再合到 `main`。
-
-### 14.4 回滚与对比
-
-```bash
-git log --oneline --graph --all      # 看两条分支的合并历史
-git show <commit> --stat             # 某次改了什么
-git checkout main -- <file>          # 单独把 main 上某文件取回来（慎用）
-git revert <commit>                  # 撤销一次提交（不用 reset）
-```
+- 仓库 `D:/code/kankan/.git`，**纯本地，无 remote**；长期分支 `main`（稳定基线）/ `dev`（当前工作分支，所有改动落这里）。
+- 提交身份是仓库局部配置 `kankan-dev <kankan@localhost>`，未写全局，不影响其他项目。
+- 分支策略、按改动选测试的映射表、交付话术等工作规则已移出本文件：见 `AGENTS.md` §1~§3 与 `.workbuddy/memory/MEMORY.md`。
 
 ---
 
