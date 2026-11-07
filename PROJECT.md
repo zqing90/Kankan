@@ -1,7 +1,7 @@
 # 看看（Kankan）· 项目总说明
 
 > 这份文档写给「接手这个项目的 AI」或未来的自己。目标是：只读这一个文件，就能知道项目是什么、代码在哪、为什么这么写、哪些坑已经踩过、下一步该做什么。
-> 生成时间：2026-11-06 ｜ 版本：1.0.0 ｜ 全部内容为本地可运行代码，无外部私有依赖。
+> 生成时间：2026-11-06 ｜ 最后更新：2026-11-07（1.4.8） ｜ 全部内容为本地可运行代码，无外部私有依赖。
 
 ---
 
@@ -97,7 +97,7 @@ vod-tv/
 ├── gradle.properties
 ├── local.properties             ⚠️ 不入库，需自己写 sdk.dir
 ├── gradlew / gradlew.bat
-├── dist/Kankan-1.4.0-debug.apk  已构建产物（同时复制一份到 E:\share\）
+├── dist/Kankan-1.4.8-debug.apk  已构建产物（历史版本依次留档；同时复制一份到 E:\share\）
 ├── README.md                    使用与构建说明（面向人）
 ├── PROJECT.md                   本文件（面向 AI）
 └── app/
@@ -111,17 +111,20 @@ vod-tv/
         │   │   ├── SourceConfig.java        单个源模型（id/name/host/path/priority/enabled）
         │   │   ├── SourceStore.java         14 个内置源 + 启停/锁定/恢复默认/远程同步
         │   │   ├── SourceStats.java         ⭐ 成功率统计与打分（拉普拉斯平滑）
-        │   │   ├── RankRepository.java      ⭐ 榜单：豆瓣直连 / 服务端两套 + 磁盘缓存
+        │   │   ├── RankRepository.java      ⭐ 榜单：豆瓣双接口直连 / 服务端两套 + 磁盘缓存
+        │   │   │                            + 新品速递 / 找一找（1.4.8，见 §20）
         │   │   ├── RankItem.java            榜单条目模型 + 双结构归一化
         │   │   ├── PlayResolver.java        ⭐ 搜片 → 拆线路/分集 → 解析 m3u8 → 探测 → 排序
         │   │   ├── PlayCache.java           ⭐ 源检测结果按自然日缓存（每部片一个文件）
+        │   │   ├── ResumeHelper.java        ⭐ 续播三级降级（PlayCache→重新检索→详情页），
+        │   │   │                            记录页/历史入口共用（1.4.1，见 §17.2）
         │   │   ├── MovieInfo.java           影片信息模型（Intent ↔ JSON 双向转换）
-        │   │   ├── HistoryStore.java        ⭐ 播放进度 + 影片信息快照（首页继续观看 / 记录页用）
+        │   │   ├── HistoryStore.java        ⭐ 播放进度 + 影片信息快照 + 已看完推导（1.4.7，见 §17.5）
         │   │   ├── SearchHistory.java       搜索关键词历史（最多 12 条，去重、最新的在前）
         │   │   ├── ImageLoader.java         海报加载（Referer + 内存/磁盘缓存）
         │   │   └── Http.java                极简 HTTP，只用 HttpURLConnection
         │   ├── ui/
-        │   │   ├── HomeActivity.java        海报墙（手机 3 列 / 电视 6 列）、分组 tab、继续观看
+        │   │   ├── HomeActivity.java        海报墙三 tab：豆瓣热榜/新品速递/找一找（1.4.8，见 §20）
         │   │   ├── DetailActivity.java      影片信息 + 片源列表 + 选集 + 继续观看
         │   │   ├── SearchActivity.java      搜索页：本地榜单 + 片源站候选合并、最近搜索标签
         │   │   ├── HistoryActivity.java     观看记录页（网格 / 单条删除 / 清空）
@@ -190,6 +193,8 @@ vod-collector/
           → 合并去重 → 写 rank.json + 记日期 → 刷新 UI
 ```
 
+首页现在是三个 tab（1.4.8）：**豆瓣热榜**（17 榜全量合并去重）/ **新品速递**（豆瓣 B 接口）/ **找一找**（B 接口按条件查片），详见 §20。
+
 ### 3.2 点开一部片
 
 ```
@@ -221,18 +226,35 @@ PlayerActivity
 
 ## 4. 外部接口（全部需要联网的地方）
 
-### 4.1 豆瓣榜单（客户端直连模式）
+### 4.1 豆瓣双接口（1.4.8 实测对比后双轨使用）
+
+**A 接口 · rexxar 榜单**（豆瓣热榜 17 榜在用）
 
 ```
 GET https://m.douban.com/rexxar/api/v2/subject_collection/{cid}/items?start=0&count=60
 Headers:
-  User-Agent: Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 ... Safari/604.1
-  Referer:    https://m.douban.com/
+  User-Agent: Mozilla/5.0 (iPhone; ...) Safari/604.1
+  Referer:    https://m.douban.com/        ← 缺了直接 400
 ```
 
-- `{cid}` 是榜单 id，共 17 个，见 `vod-collector/src/douban.js` 的 `BOARDS`
-- **不能用**老接口 `/j/search_subjects`（403）
-- 连续 35 次请求未封禁，但仍建议 30 分钟缓存
+- `{cid}` 见 `vod-collector/src/douban.js` 的 `BOARDS`；count 上限 50
+- 字段全：`pic/cover.url`、`rating.value`、`card_subtitle`、`description`
+
+**B 接口 · new_search_subjects**（新品速递 / 找一找在用）
+
+```
+GET https://m.douban.com/rexxar/api/v2/new_search_subjects?start=0&count=20&sort=U&tags=电影&year_range=2020,2026
+Headers:
+  User-Agent: 必须有，缺了 418；不需要 Referer
+```
+
+- 每页**固定 20 条**，`start` 可翻到 980 以后（适合自动翻页）
+- 字段窄：`title/rate/cover/url/casts/directors`，**没有简介和年份**（年份由查询条件带入）
+- 参数：`sort=U(最热)/S(高分)/T(最新)`；`tags` 逗号组合可用、**空格不行**；
+  `year_range=a,b` 支持区间；`range=8,10` 评分下限
+- 封装：`RankRepository.fetchNewReleases()`（当年可播按热度 3 页 60 条）、`RankRepository.find(tags, yearKey, sort, start)`
+
+老接口 `/j/search_subjects` 确认 403，不要用。两接口 30 分钟内建议缓存。
 
 ### 4.2 苹果 CMS（maccms V10）资源站
 
@@ -525,7 +547,13 @@ echo "sdk.dir=D:\\Android\\Sdk" > local.properties
 | 改 1 个 .java 后 `assembleDebug` | 37 秒 |
 | `lintDebug` | 1 分 25 秒 |
 
-> 小坑：增量构建偶尔会把 dex 以**未压缩**方式打进 APK（2.79MB → 5.74MB），dex 内容完全一致（都是 6,439,996 字节）。介意体积就 `clean` 一次。
+> ⚠️ **增量构建可能产出被污染的 APK（2026-11-07 实锤）**：assembleDebug 增量打包时
+> zipflinger 可能把陈旧的条目数据留在 zip 里——本地条目区混入孤儿数据（实测 2.84MB、
+> 44 个僵尸 zip 本地头，其中一个还是全零空头），中央目录不引用它们。
+> 表现：**APK 体积异常翻倍**（3.2MB → 6.07MB），dex 内容没变，能正常安装运行。
+> 识别：文件里 `PK\x03\x04` 本地头数远大于中央目录条目数（污染时 196 vs 149；
+> 正常包 150 vs 149，多出的 1 个是 dex 内数据的假阳性，历史包同样）。
+> 解法：**`clean assembleDebug` 重打**。构建后体积比上一版翻倍，先怀疑这个。
 
 装机：
 
@@ -747,7 +775,7 @@ git revert <commit>                  # 撤销一次提交（不用 reset）
 | 卡片副标题 | 11~12sp | `text_secondary` |
 | 说明 / 提示 | 11~12sp | `text_dim` |
 
-强调色只有一个：`accent #FF4D6A`（焦点描边、进度条、选中态）。不要临时加新色值。
+强调色只有一个：**品牌蓝 `#2B5CFF`**（`brand`，焦点/选中态用亮一档的 `focus #5B82FF`），与 §18.2 一致。不要临时加新色值。（本节旧版写的粉红 `accent` 已废弃。）
 
 ### 15.5 焦点
 
@@ -847,6 +875,13 @@ git revert <commit>                  # 撤销一次提交（不用 reset）
 - 第 2 级必须更新遮罩文案（「重新检索 N 个站…」），否则用户以为卡死。
 - 全程 `opening` 标志拦住重复点击；`onResume` 复位并收起遮罩。
 - 遮罩层 `busy_panel` 显式 `clickable="true"`，否则触摸会穿透到下面的网格。
+
+**1.4.1~1.4.2 的演进**：
+
+- 三级降级抽成 `data/ResumeHelper.java`，**观看记录页与一切「继续观看」入口共用**，
+  回调 `onBusy / onPlay / onGiveUp`，带 busy 遮罩 + Toast——不要再往 `HistoryActivity` 里手写一份。
+- 1.4.1 曾把续播横条放在首页顶部，但点击没反应（详情页对不上集时静默停住）；
+  1.4.2 **首页历史横条整体删除**（用户明确要求），续播入口只剩观看记录页。
 
 ### 17.3 播放页参数打包只有一份
 
@@ -1093,3 +1128,42 @@ PDF 页面尺寸和图形 bbox 不一致，光栅化后**字形落在画布偏�
 `play_arrow` 这类形状失衡。
 
 配套自检 `tools/check_icons.py`（见 AGENTS.md §5.3）：偏差 ≤2% 画幅、字形占 40%~92%。
+
+---
+
+## 20. 首页三 tab（1.4.8）
+
+### 20.1 为什么改
+
+用户反馈豆瓣源影视太少。调研影视仓（takagen99/Box）后确认其首页三选一（豆瓣热播 / 站点推荐 / 历史），
+其「豆瓣热播」走的就是 B 接口；再对比豆瓣 A/B 两个接口（见 §4.1）后拍板：
+**首页留 3 个 tab**——豆瓣热榜（全部，17 榜全量合并去重）、新品速递、找一找。
+
+### 20.2 三个 tab
+
+| tab | 数据 | 实现 |
+|---|---|---|
+| 豆瓣热榜 | 17 榜**全量合并去重**（保留首现榜位），不再按 group/boardId 分组 | `rebuildHotAll()`；无独立接口，复用 rank.json |
+| 新品速递 | 当年可播片按热度，3 页 60 条 | `RankRepository.fetchNewReleases()`，Board id=`new_releases` |
+| 找一找 | B 接口按条件查片，支持自动翻页 | `RankRepository.find(tags, yearKey, sort, start)` |
+
+### 20.3 找一找的交互与状态
+
+- 三组筛选：**类型**（全部/电影/电视剧/综艺/动画/纪录片）、**年份**（all/cur/prev/older，older=1900~前年）、
+  **排序**（U 最热 / S 高分 / R 最新）。`findTags/findYear/findSort` 三个状态变量，组合 key=`findKey()`。
+- **每个条件独占一行**（2026-11-07 用户明确要求）：`find_bar` 是纵向 LinearLayout，
+  `addChipGroup` 每组包一层横向行，行距 4dp；行间竖线分隔已删。
+- chips 焦点行为：**焦点扫过 300ms 防抖后才发请求**（`scheduleFindApply`），结果按 findKey 组合缓存；
+  选中态**原地更新**（遍历改颜色），**绝不重建视图**——重建会销毁焦点、遥控器断链。
+- 焦点链：tab ↓ 第一个 chip；chip ↓ 在**末行（排序）**进 grid，非末行走默认焦点搜索落下一行；
+  grid 顶 ↑ 回当前 tab。
+- 自动翻页：滚到最后 4 行触发 `loadMoreFind`，按 title 去重；`FindResult` 记 `nextStart/hasMore`。
+- 切 tab 回顶：`setSelection(0)` + post `smoothScrollToPositionFromTop(0,0)`
+  （`setSelectionFromTop` 是 API 21，minSdk 19 lint 会拦；handleDataChanged 会恢复旧位置，所以必须双保险）。
+
+### 20.4 1.4.8 遗留
+
+- **待真机验收**：热榜合并去重量级、新品速递 60 条、找一找三组筛选 + 自动翻页、chips 焦点链。
+- **片太少的真正瓶颈在 CMS 源**（豆瓣侧 1.4.8 只扩了入口）：CMS 采集源补充调研停在候选源验证
+  （ffzy/bdzy 等证书或代理问题待复测），见调研存档 `tools/research/`。
+- dev 分支 `96d2368`（三 tab）+ `4e5ad6c`（找一找分行），**未合 main**，等用户验收。
