@@ -3,9 +3,9 @@
 > 这份文档写给「接手这个项目的 AI」或未来的自己。目标是：只读这一个文件，就能知道项目是什么、代码在哪、为什么这么写、哪些坑已经踩过、下一步该做什么。
 > 生成时间：2026-11-06 ｜ 最后更新：2026-11-07（1.4.8） ｜ 全部内容为本地可运行代码，无外部私有依赖。
 
-> **工作规则不在本文件**（2026-11-07 起）：APK 分发、dev/main 分支策略、按改动选测试、图标管线等
-> 硬性规则统一在 `AGENTS.md`（每次会话自动注入），规则沉淀见 `.workbuddy/memory/MEMORY.md`。
-> 本文件只讲项目本身：架构、数据流、外部接口、踩坑清单、版本演进。
+> **分工（2026-11-07 起）**：本文件只讲项目本身（是什么 / 结构 / 技术 / 原理）；
+> 硬性工作规则在 `AGENTS.md`（每次会话自动注入）+ `.workbuddy/memory/MEMORY.md`；
+> 所有「现象 → 原因 → 解法」的坑在 **`PITFALLS.md`**。新坑追加到 PITFALLS.md，不写回这里。
 
 ---
 
@@ -345,7 +345,7 @@ vod_play_url 含 .m3u8  +5
 |---|---|---|---|
 | 最低版本 | **minSdk 19（Android 4.4）** | 4.4 起 TLS 1.2 与 GridView 尺寸方法原生可用，兼容绕路全部可以不要 | 4.0~4.3 不再支持 |
 | TV 框架 | **不用 Leanback**，framework View + GridView | 当初为兼容 4.0 排除（Leanback 要 16）；现在门槛已过，但手写焦点已稳定，换框架无收益 | 焦点系统全手写（焦点放大、白边） |
-| 播放器 | ExoPlayer **2.19.1** | 升到 4.4 后不再受「API 14 最后版本」限制，取最后一个 2.x（HLS 修复最全） | 依赖 androidx（须 `useAndroidX=true`）；与 2.9.x API 差异大，见 §8.5 |
+| 播放器 | ExoPlayer **2.19.1** | 升到 4.4 后不再受「API 14 最后版本」限制，取最后一个 2.x（HLS 修复最全） | 依赖 androidx（须 `useAndroidX=true`）；与 2.9.x API 差异大，见 `PITFALLS.md` P-07 |
 | 图片库 | 自己写 `ImageLoader` | Glide/Coil 都要求 API 14+ 但体积大、且需处理 Referer | 无 GIF、无复杂变换 |
 | 依赖注入 | 无 | 保持 APK 体积与构建简单 | 全局静态初始化，见 `App.java` |
 | 榜单源 | 豆瓣 rexxar 私有接口 | 第三方榜单全试过：猫眼/Trakt 403，云合 HTML，酷云连不通 | 接口变更需发版；可用服务端模式兜底 |
@@ -353,118 +353,9 @@ vod_play_url 含 .m3u8  +5
 
 ---
 
-## 8. 踩坑清单（现象 → 原因 → 解法）
+## 8. 踩坑笔记（已拆分）
 
-### 8.1 Android 4.0~4.3 连不上 HTTPS
-
-> 状态：**已不影响**（minSdk 提到 19 后不再有 4.0~4.3 设备）。`App.enableTls12()` 保留，用于个别 4.4 ROM 没默认开 TLS 1.2 的情况。
-
-- 现象：所有网络请求 `SSLException`，豆瓣、CDN 全挂
-- 原因：4.0~4.3 的 `SSLSocket` 默认只开 TLSv1，服务端只接受 TLS 1.2
-- 解法：`App.enableTls12()` 把 `TLSv1.2` 塞进 `enabledProtocols`；同时装了 permissive TrustManager（老机器证书链缺失）
-- 限制：**能否成功取决于 ROM 是否编入 TLS 1.2 的 OpenSSL**，4.4 起才是标配。所以「能装 ≠ 能用」
-
-### 8.2 `GridView.getColumnWidth()` / `getHorizontalSpacing()` 是 API 16
-
-> 状态：**已不影响**（minSdk 19）。代码里的手算列宽保留，行为正确且与 `stretchMode` 无关，不必改回。
-
-- 现象：4.0/4.1 上打开首页直接 `NoSuchMethodError` 崩溃，编译期完全看不出来
-- 原因：这两个方法 16 才有
-- 解法：按屏幕宽度自己算，间距用布局里写死的 14dp
-- **教训：必须跑 `./gradlew lintDebug` 看 `NewApi`，不能只在 5.0+ 设备上试**
-
-### 8.3 `vod_play_url` 的 `$$$` 线路
-
-- 现象：剧集列表出现两个「第01集」；点播报错或播成预告
-- 原因：一条记录含两条线路（分享页 + 直链），只按 `#` 拆
-- 解法：先按 `$$$` 选线路再拆集，见 §5.1
-
-### 8.4 豆瓣电影榜整排破图
-
-- 现象：电影分组的卡片全空，剧集正常
-- 原因：电影用的是 `cover/info/directors` 结构，没有 `pic`
-- 解法：`normalize()` 里判断 `!it.pic && it.cover` 走另一套字段
-
-### 8.5 ExoPlayer 2.9.6 → 2.19.1 的迁移点（已升级，改代码前先看）
-
-- **`ExoPlayerFactory.newSimpleInstance()` 已删除** → 改用 `new SimpleExoPlayer.Builder(ctx).setTrackSelector(...).setLoadControl(...).build()`
-- **`DefaultBandwidthMeter` 没有公开构造函数了** → 不需要自己传，`DefaultTrackSelector` 内部会建；要自定义就用它的 `Builder`
-- **`AdaptiveTrackSelection.Factory(meter)` 构造签名变了**（多一个 `Clock` 参数）→ 干脆不传，用 `new DefaultTrackSelector(this)` 走默认
-- **`Player.EventListener` 已删除** → 改为 `implements Player.Listener`，回调名也变了：`onPlayerStateChanged(boolean,int)` → `onPlaybackStateChanged(int)`，`onPlayerError(ExoPlaybackException)` → `onPlayerError(PlaybackException)`
-- **`player.prepare(source)` 拆成两步** → `setMediaSource(source)` + `prepare()`；`HlsMediaSource.Factory` 现在吃 `MediaItem` 而不是 `Uri`
-- **`DefaultDataSourceFactory` 被 `DefaultDataSource.Factory` 取代**，且**没有** `setUserAgent` → 想带 UA 要嵌套一层：`new DefaultDataSource.Factory(ctx, new DefaultHttpDataSource.Factory().setUserAgent(ua))`
-- **依赖 androidx** → `gradle.properties` 必须 `android.useAndroidX=true`，并且要删掉原来的 `support-annotations`，否则 support/androidx 混用直接冲突
-- 教训（沿用）：2.x 的监听器都是 `default` 方法，**别加多余空实现**，只覆盖需要的
-
-### 8.6 Gradle / SDK 下载慢或报错
-
-- `/root/.gradle/init.gradle` 若有语法错误（如 `url` 没加引号、`mavelCentral()` 拼错），整个构建直接失败 → 移走备份成 `init.gradle.broken.bak`
-- SDK 官方源 50KB/s → 用腾讯镜像 `https://mirrors.cloud.tencent.com/AndroidSDK/`（5MB/s）
-- Gradle 发行包 → 腾讯镜像；JDK 17 → 华为镜像
-- `gradle-wrapper.properties` 里的 `distributionUrl` 也要换
-
-### 8.7 站点域名频繁更换
-
-- 现象：昨天能用的源今天 404
-- 原因：资源站被墙/换域名是常态
-- 对策：`SourceStore` 支持改 host；`config/stations.json` 的 `hosts[]` 支持故障切换。**不要在代码里硬编码分片域名**（如 `yyv13.gghijk.com` 与接口返回的 `v13.gghijk.com` 就不是一回事）
-
-### 8.8 「热播榜」排序参数是假的
-
-- 现象：`order=vod_hits desc` 和不传完全一样
-- 原因：多数资源站根本没实现按点击排序
-- 结论：只有 `h=168`（最近 168 小时）有效；真正的榜单只能靠第三方（最终选了豆瓣），不要在这条路上继续投入
-
-### 8.9 `getColor()` 里混用资源 ID 和颜色字面量 → 首页秒崩
-
-- 现象：App 能正常打开，海报墙刚渲染就闪退；`CrashLog` 显示
-  `android.content.res.Resources$NotFoundException: Resource ID #0xffc0c8d4`，栈顶是 `HomeActivity$PosterAdapter.getView`
-- 原因：原来写的是
-  `getResources().getColor(position == 0 ? R.color.gold : position == 1 ? 0xFFC0C8D4 : 0xFFCD7F32)`
-  —— 三元表达式把**资源 ID** 和**颜色字面量**混在一个分支里。第 1 名拿到的是合法资源 ID 所以不报错，第 2 名把 `0xFFC0C8D4` 当资源 ID 去查表，必然抛 `NotFoundException`
-- 解法：三个分支全部用资源 ID（`R.color.gold` / `silver` / `bronze`），或者干脆绕开 `getColor()`，直接 `setBackgroundColor(0xFFC0C8D4)`
-- **规则：`getResources().getXxx()` 的参数只能是资源 ID；颜色值请直接传给 View 的 setter。三元表达式里出现 `R.` 与 `0xFF...` 混排，一律视为 bug**
-- 已修：v1.0.2（versionCode 3），并在 `colors.xml` 补了 `silver` / `bronze`
-
-### 8.10 遥控器点不动：条目 focusable 会吃掉 OK 键 / Tab 只认 click
-
-- 现象一：海报墙里按 OK 没有任何反应，进不了详情页（`grid.setOnItemClickListener` 像失效）
-- 原因：`item_poster.xml` 根布局是 `focusable="true"`，AbsListView 因此认为「条目自己会处理按键」（`mItemsCanFocus=true`），OK 键被焦点所在的条目吞掉，`OnItemClickListener` 永远等不到
-- 解法：点击/按键监听要挂在**条目自身**上（`setOnClickListener` + `setOnKeyListener` 认 `DPAD_CENTER / ENTER / NUMPAD_ENTER`），同时要防重复打开，因为条目监听和 GridView 的 itemClick 可能都触发；**用布尔量 + `onResume` 复位，不要用时间窗**（600ms 时间窗会把「从详情页返回后立刻再点」一起吞掉，又变成要点两次）
-- 现象二：顶部 Tab 切换后列表不刷新
-- 原因：原来只挂了 `setOnClickListener`，而 `grid` 的 `nextFocusUp` 指向的 `tabs` 是**不可聚焦的容器**，焦点能不能落到某个 Tab 上取决于 ROM 的焦点搜索；而且只有按 OK 才切，遥控器左右移动时毫无反馈，看起来就是"点了没反应"
-- 解法：给每个 Tab `setId(View.generateViewId())`，用 `setNextFocusLeftId/RightId/DownId` 显式串焦点链；**焦点一落到 Tab 就 `selectTab()`**（左右扫过去内容立即变），再用 `setOnKeyListener` + `setOnClickListener` 兜底；`selectTab` 里同步更新 `grid.setNextFocusUpId(当前Tab)`，这样从网格往上走回到当前分类而不是跳回第一个
-- **规则：凡是动态生成的、要参与 D-pad 导航的控件，一律显式指定 id 和 nextFocus*，不要依赖 FocusFinder 猜**
-
-### 8.11 手机上「每个按钮都要点两次才进」——`focusableInTouchMode`
-
-- 现象：手机端点海报、点设置按钮、点片源行，第一下没反应，第二下才生效；TV 遥控器正常
-- 原因：布局里给条目根节点写了 `android:focusableInTouchMode="true"`。`View.onTouchEvent` 的 ACTION_DOWN 分支是：
-
-  ```java
-  if (isFocusable() && isFocusableInTouchMode() && !isFocused()) focusTaken = requestFocus();
-  ...
-  if (!focusTaken) performClick();   // 第一次点击只抢焦点，click 被跳过
-  ```
-
-  所以第一次点击只是让这个 View 拿到焦点，第二次才真正触发 click
-- 解法：**列表条目和按钮一律不要写 `focusableInTouchMode`**。TV 上（非触摸模式）靠 `focusable="true"` 就够；触摸模式下没有它，click 第一下就能触发
-- 唯一例外：`EditText` 必须保留，否则点上去不弹键盘
-- 已清：`item_poster` / `item_history` / `item_line` / `item_source` / `TopButton` 样式
-
-### 8.12 切换分类后列表不回顶部——`setSelection` 在触摸模式是空操作
-
-- 现象：手机上切「电影 / 剧集 / 动画」，下面的海报墙还停在原来那一屏
-- 原因：`AbsListView.setSelection()` 里
-
-  ```java
-  if (!isInTouchMode()) setNextSelectedPositionInt(position);
-  else mResurrectToPosition = position;   // 只记了个"待恢复位置"，不触发滚动
-  ```
-
-  触摸模式下它根本不滚，TV 上才有效
-- 解法：`grid.post { if (isInTouchMode()) smoothScrollToPosition(0) else setSelection(0) }`。
-  必须 `post` 到下一帧，让新数据先完成布局，否则会被 `notifyDataSetChanged` 的重排覆盖
+所有「现象 → 原因 → 解法」类的坑不再放在本文件，统一见 **`PITFALLS.md`**（构建工具链 / 4.4 兼容 / 数据接口 / UI 焦点 / 图标管线五类，P-01~P-14）。新坑也追加到那个文件。
 
 ---
 
@@ -503,13 +394,7 @@ echo "sdk.dir=D:\\Android\\Sdk" > local.properties
 | 改 1 个 .java 后 `assembleDebug` | 37 秒 |
 | `lintDebug` | 1 分 25 秒 |
 
-> ⚠️ **增量构建可能产出被污染的 APK（2026-11-07 实锤）**：assembleDebug 增量打包时
-> zipflinger 可能把陈旧的条目数据留在 zip 里——本地条目区混入孤儿数据（实测 2.84MB、
-> 44 个僵尸 zip 本地头，其中一个还是全零空头），中央目录不引用它们。
-> 表现：**APK 体积异常翻倍**（3.2MB → 6.07MB），dex 内容没变，能正常安装运行。
-> 识别：文件里 `PK\x03\x04` 本地头数远大于中央目录条目数（污染时 196 vs 149；
-> 正常包 150 vs 149，多出的 1 个是 dex 内数据的假阳性，历史包同样）。
-> 解法：**`clean assembleDebug` 重打**。构建后体积比上一版翻倍，先怀疑这个。
+> ⚠️ 增量构建可能产出被污染的 APK（体积翻倍、孤儿 zip 条目）——识别与解法见 `PITFALLS.md` P-01。
 
 装机：
 
@@ -685,8 +570,8 @@ node src/cli.js play <站id> <片名>
 
 - 所有可聚焦控件必须显式串 `nextFocusLeft/Right/Up/Down`（FocusFinder 在 TV 上不可靠）。
 - 焦点样式统一 `bg_tab`（2dp accent 描边 + 半透明底），卡片可叠加 1.07 放大。
-- 列表条目自己 `focusable="true"` 时，OK 键会被条目吃掉 —— 必须同时挂 `setOnKeyListener` + `setOnClickListener`（见 §8.10）。
-- 布局里**不要**给可点击控件写 `focusableInTouchMode="true"`（见 §8.11）。
+- 列表条目自己 `focusable="true"` 时，OK 键会被条目吃掉 —— 必须同时挂 `setOnKeyListener` + `setOnClickListener`（见 `PITFALLS.md` P-11）。
+- 布局里**不要**给可点击控件写 `focusableInTouchMode="true"`（见 `PITFALLS.md` P-12）。
 
 ---
 
@@ -1020,18 +905,9 @@ python tools/check_ids.py     # java 强转类型 vs 布局标签，防止改结
    24dp 时只有 4~5dp，等于看不见；30dp 时约 6dp，勉强可读。再小就必须考虑
    自绘更粗的字形（届时另开图标，不要靠加文字解决，用户已明确不要文字）。
 
-### 19.6 图标导出偏移（管线级 bug，别再犯）
+### 19.6 图标导出偏移
 
-`tools/fetch_material_icons.py` 的链路是 SVG → svglib 转 PDF → pdfium 光栅化。
-PDF 页面尺寸和图形 bbox 不一致，光栅化后**字形落在画布偏左下**：
-1.4.4 实测 96px 画布偏 (-12, +12)，缩到 72px 就是 (-9, +9)，即 1/8 画幅全错位。
-所有图标（返回、搜索、记录、刷新、设置、播放系列）都受影响。
-
-修法：渲染完先按 alpha bbox 裁出来、贴回画布正中再接缩放（`center_glyph()`），
-只改位置不改尺寸——Material 各图标的相对大小是设计好的，按 bbox 缩放会让
-`play_arrow` 这类形状失衡。
-
-配套自检 `tools/check_icons.py`（见 AGENTS.md §5.3）：偏差 ≤2% 画幅、字形占 40%~92%。
+管线级 bug（SVG→PDF→光栅化后字形偏左下）与修法 `center_glyph()` 见 **`PITFALLS.md` P-14**；交付前自检命令见 AGENTS.md §5.3。
 
 ---
 
