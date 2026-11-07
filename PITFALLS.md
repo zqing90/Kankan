@@ -142,4 +142,4 @@
 
 - 原因：`tools/fetch_material_icons.py` 的链路是 SVG → svglib 转 PDF → pdfium 光栅化。PDF 页面尺寸和图形 bbox 不一致，光栅化后**字形落在画布偏左下**：1.4.4 实测 96px 画布偏 (-12, +12)，缩到 72px 就是 (-9, +9)，即 1/8 画幅全错位。所有图标（返回、搜索、记录、刷新、设置、播放系列）都受影响
 - 修法：渲染完先按 alpha bbox 裁出来、贴回画布正中再接缩放（`center_glyph()`），只改位置不改尺寸——Material 各图标的相对大小是设计好的，按 bbox 缩放会让 `play_arrow` 这类形状失衡
-- 配套自检 `tools/check_icons.py`（见 AGENTS.md §5.3）：偏差 ≤2% 画幅、字形占 40%~92%
+- 配套自检 `tools/check_icons.py`：偏差 ≤2% 画幅、字形占 40%~92%

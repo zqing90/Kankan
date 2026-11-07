@@ -3,10 +3,6 @@
 > 这份文档写给「接手这个项目的 AI」或未来的自己。目标是：只读这一个文件，就能知道项目是什么、代码在哪、为什么这么写、哪些坑已经踩过、下一步该做什么。
 > 生成时间：2026-11-06 ｜ 最后更新：2026-11-07（1.4.8） ｜ 全部内容为本地可运行代码，无外部私有依赖。
 
-> **分工（2026-11-07 起）**：本文件只讲项目本身（是什么 / 结构 / 技术 / 原理）；
-> 硬性工作规则在 `AGENTS.md`（每次会话自动注入）+ `.workbuddy/memory/MEMORY.md`；
-> 所有「现象 → 原因 → 解法」的坑在 **`PITFALLS.md`**。新坑追加到 PITFALLS.md，不写回这里。
-
 ---
 
 ## 0. 一句话概括
@@ -353,9 +349,9 @@ vod_play_url 含 .m3u8  +5
 
 ---
 
-## 8. 踩坑笔记（已拆分）
+## 8. 踩坑笔记
 
-所有「现象 → 原因 → 解法」类的坑不再放在本文件，统一见 **`PITFALLS.md`**（构建工具链 / 4.4 兼容 / 数据接口 / UI 焦点 / 图标管线五类，P-01~P-14）。新坑也追加到那个文件。
+踩坑笔记（现象 → 原因 → 解法，P-01~P-14，覆盖构建工具链 / 4.4 兼容 / 数据接口 / UI 焦点 / 图标管线）单独放在 **`PITFALLS.md`**。
 
 ---
 
@@ -371,7 +367,7 @@ echo "sdk.dir=D:\\Android\\Sdk" > local.properties
 ./gradlew assembleDebug
 # 产物：app/build/outputs/apk/debug/app-debug.apk
 # 留档：dist/Kankan-1.4.0-debug.apk
-# 分发：E:\share\Kankan-1.4.0-debug.apk   ← 见 AGENTS.md §1（APK 分发铁律）
+# 分发：复制一份到对外分发目录（本机约定 E:\share\）
 ```
 
 环境（本机已装好，可直接构建）：
@@ -477,11 +473,10 @@ node src/cli.js play <站id> <片名>
 
 ---
 
-## 14. Git 仓库事实（工作规则见 AGENTS.md 与 .workbuddy/memory/MEMORY.md）
+## 14. Git 仓库事实
 
 - 仓库 `D:/code/kankan/.git`，**纯本地，无 remote**；长期分支 `main`（稳定基线）/ `dev`（当前工作分支，所有改动落这里）。
 - 提交身份是仓库局部配置 `kankan-dev <kankan@localhost>`，未写全局，不影响其他项目。
-- 分支策略、按改动选测试的映射表、交付话术等工作规则已移出本文件：见 `AGENTS.md` §1~§3 与 `.workbuddy/memory/MEMORY.md`。
 
 ---
 
@@ -907,7 +902,8 @@ python tools/check_ids.py     # java 强转类型 vs 布局标签，防止改结
 
 ### 19.6 图标导出偏移
 
-管线级 bug（SVG→PDF→光栅化后字形偏左下）与修法 `center_glyph()` 见 **`PITFALLS.md` P-14**；交付前自检命令见 AGENTS.md §5.3。
+管线级 bug（SVG→PDF→光栅化后字形偏左下）与修法 `center_glyph()` 见 **`PITFALLS.md` P-14**；
+交付前跑 `tools/check_icons.py` 自检：偏差 ≤2% 画幅、字形占 40%~92%。
 
 ---
 
