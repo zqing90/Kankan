@@ -413,7 +413,27 @@ node src/cli.js play <站id> <片名>
 
 浏览器开 `http://localhost:8765` 即海报墙。
 
-### 9.3 客户端切到服务端模式
+### 9.3 发布到 GitHub Release（可选）
+
+APK 不进仓库（`.gitignore` 排除了 `*.apk`），对外分发走 Release 附件，这样每次 clone 不用多下几 MB：
+
+```bash
+cd vod-tv
+python tools/release.py --dry-run     # 先看它打算做什么，不动远程
+python tools/release.py               # 按 app/build.gradle 的版本号发版
+```
+
+脚本按顺序做六件事，任一步不过就中止：① 确认 `main` 已包含 `dev` 全部提交 → ② 核对包内
+`versionName` 与目标版本一致（能找到 aapt2 时）→ ③ 跑 `check_apk` 的污染判定，脏包拒发 →
+④ 在 `main` 的 HEAD 上打 `v<version>` tag 并推送（失败重试 3 次，仍失败就中止，不会建出
+指向空 tag 的 Release）→ ⑤ 创建/更新 Release，正文自动取「上一版 tag 到本版」的提交标题 →
+⑥ 上传 APK 附件（同名资产先删后传）。
+
+凭证从 git 的 credential helper 现取，不需要装 `gh`。常用参数：`--notes NOTES.md`
+（在变更列表后插入手写说明）、`--draft`、`--prerelease`、`--allow-unmerged`、
+`--proxy http://127.0.0.1:端口`（`github.com:443` 不通而 `api.github.com` 通时用）。
+
+### 9.4 客户端切到服务端模式
 
 设置页填 `http://<电脑内网IP>:8765` → 保存 → 强制更新榜单。电视与电脑必须同局域网，**不能填 localhost**。
 
