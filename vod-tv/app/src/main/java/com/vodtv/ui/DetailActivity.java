@@ -46,6 +46,14 @@ public class DetailActivity extends Activity {
     private List<PlayResolver.PlayLine> currentLines = new java.util.ArrayList<PlayResolver.PlayLine>();
     private boolean inEpisodes = false;
 
+    /** 集数达到这个数才按组折叠；短剧保持平铺，折叠反而多一步操作 */
+    private static final int EP_GROUP_THRESHOLD = 50;
+    private static final int EP_GROUP_SIZE = 10;
+    /** 当前选集页展示的线路；组头开合只重建列表，不动它 */
+    private PlayResolver.PlayLine epLineShown;
+    /** 选集页的折叠组号集合，每次 showEpisodes 重新初始化 */
+    private final java.util.HashSet<Integer> collapsedEpGroups = new java.util.HashSet<Integer>();
+
     private TextView btnResume;
     private View btnBack;
     private TextView btnBackLabel;
@@ -430,6 +438,37 @@ public class DetailActivity extends Activity {
     private void showEpisodes(final PlayResolver.PlayLine l) {
         inEpisodes = true;
         if (btnBackLabel != null) btnBackLabel.setText("片源列表");
+        epLineShown = l;
+        collapsedEpGroups.clear();
+
+        // 默认只展开「上次看到」的那一组（没有记录就开第一组），其余全收起
+        if (l.eps.size() >= EP_GROUP_THRESHOLD) {
+            HistoryStore.Entry h = HistoryStore.get(title);
+            int lastIdx = -1;
+            if (h != null && l.sourceId != null && l.sourceId.equals(h.sourceId)) {
+                for (int i = 0; i < l.eps.size(); i++) {
+                    if (h.ep != null && h.ep.equals(l.eps.get(i).label)) {
+                        lastIdx = i;
+                        break;
+                    }
+                }
+            }
+            int openGroup = lastIdx >= 0 ? lastIdx / EP_GROUP_SIZE : 0;
+            for (int g = 0; g <= (l.eps.size() - 1) / EP_GROUP_SIZE; g++) {
+                if (g != openGroup) collapsedEpGroups.add(g);
+            }
+        }
+
+        renderEpisodes(-1);
+    }
+
+    /**
+     * 重建选集列表（返回片源列表那一行 + 组头 + 集数行）。
+     * 集数达到阈值时按 10 集一组插入可点开合的组头；toggleGroup >= 0 表示
+     * 刚点了第 toggleGroup 组的组头，重建后把焦点还给那个组头。
+     */
+    private void renderEpisodes(final int toggleGroup) {
+        final PlayResolver.PlayLine l = epLineShown;
         linesBox.removeAllViews();
         linesTitle.setText("选集 · " + l.sourceName + "（共 " + l.eps.size() + " 集）");
         scroll.scrollTo(0, 0);
@@ -449,40 +488,83 @@ public class DetailActivity extends Activity {
         });
         linesBox.addView(back, rowParams());
 
+        final boolean grouping = l.eps.size() >= EP_GROUP_THRESHOLD;
         View firstEp = null;
         View lastWatch = null;
+        View headerToFocus = null;
         final String lastPosText = (h != null && lastEp != null) ? h.posText() : "";
-        for (int i = 0; i < l.eps.size(); i++) {
-            final PlayResolver.Ep ep = l.eps.get(i);
-            final View row = LayoutInflater.from(this).inflate(R.layout.item_line, linesBox, false);
-            final TextView name = (TextView) row.findViewById(R.id.line_name);
-            final TextView spec = (TextView) row.findViewById(R.id.line_spec);
-            final TextView badge = (TextView) row.findViewById(R.id.line_badge);
 
-            name.setText(ep.label);
-            // 探针已解析过的那一集打个标，说明这条是确认能播的
-            if (ep.label != null && ep.label.equals(l.label)) {
-                badge.setVisibility(View.VISIBLE);
-                badge.setText("已验证");
-            }
-            boolean isLast = lastEp != null && lastEp.equals(ep.label);
-            spec.setText(isLast ? "上次看到 " + lastPosText : "");
-            if (isLast) lastWatch = row;
+        int i = 0;
+        int g = 0;
+        while (i < l.eps.size()) {
+            final int group = g;
+            final int start = i;
+            final int end = Math.min(i + EP_GROUP_SIZE, l.eps.size());
+            final boolean expanded = !grouping || !collapsedEpGroups.contains(group);
 
-            row.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    spec.setText("解析中…");
-                    resolveAndPlay(l, ep, spec);
+            if (grouping) {
+                View head = LayoutInflater.from(this).inflate(R.layout.item_line, linesBox, false);
+                ((TextView) head.findViewById(R.id.line_name)).setText(
+                        (expanded ? "▾ " : "▸ ") + "第 " + (start + 1) + " - " + end + " 集");
+                ((TextView) head.findViewById(R.id.line_spec)).setText("");
+                ((TextView) head.findViewById(R.id.line_badge)).setVisibility(View.GONE);
+                ((TextView) head.findViewById(R.id.line_stat)).setText("");
+                head.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (collapsedEpGroups.contains(group)) {
+                            collapsedEpGroups.remove(group);
+                        } else {
+                            collapsedEpGroups.add(group);
+                        }
+                        renderEpisodes(group);
+                    }
+                });
+                linesBox.addView(head, rowParams());
+                if (group == toggleGroup) headerToFocus = head;
+                if (!expanded) {
+                    g++;
+                    i = end;
+                    continue;
                 }
-            });
+            }
 
-            linesBox.addView(row, rowParams());
-            if (firstEp == null) firstEp = row;
+            for (; i < end; i++) {
+                final PlayResolver.Ep ep = l.eps.get(i);
+                final View row = LayoutInflater.from(this).inflate(R.layout.item_line, linesBox, false);
+                final TextView name = (TextView) row.findViewById(R.id.line_name);
+                final TextView spec = (TextView) row.findViewById(R.id.line_spec);
+                final TextView badge = (TextView) row.findViewById(R.id.line_badge);
+
+                // 上次看到的那集文字前打勾，和组头一起标出「你在哪」
+                name.setText(isLastWatch(lastEp, ep.label) ? "✓ " + ep.label : ep.label);
+                // 探针已解析过的那一集打个标，说明这条是确认能播的
+                if (ep.label != null && ep.label.equals(l.label)) {
+                    badge.setVisibility(View.VISIBLE);
+                    badge.setText("已验证");
+                }
+                boolean isLast = isLastWatch(lastEp, ep.label);
+                spec.setText(isLast ? "上次看到 " + lastPosText : "");
+                if (isLast) lastWatch = row;
+
+                row.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        spec.setText("解析中…");
+                        resolveAndPlay(l, ep, spec);
+                    }
+                });
+
+                linesBox.addView(row, rowParams());
+                if (firstEp == null) firstEp = row;
+            }
+            g++;
         }
 
-        // 有上次记录就直接把焦点放在那一集上，按 OK 就接着看
-        final View target = lastWatch != null ? lastWatch : firstEp;
+        // 有上次记录就直接把焦点放在那一集上，按 OK 就接着看；
+        // 刚点了组头就把焦点还给组头，不然重建后焦点会跳走
+        View target = toggleGroup >= 0 ? headerToFocus
+                : (lastWatch != null ? lastWatch : firstEp);
         if (target != null) {
             final View f = target;
             f.post(new Runnable() {
@@ -492,6 +574,10 @@ public class DetailActivity extends Activity {
                 }
             });
         }
+    }
+
+    private static boolean isLastWatch(String lastEp, String epLabel) {
+        return lastEp != null && lastEp.equals(epLabel);
     }
 
     private void resolveAndPlay(final PlayResolver.PlayLine l,

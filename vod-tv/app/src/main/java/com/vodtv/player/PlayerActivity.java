@@ -581,57 +581,25 @@ public class PlayerActivity extends Activity implements Player.Listener {
 
     /* ---------- 选集浮层 ---------- */
 
+    /** 集数达到这个数才按组折叠；短剧保持平铺，折叠反而多一步操作 */
+    private static final int EP_GROUP_THRESHOLD = 50;
+    private static final int EP_GROUP_SIZE = 10;
+    /** 浮层打开期间的折叠组号集合，每次 openEpisodes 重新初始化 */
+    private java.util.HashSet<Integer> collapsedEpGroups = new java.util.HashSet<Integer>();
+
     private void openEpisodes() {
         if (epLabels == null || epLabels.size() < 2) return;
 
-        epBox.removeAllViews();
+        collapsedEpGroups = new java.util.HashSet<Integer>();
         epTitle.setText("选集 · " + (sourceName == null ? "" : sourceName)
                 + "（共 " + epLabels.size() + " 集）");
 
-        int screenW = getResources().getDisplayMetrics().widthPixels;
-        final int cellW = dp(150);
-        final int cols = Math.max(3, (screenW - dp(90)) / cellW);
-
-        LinearLayout row = null;
-        for (int i = 0; i < epLabels.size(); i++) {
-            if (i % cols == 0) {
-                row = new LinearLayout(this);
-                row.setOrientation(LinearLayout.HORIZONTAL);
-                LinearLayout.LayoutParams rlp = new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT);
-                rlp.bottomMargin = dp(6);
-                epBox.addView(row, rlp);
+        // 默认只展开当前正在播的那一组，其余全收起；没在播态就开第一组
+        if (epLabels.size() >= EP_GROUP_THRESHOLD) {
+            int openGroup = epIndex >= 0 ? epIndex / EP_GROUP_SIZE : 0;
+            for (int g = 0; g <= (epLabels.size() - 1) / EP_GROUP_SIZE; g++) {
+                if (g != openGroup) collapsedEpGroups.add(g);
             }
-
-            final int idx = i;
-            TextView b = new TextView(this);
-            b.setText(epLabels.get(i));
-            b.setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX,
-                    getResources().getDimensionPixelSize(R.dimen.text_caption));
-            b.setTextColor(getResources().getColor(R.color.text_primary));
-            b.setPadding(dp(12), dp(9), dp(12), dp(9));
-            b.setBackgroundResource(R.drawable.bg_chip);
-            b.setFocusable(true);
-            b.setSingleLine(true);
-            b.setEllipsize(TextUtils.TruncateAt.END);
-            b.setGravity(android.view.Gravity.CENTER);
-            // 当前正在播的那一集用品牌蓝实底标出（bg_chip 的 selected 态），一眼能找到自己在哪
-            b.setSelected(i == epIndex);
-            b.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (idx == epIndex) {
-                        closeEpisodes();
-                    } else {
-                        switchEpisode(idx);
-                    }
-                }
-            });
-
-            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(cellW, LinearLayout.LayoutParams.WRAP_CONTENT);
-            lp.rightMargin = dp(6);
-            row.addView(b, lp);
         }
 
         epPanel.setVisibility(View.VISIBLE);
@@ -640,18 +608,128 @@ public class PlayerActivity extends Activity implements Player.Listener {
         if (f != null) f.clearFocus();
         handler.removeCallbacks(hideControls);
         // 焦点落在当前集上，省得用户在几十集里找
-        epPanel.post(new Runnable() {
-            @Override
-            public void run() {
-                int r = epIndex >= 0 ? epIndex / cols : 0;
-                int c = epIndex >= 0 ? epIndex % cols : 0;
-                if (r >= epBox.getChildCount()) return;
-                View rowView = epBox.getChildAt(r);
-                if (!(rowView instanceof LinearLayout)) return;
-                LinearLayout rl = (LinearLayout) rowView;
-                if (c < rl.getChildCount()) rl.getChildAt(c).requestFocus();
+        final View target = rebuildEpisodes(-1);
+        if (target != null) {
+            epPanel.post(new Runnable() {
+                @Override
+                public void run() {
+                    target.requestFocus();
+                }
+            });
+        }
+    }
+
+    /**
+     * 重建浮层里的集数格。
+     * 集数达到阈值时按 10 集一组插入可点开合的组头；toggleGroup >= 0 表示
+     * 刚点了第 toggleGroup 组的组头，重建后把焦点还给那个组头。
+     *
+     * @return 建议获得焦点的 View（初次打开 = 当前集格子，切换组 = 被点的组头），没有则 null
+     */
+    private View rebuildEpisodes(final int toggleGroup) {
+        epBox.removeAllViews();
+
+        int screenW = getResources().getDisplayMetrics().widthPixels;
+        final int cellW = dp(150);
+        final int cols = Math.max(3, (screenW - dp(90)) / cellW);
+        final int n = epLabels.size();
+        final boolean grouping = n >= EP_GROUP_THRESHOLD;
+
+        View currentChip = null;
+        View firstChip = null;
+        View headerToFocus = null;
+
+        int i = 0;
+        int g = 0;
+        while (i < n) {
+            final int group = g;
+            final int start = i;
+            final int end = Math.min(i + EP_GROUP_SIZE, n);
+            final boolean expanded = !grouping || !collapsedEpGroups.contains(group);
+
+            if (grouping) {
+                TextView h = new TextView(this);
+                h.setText((expanded ? "▾ " : "▸ ")
+                        + "第 " + (start + 1) + " - " + end + " 集");
+                h.setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX,
+                        getResources().getDimensionPixelSize(R.dimen.text_caption));
+                h.setTextColor(getResources().getColor(R.color.text_secondary));
+                h.setPadding(dp(12), dp(9), dp(12), dp(9));
+                h.setBackgroundResource(R.drawable.bg_chip);
+                h.setFocusable(true);
+                h.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (collapsedEpGroups.contains(group)) {
+                            collapsedEpGroups.remove(group);
+                        } else {
+                            collapsedEpGroups.add(group);
+                        }
+                        View t = rebuildEpisodes(group);
+                        if (t != null) t.requestFocus();
+                    }
+                });
+                LinearLayout.LayoutParams hlp = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT);
+                hlp.bottomMargin = dp(6);
+                epBox.addView(h, hlp);
+                if (group == toggleGroup) headerToFocus = h;
+                if (!expanded) {
+                    g++;
+                    i = end;
+                    continue;
+                }
             }
-        });
+
+            LinearLayout row = null;
+            for (; i < end; i++) {
+                if (i % cols == 0 || row == null) {
+                    row = new LinearLayout(this);
+                    row.setOrientation(LinearLayout.HORIZONTAL);
+                    LinearLayout.LayoutParams rlp = new LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.MATCH_PARENT,
+                            LinearLayout.LayoutParams.WRAP_CONTENT);
+                    rlp.bottomMargin = dp(6);
+                    epBox.addView(row, rlp);
+                }
+
+                final int idx = i;
+                TextView b = new TextView(this);
+                // 当前正在播的那一集：品牌蓝实底（bg_chip 的 selected 态）+ 文字前打勾，一眼能找到自己在哪
+                b.setText((i == epIndex ? "✓ " : "") + epLabels.get(i));
+                b.setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX,
+                        getResources().getDimensionPixelSize(R.dimen.text_caption));
+                b.setTextColor(getResources().getColor(R.color.text_primary));
+                b.setPadding(dp(12), dp(9), dp(12), dp(9));
+                b.setBackgroundResource(R.drawable.bg_chip);
+                b.setFocusable(true);
+                b.setSingleLine(true);
+                b.setEllipsize(TextUtils.TruncateAt.END);
+                b.setGravity(android.view.Gravity.CENTER);
+                b.setSelected(i == epIndex);
+                b.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (idx == epIndex) {
+                            closeEpisodes();
+                        } else {
+                            switchEpisode(idx);
+                        }
+                    }
+                });
+
+                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(cellW, LinearLayout.LayoutParams.WRAP_CONTENT);
+                lp.rightMargin = dp(6);
+                row.addView(b, lp);
+                if (firstChip == null) firstChip = b;
+                if (i == epIndex) currentChip = b;
+            }
+            g++;
+        }
+
+        if (toggleGroup >= 0) return headerToFocus;
+        return currentChip != null ? currentChip : firstChip;
     }
 
     private void closeEpisodes() {
