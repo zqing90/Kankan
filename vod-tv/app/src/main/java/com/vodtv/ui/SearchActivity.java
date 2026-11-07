@@ -22,6 +22,7 @@ import com.vodtv.data.PlayResolver;
 import com.vodtv.data.RankItem;
 import com.vodtv.data.RankRepository;
 import com.vodtv.data.SearchHistory;
+import com.vodtv.widget.FocusKit;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -158,6 +159,16 @@ public class SearchActivity extends Activity {
                 openAt(position);
             }
         });
+
+        // 结果网格同样要「焦点落在卡片上」：FocusFinder 从输入框/搜索图标往下走时，
+        // 命中的是 GridView 容器，卡片不会亮、OK 也不进详情（和首页 1.4.10 同一个坑）。
+        FocusKit.bindGrid(grid, null);
+        FocusKit.iconFx(findViewById(R.id.btn_go));
+
+        // 输入框是单行 EditText，↓ 必须先明确交给结果网格，
+        // 否则焦点可能在输入框里左右移光标，看着像「卡住了」
+        input.setNextFocusDownId(R.id.sgrid);
+        findViewById(R.id.btn_go).setNextFocusDownId(R.id.sgrid);
     }
 
     /* ---------- 最近搜索 ---------- */
@@ -168,6 +179,9 @@ public class SearchActivity extends Activity {
         List<String> hist = SearchHistory.list();
         boolean typing = input.getText().toString().trim().length() > 0;
         if (typing || hist.isEmpty()) {
+            // 面板一收，焦点若正停在某个历史标签上，会跟着 view 一起消失，
+            // 遥控器随即变成「按了没反应」。先交回输入框再藏。
+            if (historyPanel.hasFocus()) input.requestFocus();
             historyPanel.setVisibility(View.GONE);
             return;
         }

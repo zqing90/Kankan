@@ -23,6 +23,7 @@ import com.vodtv.R;
 import com.vodtv.data.HistoryStore;
 import com.vodtv.data.ImageLoader;
 import com.vodtv.data.PlayResolver;
+import com.vodtv.widget.FocusKit;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -100,6 +101,9 @@ public class HistoryActivity extends Activity {
                 }
             }
         });
+
+        // 遥控器焦点必须落到记录卡片上，不能停在 GridView 容器上（和首页、搜索结果同一个坑）
+        FocusKit.bindGrid(grid, null);
         grid.post(new Runnable() {
             @Override
             public void run() {
@@ -288,6 +292,18 @@ public class HistoryActivity extends Activity {
             done.setLayoutParams(a);
             rest.setLayoutParams(b);
             done.setVisibility(e.dur > 0 ? View.VISIBLE : View.GONE);
+
+            // 焦点反馈：与首页/搜索页的卡片同一套（1.06 放大），
+            // 只靠 bg_card 的 2dp 描边在 3 米外太弱，用户会说「看不出选中了」
+            v.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View view, boolean has) {
+                    float s = has ? 1.06f : 1f;
+                    view.animate().scaleX(s).scaleY(s).setDuration(120).start();
+                }
+            });
+            v.setScaleX(v.isFocused() ? 1.06f : 1f);
+            v.setScaleY(v.isFocused() ? 1.06f : 1f);
 
             // 条目自身 focusable，GridView 的 itemClick 收不到 OK，必须挂到这里
             v.setOnClickListener(new View.OnClickListener() {

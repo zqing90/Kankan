@@ -169,7 +169,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_md"
             android:fillViewport="true"
-            android:scrollbars="none">
+            android:scrollbars="none"
+            android:descendantFocusability="afterDescendants">
 
             <LinearLayout
                 android:id="@+id/p_buttons"
@@ -263,7 +264,8 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:layout_marginTop="@dimen/space_lg"
-            android:scrollbars="none">
+            android:scrollbars="none"
+            android:descendantFocusability="afterDescendants">
 
             <LinearLayout
                 android:id="@+id/ep_box"

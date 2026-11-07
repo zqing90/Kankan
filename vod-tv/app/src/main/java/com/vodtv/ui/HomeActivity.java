@@ -23,6 +23,7 @@ import com.vodtv.data.ImageLoader;
 import com.vodtv.data.Prefs;
 import com.vodtv.data.RankItem;
 import com.vodtv.data.RankRepository;
+import com.vodtv.widget.FocusKit;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -56,6 +57,13 @@ public class HomeActivity extends Activity {
     private int posterHeight = 0;         // 按列宽动态算，避免不同分辨率下高度失控
     /** 上一次真正持有焦点的卡片位置：从 tab 按 ↓ 回到海报墙时还停在原地，不弹回第一张 */
     private int lastFocusedPos = 0;
+    /** 给 FocusKit 读「上次停在哪张」用，写成字段避免每次按键都 new 一个匿名类 */
+    private final FocusKit.Position lastPosRef = new FocusKit.Position() {
+        @Override
+        public int get() {
+            return lastFocusedPos;
+        }
+    };
 
     /** tab 0：全部榜单合并去重后的列表（data 一变就重建） */
     private List<RankItem> hotAll = new ArrayList<RankItem>();
@@ -157,10 +165,10 @@ public class HomeActivity extends Activity {
         buildTabs();
         buildFindBar();
         // 四个顶栏图标都要有「看得见」的焦点态，否则遥控器选过去了也没反馈
-        bindIconFocus(btnSearch);
-        bindIconFocus(btnHistory);
-        bindIconFocus(btnRefresh);
-        bindIconFocus(btnSettings);
+        FocusKit.iconFx(btnSearch);
+        FocusKit.iconFx(btnHistory);
+        FocusKit.iconFx(btnRefresh);
+        FocusKit.iconFx(btnSettings);
 
         adapter = new PosterAdapter();
         // 列数必须在 setAdapter 之前定：GridView 在首次布局时才按 numColumns 摊格子，
@@ -193,41 +201,9 @@ public class HomeActivity extends Activity {
             }
         });
 
-        /*
-         * 焦点必须落在「卡片」上，不能停在 GridView 容器上。
-         *
-         * tab 的 nextFocusDown 直接指的就是 grid 这个 View，所以遥控器按 ↓ 时，
-         * 焦点是先给 GridView 容器的。容器拿着焦点时：
-         *   - 卡片自己的 focused 态（bg_poster 描边 + 1.06 放大）不会触发，看着「没选中」；
-         *   - 布局里把 listSelector 设成了透明（卡片自带描边），容器选中态也没有兜底高亮；
-         *   - 容器 mSelectedPosition 是 -1，按 OK 也不进详情。
-         * 用户 2026-11-07 反馈的「按 ↓ 选不到任何一张海报、进不了详情」就是这个。
-         *
-         * 三道保险，缺一不可：
-         *   1. 容器允许子项持有焦点（GridView 没有 ListView 的 setItemsCanFocus，
-         *      只有 descendantFocusability 这一个开关可用）；
-         *   2. 容器刚拿到焦点 → 主动把焦点转交给卡片；
-         *   3. 容器的选中回调里再兜一次（AbsListView 拿到焦点后会 setSelection，
-         *      onItemSelected 里的 view 就是要的那张卡片）。
-         */
-        grid.setDescendantFocusability(ViewGroup.FOCUS_AFTER_DESCENDANTS);
-        grid.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (hasFocus) handOffGridFocus();
-            }
-        });
-        grid.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(android.widget.AdapterView<?> parent, View view, int position, long id) {
-                // 容器还持有焦点、选中项却没聚焦 → 把焦点按到这张卡片上
-                if (view != null && !view.isFocused()) view.requestFocus();
-            }
-
-            @Override
-            public void onNothingSelected(android.widget.AdapterView<?> parent) {
-            }
-        });
+        // 焦点必须落在「卡片」上，不能停在 GridView 容器上 —— 三道保险的实现在 FocusKit，
+        // 搜索页、观看记录页共用同一份（2026-11-07 三个页面在电视上症状完全一样）。
+        FocusKit.bindGrid(grid, lastPosRef);
 
         btnRefresh.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -457,7 +433,7 @@ public class HomeActivity extends Activity {
                         // 末行（排序）的 ↓ 才进网格；上面的行走默认焦点搜索，落到下一行的 chip
                         View row = (View) v.getParent();
                         if (findRow.getChildAt(findRow.getChildCount() - 1) == row) {
-                            focusGrid();   // 直接 requestFocus 会停在 GridView 容器上，卡片收不到焦点
+                            FocusKit.focusGrid(grid, lastPosRef);
                             return true;
                         }
                         return false;
@@ -692,28 +668,6 @@ public class HomeActivity extends Activity {
         }
     }
 
-    /**
-     * 顶栏图标按钮的焦点反馈。
-     *
-     * 样式里 IconButton 的 alpha 是固定 0.72（让图标不抢标题重心），selector 里
-     * focused 只是把底色从 6% 白提到 12% 白 —— 深色背景 + 72% 透明，电视 3 米外
-     * 等于「看不出选中了没有」，用户反馈的「选中要给个效果」就是这个。
-     * 这里统一成和全站一样的：1.06 放大 + 提亮到不透明。
-     */
-    private void bindIconFocus(View v) {
-        final float idle = 0.72f;
-        v.setAlpha(idle);
-        v.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View view, boolean has) {
-                float s = has ? 1.06f : 1f;
-                view.animate().scaleX(s).scaleY(s).setDuration(120).start();
-                view.setAlpha(has ? 1f : idle);
-                view.setSelected(has);   // 让 selector 里的 state_selected 分支也能用
-            }
-        });
-    }
-
     private void selectTab(int idx) {
         if (idx < 0 || idx >= tabDefs.size()) return;
 
@@ -777,40 +731,6 @@ public class HomeActivity extends Activity {
     }
 
     /* ---------- 列表 ---------- */
-
-    /**
-     * GridView 容器刚拿到焦点：立刻转交给卡片。
-     *
-     * 优先回到上一次停留的那张（firstVisible + 偏移），没有再退到画面第一张。
-     * 不这么做的话，用户从 tab 按 ↓ 永远被弹回左上角第一张，滚到第 5 屏再按 ↑↓ 就白滚了。
-     */
-    private void handOffGridFocus() {
-        View child = pickGridChild();
-        if (child != null && child.requestFocus()) return;
-
-        // 首帧还没布局完（child 为 null）时，下一帧再试一次
-        grid.post(new Runnable() {
-            @Override
-            public void run() {
-                View c = pickGridChild();
-                if (c != null && !c.isFocused()) c.requestFocus();
-            }
-        });
-    }
-
-    private View pickGridChild() {
-        int idx = lastFocusedPos - grid.getFirstVisiblePosition();
-        View c = idx >= 0 ? grid.getChildAt(idx) : null;
-        return c != null ? c : grid.getChildAt(0);
-    }
-
-    /** 把焦点送进海报墙（给「找一找」筛选条的末行 ↓ 用，直接 requestFocus 会停在容器上） */
-    private void focusGrid() {
-        View child = pickGridChild();
-        if (child != null && child.requestFocus()) return;
-        grid.requestFocus();
-        handOffGridFocus();
-    }
 
     private List<RankItem> currentItems() {
         if (currentTab == 2) return findState().items;
