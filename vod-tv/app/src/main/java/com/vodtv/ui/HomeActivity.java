@@ -88,7 +88,28 @@ public class HomeActivity extends Activity {
             {"U", "最热"}, {"S", "高分"}, {"R", "最新"},
     };
 
-    private static final int GRID_COLS = 6;
+    /**
+     * 列数按**物理像素**算，不读 density、也不读 values 里的 grid_cols。
+     *
+     * 原因：电视面板的 densityDpi 各家乱报，同一个 1920x1080 面板有报 160 的、
+     * 也有报 320 的。报 320 时屏幕只有 540dp 宽，连 values-w520dp 的 7 列也会
+     * 被算成「每张 150dp」，而报 160 时又变成每张 274dp —— 看着完全不是同一个 App。
+     * 物理像素是唯一稳定的量：1920 宽就摆 7 张（每张约 250px），3 米外一行 7 个正好。
+     *
+     * 手机竖屏（1080x2340 这类）宽高比不满足下面任何一档，直接走 values/integers.xml。
+     */
+    private int resolveColumns(int widthPx, int heightPx) {
+        // 只有「横向大屏」才按像素加列数；竖屏手机哪怕 1440px 宽，宽 < 高，不受影响
+        boolean wide = widthPx > heightPx;
+        if (wide) {
+            if (widthPx >= 3200) return 11;   // 4K
+            if (widthPx >= 2560) return 9;    // 2K
+            if (widthPx >= 1920) return 7;    // 1080p
+            if (widthPx >= 1600) return 6;
+            if (widthPx >= 1280) return 5;    // 720p
+        }
+        return getResources().getInteger(R.integer.grid_cols);
+    }
 
     private final List<String[]> tabDefs = new ArrayList<String[]>();
     /** 和 tabDefs 一一对应的 TextView，用来控制焦点链和选中态 */
@@ -133,8 +154,17 @@ public class HomeActivity extends Activity {
 
         buildTabs();
         buildFindBar();
+        // 四个顶栏图标都要有「看得见」的焦点态，否则遥控器选过去了也没反馈
+        bindIconFocus(btnSearch);
+        bindIconFocus(btnHistory);
+        bindIconFocus(btnRefresh);
+        bindIconFocus(btnSettings);
 
         adapter = new PosterAdapter();
+        // 列数必须在 setAdapter 之前定：GridView 在首次布局时才按 numColumns 摊格子，
+        // 之后改列数要重建适配器才生效。
+        android.util.DisplayMetrics dm = getResources().getDisplayMetrics();
+        grid.setNumColumns(resolveColumns(dm.widthPixels, dm.heightPixels));
         grid.setAdapter(adapter);
         grid.post(new Runnable() {
             @Override
@@ -582,27 +612,68 @@ public class HomeActivity extends Activity {
         }
 
         // 显式把焦点链串起来，别指望 FocusFinder 自己猜（容器本身不可聚焦）
-        for (int i = 0; i < tabViews.size(); i++) {
+        bindTopbarFocus();
+        grid.setNextFocusUpId(tabViews.get(0).getId());
+    }
+
+    /**
+     * 顶栏一行的焦点闭环：
+     * <pre>
+     *   tab0 ←→ tab1 ←→ tab2（找一找） → 搜索 → 记录 → 更新 → 设置 → 回到 tab0
+     *   每个节点的 ↑ 都钉在自己身上（已经是最上面一行了）；↓ 一律回海报墙
+     * </pre>
+     *
+     * ★ 踩过的坑（2026-11-07 用户实测）：旧版为了让左右能在 tab 间环绕，
+     *   把最后一个 tab 的 nextFocusRight 设成了 tab0。结果整行被 tab 封成环，
+     *   遥控器按 → 只会在「豆瓣热榜 / 新品速递 / 找一找」里转圈，
+     *   右边那排搜索、记录、更新、设置**永远选不中**（它们只设了 nextFocusLeft，
+     *   而焦点移动只认「当前控件」的 nextFocusX，不认目标控件的）。
+     *   现在环绕改挂在两端：tab0 的 ← 去设置、设置的 → 回 tab0，
+     *   中间是单向直链，遥控器才能一路走到头。
+     */
+    private void bindTopbarFocus() {
+        final int n = tabViews.size();
+        if (n == 0) return;
+
+        final View[] icons = {btnSearch, btnHistory, btnRefresh, btnSettings};
+
+        for (int i = 0; i < n; i++) {
             TextView cur = tabViews.get(i);
-            int left = (i == 0) ? tabViews.size() - 1 : i - 1;
-            int right = (i == tabViews.size() - 1) ? 0 : i + 1;
-            cur.setNextFocusLeftId(tabViews.get(left).getId());
-            cur.setNextFocusRightId(tabViews.get(right).getId());
+            cur.setNextFocusLeftId(i == 0 ? btnSettings.getId() : tabViews.get(i - 1).getId());
+            cur.setNextFocusRightId(i == n - 1 ? btnSearch.getId() : tabViews.get(i + 1).getId());
             cur.setNextFocusDownId(R.id.grid);
+            cur.setNextFocusUpId(cur.getId());       // 顶行，再往上没有了：钉住自己，别让焦点乱跳
         }
-        if (!tabViews.isEmpty()) {
-            grid.setNextFocusUpId(tabViews.get(0).getId());
-            // 顶栏右侧是一排图标：分类最右 → 搜索 → 记录 → 更新 → 设置 → 回到分类最左
-            View lastTab = tabViews.get(tabViews.size() - 1);
-            btnSearch.setNextFocusLeftId(lastTab.getId());
-            btnSearch.setNextFocusRightId(btnHistory.getId());
-            btnHistory.setNextFocusLeftId(btnSearch.getId());
-            btnHistory.setNextFocusRightId(btnRefresh.getId());
-            btnRefresh.setNextFocusLeftId(btnHistory.getId());
-            btnRefresh.setNextFocusRightId(btnSettings.getId());
-            btnSettings.setNextFocusLeftId(btnRefresh.getId());
-            btnSettings.setNextFocusRightId(tabViews.get(0).getId());
+
+        for (int i = 0; i < icons.length; i++) {
+            View v = icons[i];
+            v.setNextFocusLeftId(i == 0 ? tabViews.get(n - 1).getId() : icons[i - 1].getId());
+            v.setNextFocusRightId(i == icons.length - 1 ? tabViews.get(0).getId() : icons[i + 1].getId());
+            v.setNextFocusUpId(v.getId());
+            v.setNextFocusDownId(R.id.grid);
         }
+    }
+
+    /**
+     * 顶栏图标按钮的焦点反馈。
+     *
+     * 样式里 IconButton 的 alpha 是固定 0.72（让图标不抢标题重心），selector 里
+     * focused 只是把底色从 6% 白提到 12% 白 —— 深色背景 + 72% 透明，电视 3 米外
+     * 等于「看不出选中了没有」，用户反馈的「选中要给个效果」就是这个。
+     * 这里统一成和全站一样的：1.06 放大 + 提亮到不透明。
+     */
+    private void bindIconFocus(View v) {
+        final float idle = 0.72f;
+        v.setAlpha(idle);
+        v.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean has) {
+                float s = has ? 1.06f : 1f;
+                view.animate().scaleX(s).scaleY(s).setDuration(120).start();
+                view.setAlpha(has ? 1f : idle);
+                view.setSelected(has);   // 让 selector 里的 state_selected 分支也能用
+            }
+        });
     }
 
     private void selectTab(int idx) {
