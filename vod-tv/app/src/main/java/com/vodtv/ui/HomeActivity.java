@@ -120,8 +120,6 @@ public class HomeActivity extends Activity {
         tabs = (LinearLayout) findViewById(R.id.tabs);
         findBar = findViewById(R.id.find_bar);
         findRow = (LinearLayout) findViewById(R.id.find_row);
-        findBar = findViewById(R.id.find_bar);
-        findRow = (LinearLayout) findViewById(R.id.find_row);
         status = (TextView) findViewById(R.id.status);
         empty = findViewById(R.id.empty);
         btnRefresh = findViewById(R.id.btn_refresh);
@@ -330,23 +328,30 @@ public class HomeActivity extends Activity {
         return st;
     }
 
-    /** 组装筛选条：类型 | 年份 | 排序，三组 chips，组间加竖线分隔 */
+    /** 组装筛选条：类型 / 年份 / 排序各占一行，行间留 4dp 间距 */
     private void buildFindBar() {
         findRow.removeAllViews();
         addChipGroup("类型", FIND_TYPES, findTags);
-        addDivider();
         addChipGroup("年份", FIND_YEARS, findYear);
-        addDivider();
         addChipGroup("排序", FIND_SORTS, findSort);
     }
 
     private void addChipGroup(String label, String[][] defs, String current) {
+        // 一个条件一行：行本身横向，标签 + 该组 chips 排在行内
+        LinearLayout row = new LinearLayout(this);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setGravity(android.view.Gravity.CENTER_VERTICAL);
+        LinearLayout.LayoutParams rowLp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        if (findRow.getChildCount() > 0) rowLp.topMargin = dp(4);
+        findRow.addView(row, rowLp);
+
         TextView lb = new TextView(this);
         lb.setText(label);
         lb.setTextSize(12);
         lb.setTextColor(getResources().getColor(R.color.text_tertiary));
         lb.setPadding(dp(10), 0, dp(4), 0);
-        findRow.addView(lb);
+        row.addView(lb);
 
         for (final String[] def : defs) {
             final boolean on = def[0].equals(current);
@@ -381,24 +386,19 @@ public class HomeActivity extends Activity {
                 @Override
                 public boolean onKey(View v, int keyCode, KeyEvent event) {
                     if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_DPAD_DOWN) {
-                        grid.requestFocus();
-                        return true;
+                        // 末行（排序）的 ↓ 才进网格；上面的行走默认焦点搜索，落到下一行的 chip
+                        View row = (View) v.getParent();
+                        if (findRow.getChildAt(findRow.getChildCount() - 1) == row) {
+                            grid.requestFocus();
+                            return true;
+                        }
+                        return false;
                     }
                     return false;
                 }
             });
-            findRow.addView(c);
+            row.addView(c);
         }
-    }
-
-    private void addDivider() {
-        View d = new View(this);
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(dp(1), dp(16));
-        lp.leftMargin = dp(6);
-        lp.rightMargin = dp(6);
-        d.setLayoutParams(lp);
-        d.setBackgroundColor(0xFF2A2F3A);
-        findRow.addView(d);
     }
 
     /** 视觉选中态：原地更新同组 chips，不重建视图——重建会把焦点一起销毁，遥控器就断链了 */
@@ -407,17 +407,23 @@ public class HomeActivity extends Activity {
         else if ("年份".equals(groupLabel)) findYear = value;
         else if ("排序".equals(groupLabel)) findSort = value;
 
-        for (int i = 0; i < findRow.getChildCount(); i++) {
-            View v = findRow.getChildAt(i);
-            Object tag = v.getTag();
-            if (!(v instanceof TextView) || tag == null) continue;
-            String t = String.valueOf(tag);
-            if (!t.startsWith("chip_" + groupLabel + "_")) continue;
-            String chipValue = t.substring(("chip_" + groupLabel + "_").length());
-            boolean on = chipValue.equals(value);
-            v.setSelected(on);
-            ((TextView) v).setTextColor(getResources().getColor(
-                    on ? R.color.text_primary : R.color.text_secondary));
+        // find_row 下是三行 LinearLayout，chip 都在行里，两级遍历
+        for (int r = 0; r < findRow.getChildCount(); r++) {
+            View row = findRow.getChildAt(r);
+            if (!(row instanceof ViewGroup)) continue;
+            ViewGroup g = (ViewGroup) row;
+            for (int i = 0; i < g.getChildCount(); i++) {
+                View v = g.getChildAt(i);
+                Object tag = v.getTag();
+                if (!(v instanceof TextView) || tag == null) continue;
+                String t = String.valueOf(tag);
+                if (!t.startsWith("chip_" + groupLabel + "_")) continue;
+                String chipValue = t.substring(("chip_" + groupLabel + "_").length());
+                boolean on = chipValue.equals(value);
+                v.setSelected(on);
+                ((TextView) v).setTextColor(getResources().getColor(
+                        on ? R.color.text_primary : R.color.text_secondary));
+            }
         }
     }
 
@@ -692,7 +698,7 @@ public class HomeActivity extends Activity {
             grid.setNextFocusUpId(tabId);
         }
 
-        // 找一找 tab：↓ 先落筛选条第一个 chip（chips 的 ↓ 在 onKey 里交给 grid）
+        // 找一找 tab：↓ 先落筛选条第一个 chip（chips 末行的 ↓ 在 onKey 里交给 grid）
         int chipId = firstChipId();
         for (int i = 0; i < tabViews.size(); i++) {
             tabViews.get(i).setNextFocusDownId(
@@ -702,11 +708,16 @@ public class HomeActivity extends Activity {
     }
 
     private int firstChipId() {
-        for (int i = 0; i < findRow.getChildCount(); i++) {
-            View v = findRow.getChildAt(i);
-            Object tag = v.getTag();
-            if (v.isFocusable() && tag != null && String.valueOf(tag).startsWith("chip_")) {
-                return v.getId();
+        for (int r = 0; r < findRow.getChildCount(); r++) {
+            View rowV = findRow.getChildAt(r);
+            if (!(rowV instanceof ViewGroup)) continue;
+            ViewGroup g = (ViewGroup) rowV;
+            for (int i = 0; i < g.getChildCount(); i++) {
+                View v = g.getChildAt(i);
+                Object tag = v.getTag();
+                if (v.isFocusable() && tag != null && String.valueOf(tag).startsWith("chip_")) {
+                    return v.getId();
+                }
             }
         }
         return View.NO_ID;
