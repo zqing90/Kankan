@@ -827,6 +827,24 @@ public class PlayerActivity extends Activity implements Player.Listener {
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
+        // 遥控器「菜单」键 = 选集浮层（2026-11-08 用户反馈：以前只能 ↑ 呼出控制栏再挪到「选集」按钮，
+        // 菜单键按下去毫无反应，看着像坏了）。浮层开着时再按一次收起，和按钮同义。
+        if (keyCode == KeyEvent.KEYCODE_MENU) {
+            if (epPanel.getVisibility() == View.VISIBLE) {
+                closeEpisodes();
+            } else if (epLabels != null && epLabels.size() > 1) {
+                openEpisodes();
+            } else if (msg.getVisibility() != View.VISIBLE) {
+                // 电影/单集没有选集可弹，得给一句反馈，否则用户以为菜单键又没反应。
+                // 正在缓冲/报错时不动 msg，免得把「缓冲中…」「播放失败」顶掉。
+                msg.setVisibility(View.VISIBLE);
+                msg.setText("本片只有一集，没有选集");
+                handler.removeCallbacks(hideMsg);
+                handler.postDelayed(hideMsg, 2000);
+            }
+            return true;
+        }
+
         // 选集浮层开着：返回关浮层，其余交给浮层里的按钮自己处理
         if (epPanel.getVisibility() == View.VISIBLE) {
             if (keyCode == KeyEvent.KEYCODE_BACK) {

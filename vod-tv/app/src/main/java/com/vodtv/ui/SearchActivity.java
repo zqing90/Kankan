@@ -171,6 +171,13 @@ public class SearchActivity extends Activity {
         findViewById(R.id.btn_go).setNextFocusDownId(R.id.sgrid);
     }
 
+    /** 兜底：方向键在页面分发阶段再拦一次（实现见 FocusKit.handleGridKey，只在焦点位于结果卡片上时生效） */
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        if (grid != null && FocusKit.handleGridKey(grid, event.getKeyCode(), event)) return true;
+        return super.dispatchKeyEvent(event);
+    }
+
     /* ---------- 最近搜索 ---------- */
 
     /** 输入框有内容、或历史为空时，整块隐藏 */
@@ -569,7 +576,8 @@ public class SearchActivity extends Activity {
                     openAt(pos);
                 }
             });
-            v.setOnKeyListener(new View.OnKeyListener() {
+            // 方向键交给 FocusKit（否则屏幕上只剩两排、按 ↓ 不滚），OK 仍走页面自己
+            FocusKit.bindCardKey(grid, v, new View.OnKeyListener() {
                 @Override
                 public boolean onKey(View view, int keyCode, KeyEvent event) {
                     if (event.getAction() == KeyEvent.ACTION_UP && isConfirmKey(keyCode)) {

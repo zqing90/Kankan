@@ -914,7 +914,9 @@ public class HomeActivity extends Activity {
                     openDetailAt(pos);
                 }
             });
-            v.setOnKeyListener(new View.OnKeyListener() {
+            // 方向键统一交给 FocusKit：它算目标格、转交焦点、必要时滚一格（详见 bindCardKey 注释）；
+            // OK 键仍然走页面自己的逻辑
+            FocusKit.bindCardKey(grid, v, new View.OnKeyListener() {
                 @Override
                 public boolean onKey(View view, int keyCode, KeyEvent event) {
                     if (event.getAction() == KeyEvent.ACTION_UP && isConfirmKey(keyCode)) {
@@ -935,6 +937,19 @@ public class HomeActivity extends Activity {
 
     private int dp(int v) {
         return (int) (v * getResources().getDisplayMetrics().density + 0.5f);
+    }
+
+    /**
+     * 兜底：方向键在页面分发阶段再拦一次。
+     *
+     * 正常情况下卡片自己的 key 监听已经处理完了（见 FocusKit.bindCardKey），走不到这里；
+     * 但个别 ROM 的按键分发路径和原生不一致（海信 4.4 上就出现过），多这一层不用改别处。
+     * handleGridKey 只在「焦点真在网格卡片上」时才返回 true，顶栏 tab、筛选条、输入框都不受影响。
+     */
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        if (grid != null && FocusKit.handleGridKey(grid, event.getKeyCode(), event)) return true;
+        return super.dispatchKeyEvent(event);
     }
 
     @Override

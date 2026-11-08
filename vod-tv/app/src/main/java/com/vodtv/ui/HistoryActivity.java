@@ -131,6 +131,13 @@ public class HistoryActivity extends Activity {
         reload();   // 从详情/播放页回来，进度已经变了
     }
 
+    /** 兜底：方向键在页面分发阶段再拦一次（实现见 FocusKit.handleGridKey，只在焦点位于记录卡片上时生效） */
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        if (grid != null && FocusKit.handleGridKey(grid, event.getKeyCode(), event)) return true;
+        return super.dispatchKeyEvent(event);
+    }
+
     /* ---------- 数据 ---------- */
 
     private void reload() {
@@ -304,7 +311,8 @@ public class HistoryActivity extends Activity {
                     resume(e);
                 }
             });
-            v.setOnKeyListener(new View.OnKeyListener() {
+            // 方向键交给 FocusKit（否则屏幕外的行永远接不到焦点），OK/菜单仍走页面自己
+            FocusKit.bindCardKey(grid, v, new View.OnKeyListener() {
                 @Override
                 public boolean onKey(View view, int keyCode, KeyEvent event) {
                     if (event.getAction() != KeyEvent.ACTION_UP) return false;
