@@ -21,7 +21,8 @@ import android.widget.GridView;
  * 两条路最后都落在容器上，所以三个页面症状一模一样。
  *
  * 解决思路统一成四步：允许子项持焦 → 容器拿到焦点就转交 → 选中回调里再兜一次
- * → 方向键自己算目标格并自己滚动（1.4.13 补：子项持焦时系统不会替网格滚，见 onGridKey）。
+ * → 方向键自己算目标格并自己滚动（1.4.13/1.4.14 补，见 {@link #handleGridKey}；
+ *   注意监听器必须挂在**卡片**上，容器收不到方向键，见 {@link #bindCardKey}）。
  */
 public final class FocusKit {
 
@@ -71,11 +72,38 @@ public final class FocusKit {
             }
         });
 
-        // 4. 方向键：卡片自己持焦时系统不会替网格滚动，必须自己算目标格（见 onGridKey）
+        // 4. 方向键：卡片自己持焦时系统不会替网格滚动，必须自己算目标格（见 handleGridKey）
         grid.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
-                return onGridKey(grid, keyCode, event);
+                return handleGridKey(grid, keyCode, event);
+            }
+        });
+    }
+
+    /**
+     * 给一张海报卡挂上方向键处理，其它按键原样交给页面自己的监听器。
+     *
+     * 为什么必须挂在卡片上、而不能挂在 GridView 上（1.4.14 血教训）：
+     * 方向键只会送到「当前持焦的那个 View」。容器 {@code ViewGroup.dispatchKeyEvent} 的源码是
+     * <pre>
+     * } else if (mFocused != null && ...) {
+     *     if (mFocused.dispatchKeyEvent(event)) return true;   // 派给子视图
+     * }
+     * return false;                                            // 自己不再处理
+     * </pre>
+     * 也就是说子视图持焦时，容器**自己的** OnKeyListener / onKeyDown 根本不会被调用。
+     * 1.4.13 把监听器挂在 GridView 上，所以海信电视上一点效果都没有（焦点仍只在第一屏内走）。
+     *
+     * @param rest 页面原本的按键逻辑（OK 进详情、菜单删记录等），方向键已在内部处理完
+     */
+    public static void bindCardKey(final GridView grid, final View card,
+                                   final View.OnKeyListener rest) {
+        card.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (handleGridKey(grid, v, keyCode, event)) return true;
+                return rest != null && rest.onKey(v, keyCode, event);
             }
         });
     }
@@ -89,6 +117,9 @@ public final class FocusKit {
 
     /**
      * 遥控器方向键：算出「下一格是哪一格」，转交焦点，并保证它真的露在屏幕上。
+     * 卡片（{@link #bindCardKey}）、容器（{@link #bindGrid} 第四步）、以及页面
+     * {@code dispatchKeyEvent} 兜底都走这一份实现 —— 三个入口命中的是同一个逻辑，
+     * 不会出现「某个页面又漏了」。
      *
      * 为什么要自己接（1.4.13，2026-11-08 用户上报「海报墙只能显示第一屏，按 ↓ 不往下滚」）：
      * 卡片是 focusable 的，方向键落到卡片的 View.onKeyDown 上没人处理，于是交给系统的
@@ -102,7 +133,15 @@ public final class FocusKit {
      * ↓ 到最后一格、↑ 到第一行（回顶栏靠布局里写好的 nextFocusUp）、←→ 撞行首行尾，
      * 都保持原有链路，顶栏/筛选条不受影响。
      */
-    private static boolean onGridKey(final GridView grid, int keyCode, KeyEvent event) {
+    public static boolean handleGridKey(final GridView grid, int keyCode, KeyEvent event) {
+        return handleGridKey(grid, null, keyCode, event);
+    }
+
+    /**
+     * @param card 已知是哪张卡时直接传进来（卡片自己的 key 监听）：位置按视图反查，
+     *             不依赖容器的焦点状态；传 null 则从容器当前焦点推算
+     */
+    private static boolean handleGridKey(final GridView grid, View card, int keyCode, KeyEvent event) {
         if (event.getAction() != KeyEvent.ACTION_DOWN) return false;
 
         final int dir;
@@ -124,7 +163,8 @@ public final class FocusKit {
         }
 
         if (grid.getAdapter() == null) return false;
-        int pos = focusedPosition(grid);
+        // getPositionForView 找不到时返回 INVALID_POSITION(-1)，正好和「焦点不在卡片上」同一个出口
+        int pos = card != null ? grid.getPositionForView(card) : focusedPosition(grid);
         if (pos < 0) return false;
 
         int count = grid.getAdapter().getCount();

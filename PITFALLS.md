@@ -169,11 +169,16 @@
   容器不持焦也没有兜底高亮，所以现象就是「按了没反应」
 - **注意返工教训**：1.4.9~1.4.12 修的是「焦点能不能落到卡片上」（`FocusKit` 前三步），
   完全没覆盖「落到卡片上之后还能不能继续往下走」——同一个页面被反馈两次，第二次才补上
-- 解法（`FocusKit.bindGrid` 第四步，1.4.13）：方向键自己接管
+- 解法（`FocusKit.handleGridKey`，1.4.13 起草、1.4.14 修正落点）：方向键自己接管
   1. 算目标格（↓ +列数 / ↑ -列数 / ←→ ±1，撞行首行尾返回 `false`）；
   2. `child.requestFocus()`，再用 `reveal()` 把它整张滚进可见区；
   3. 目标格还没建视图 → 先按「一行高度」滚一次，滚完再转交焦点（`postDelayed` 分次重试，
      滚动是动画，视图要滚进去才会被 layout）；
   4. 越界（↓ 到底 / ↑ 到第一行）返回 `false` 交回系统，`nextFocusUp` 回顶栏的链路不变
+- **监听器必须挂在「卡片」上，挂在 GridView 上完全无效**（1.4.13 就是这么翻车的，用户当晚反馈"还是不能下翻"）：
+  `ViewGroup.dispatchKeyEvent` 在子视图持焦时只做 `mFocused.dispatchKeyEvent(event)`，
+  拿到结果直接 return，**再也不会调用容器自己的 `OnKeyListener` / `onKeyDown`**。
+  正确落点是每张卡（`FocusKit.bindCardKey(grid, card, 页面自己的监听器)`），
+  再在三个页面的 `dispatchKeyEvent` 里加一层同样的兜底（个别 ROM 派发路径不同）
 - 配套细节：行高按「屏幕上两行的 top 差」实测，**不要读 dimen**（首页 16dp、记录页 space_md 各不同）；
   `smoothScrollBy(int distance, int duration)` 的 duration 是 `int`，写成 long 直接编译失败
